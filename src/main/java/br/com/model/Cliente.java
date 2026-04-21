@@ -28,7 +28,7 @@ public class Cliente {
     private List<Endereco> enderecos; // Relacionamento 1:N
 
     // Construtor para padronizar 
-    public Parceiro() {
+    public Cliente() {
         this.ativo = true;
         this.criadoEm = LocalDateTime.now();
     }
@@ -83,11 +83,11 @@ public class Cliente {
         this.tipoPessoa = tipoPessoa;
     }
 
-    public TipoParceiro getTipoEntrega() {
+    public TipoEntrega getTipoEntrega() {
         return tipoEntrega;
     }
 
-    public void setTipo(TipoParceiro tipoEntrega) {
+    public void setTipo(TipoEntrega tipoEntrega) {
         this.tipoEntrega = tipoEntrega;
     }
 
