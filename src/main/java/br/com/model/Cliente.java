@@ -2,10 +2,15 @@ import java.time.LocalDateTime;
 
 public class Cliente {
 
-    public enum Tipo{
+    public enum TipoEntrega{
         REMETENTE,
         DESTINATARIO,
         AMBOS
+    }
+
+    public enum TipoPessoa {
+        FISICA,
+        JURIDICA
     }
 
     private Integer id;
@@ -13,7 +18,8 @@ public class Cliente {
     private String nomeFantasia;
     private String cnpj;
     private String inscricaoEstadual;
-    private Tipo tipoEntrega;
+    private TipoPessoa tipoPessoa;
+    private TipoEntrega tipoEntrega;
     private String email;
     private String telefone;
     private boolean ativo;
@@ -67,6 +73,14 @@ public class Cliente {
 
     public void setInscricaoEstadual(String inscricaoEstadual) {
         this.inscricaoEstadual = inscricaoEstadual;
+    }
+
+    public TipoPessoa getTipoPessoa() {
+        return tipoPessoa;
+    }
+
+    public void setTipoPessoa(TipoPessoa tipoPessoa) {
+        this.tipoPessoa = tipoPessoa;
     }
 
     public TipoParceiro getTipoEntrega() {
