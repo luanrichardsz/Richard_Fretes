@@ -1,4 +1,5 @@
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Veiculo {
 
@@ -164,4 +165,22 @@ public class Veiculo {
     public void setMotoristaId(Integer motoristaId) {
         this.motoristaId = motoristaId;
     }
+
+    public boolean isManutencaoPendente() {
+        return manutencaoPendente;
+    }
+
+    public void setManutencaoPendente(boolean manutencaoPendente) {
+        this.manutencaoPendente = manutencaoPendente;
+    }
+
+    public LocalDate getSeguroValidade() {
+        return seguroValidade;
+    }
+
+    public void setSeguroValidade(LocalDate seguroValidade) {
+        this.seguroValidade = seguroValidade;
+    }
+
+
 }

@@ -1,4 +1,6 @@
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Cliente {
 
@@ -31,6 +33,7 @@ public class Cliente {
     public Cliente() {
         this.ativo = true;
         this.criadoEm = LocalDateTime.now();
+        this.enderecos = new ArrayList<>();
     }
 
     // Getters e Setters
