@@ -4,7 +4,6 @@ import br.com.connection.ConnectionFactory;
 import br.com.model.Cliente;
 import br.com.model.Cliente.TipoEntrega;
 import br.com.model.Cliente.TipoPessoa;
-import br.com.model.Endereco;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,14 +12,14 @@ import java.util.List;
 public class ClienteDAO extends ConnectionFactory {
 
     public void salvar(Cliente cliente) {
-        String sql = "INSERT INTO cliente (razao_social, nome_fantasia, cnpj, inscricao_estadual, tipo_pessoa, tipo_entrega, email, telefone, ativo, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cliente (razao_social, nome_fantasia, documento, inscricao_estadual, tipo_pessoa, tipo_entrega, email, telefone, ativo, criado_em) VALUES (?, ?, ?, ?, ?::tipo_pessoa_enum, ?::tipo_entrega_enum, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, cliente.getRazaoSocial());
             stmt.setString(2, cliente.getNomeFantasia());
-            stmt.setString(3, cliente.getCnpj());
+            stmt.setString(3, cliente.getDocumento());
             stmt.setString(4, cliente.getInscricaoEstadual());
             stmt.setString(5, cliente.getTipoPessoa() != null ? cliente.getTipoPessoa().name() : null);
             stmt.setString(6, cliente.getTipoEntrega() != null ? cliente.getTipoEntrega().name() : null);
@@ -42,14 +41,14 @@ public class ClienteDAO extends ConnectionFactory {
     }
 
     public void atualizar(Cliente cliente) {
-        String sql = "UPDATE cliente SET razao_social = ?, nome_fantasia = ?, cnpj = ?, inscricao_estadual = ?, tipo_pessoa = ?, tipo_entrega = ?, email = ?, telefone = ?, ativo = ? WHERE id = ?";
+        String sql = "UPDATE cliente SET razao_social = ?, nome_fantasia = ?, documento = ?, inscricao_estadual = ?, tipo_pessoa = ?, tipo_entrega = ?, email = ?, telefone = ?, ativo = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, cliente.getRazaoSocial());
             stmt.setString(2, cliente.getNomeFantasia());
-            stmt.setString(3, cliente.getCnpj());
+            stmt.setString(3, cliente.getDocumento());
             stmt.setString(4, cliente.getInscricaoEstadual());
             stmt.setString(5, cliente.getTipoPessoa() != null ? cliente.getTipoPessoa().name() : null);
             stmt.setString(6, cliente.getTipoEntrega() != null ? cliente.getTipoEntrega().name() : null);
@@ -79,7 +78,7 @@ public class ClienteDAO extends ConnectionFactory {
                     cliente.setId(rs.getInt("id"));
                     cliente.setRazaoSocial(rs.getString("razao_social"));
                     cliente.setNomeFantasia(rs.getString("nome_fantasia"));
-                    cliente.setCnpj(rs.getString("cnpj"));
+                    cliente.setDocumento(rs.getString("documento"));
                     cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
                     cliente.setTipoPessoa(TipoPessoa.valueOf(rs.getString("tipo_pessoa")));
                     cliente.setTipo(TipoEntrega.valueOf(rs.getString("tipo_entrega")));
@@ -109,7 +108,7 @@ public class ClienteDAO extends ConnectionFactory {
                 cliente.setId(rs.getInt("id"));
                 cliente.setRazaoSocial(rs.getString("razao_social"));
                 cliente.setNomeFantasia(rs.getString("nome_fantasia"));
-                cliente.setCnpj(rs.getString("cnpj"));
+                cliente.setDocumento(rs.getString("documento"));
                 cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
                 cliente.setTipoPessoa(TipoPessoa.valueOf(rs.getString("tipo_pessoa")));
                 cliente.setTipo(TipoEntrega.valueOf(rs.getString("tipo_entrega")));
