@@ -14,7 +14,7 @@ import java.util.List;
 public class MotoristaDAO extends ConnectionFactory {
 
     public void salvar(Motorista motorista) {
-        String sql = "INSERT INTO motorista (nome_completo, rg, cpf, data_nascimento, telefone, nome_emergencia, telefone_emergencia, parentesco_emergencia, numero_cnh, categoria_cnh, validade_cnh, validade_toxicologico, tipo_vinculo, chave_pix, tipo_pix, status, adicionado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO motorista (nome_completo, rg, cpf, data_nascimento, telefone, nome_emergencia, telefone_emergencia, parentesco_emergencia, numero_cnh, categoria_cnh, validade_cnh, validade_toxicologico, tipo_vinculo, chave_pix, tipo_pix, status, adicionado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::categoria_cnh_enum, ?, ?, ?::tipo_vinculo_enum, ?, ?::tipo_pix_enum, ?, ?::status_motorista_enum)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -50,7 +50,7 @@ public class MotoristaDAO extends ConnectionFactory {
     }
 
     public void atualizar(Motorista motorista) {
-        String sql = "UPDATE motorista SET nome_completo = ?, rg = ?, cpf = ?, data_nascimento = ?, telefone = ?, nome_emergencia = ?, telefone_emergencia = ?, parentesco_emergencia = ?, numero_cnh = ?, categoria_cnh = ?, validade_cnh = ?, validade_toxicologico = ?, tipo_vinculo = ?, chave_pix = ?, tipo_pix = ?, status = ? WHERE id = ?";
+        String sql = "UPDATE motorista SET nome_completo = ?, rg = ?, cpf = ?, data_nascimento = ?, telefone = ?, nome_emergencia = ?, telefone_emergencia = ?, parentesco_emergencia = ?, numero_cnh = ?, categoria_cnh = ?::categoria_cnh_enum, validade_cnh = ?, validade_toxicologico = ?, tipo_vinculo = ?::tipo_vinculo_enum, chave_pix = ?, tipo_pix = ?::tipo_pix_enum, status = ?::status_motorista_enum WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

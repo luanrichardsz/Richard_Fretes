@@ -11,7 +11,7 @@ import java.util.List;
 public class FreteDAO extends ConnectionFactory {
 
     public void salvar(Frete frete) {
-        String sql = "INSERT INTO frete (numero_frete, remetente_id, destinatario_id, endereco_origem_id, endereco_destino_id, motorista_id, veiculo_id, chave_nfe, origem_ibge, destino_ibge, natureza_carga, peso_bruto, volumes, valor_frete_bruto, valor_pedagio, aliquota_icms, valor_icms, valor_total, status, data_emissao, previsao_entrega, motivo_falha, data_saida, data_entrega, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO frete (numero_frete, remetente_id, destinatario_id, endereco_origem_id, endereco_destino_id, motorista_id, veiculo_id, chave_nfe, origem_ibge, destino_ibge, natureza_carga, peso_bruto, volumes, valor_frete_bruto, valor_pedagio, aliquota_icms, valor_icms, valor_total, status, data_emissao, previsao_entrega, motivo_falha, data_saida, data_entrega, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::status_frete_enum, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -55,7 +55,7 @@ public class FreteDAO extends ConnectionFactory {
     }
 
     public void atualizar(Frete frete) {
-        String sql = "UPDATE frete SET numero_frete = ?, remetente_id = ?, destinatario_id = ?, endereco_origem_id = ?, endereco_destino_id = ?, motorista_id = ?, veiculo_id = ?, chave_nfe = ?, origem_ibge = ?, destino_ibge = ?, natureza_carga = ?, peso_bruto = ?, volumes = ?, valor_frete_bruto = ?, valor_pedagio = ?, aliquota_icms = ?, valor_icms = ?, valor_total = ?, status = ?, previsao_entrega = ?, motivo_falha = ?, data_saida = ?, data_entrega = ?, distancia_km = ? WHERE id = ?";
+        String sql = "UPDATE frete SET numero_frete = ?, remetente_id = ?, destinatario_id = ?, endereco_origem_id = ?, endereco_destino_id = ?, motorista_id = ?, veiculo_id = ?, chave_nfe = ?, origem_ibge = ?, destino_ibge = ?, natureza_carga = ?, peso_bruto = ?, volumes = ?, valor_frete_bruto = ?, valor_pedagio = ?, aliquota_icms = ?, valor_icms = ?, valor_total = ?, status = ?::status_frete_enum, previsao_entrega = ?, motivo_falha = ?, data_saida = ?, data_entrega = ?, distancia_km = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

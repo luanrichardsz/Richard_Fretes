@@ -41,7 +41,7 @@ public class ClienteDAO extends ConnectionFactory {
     }
 
     public void atualizar(Cliente cliente) {
-        String sql = "UPDATE cliente SET razao_social = ?, nome_fantasia = ?, documento = ?, inscricao_estadual = ?, tipo_pessoa = ?, tipo_entrega = ?, email = ?, telefone = ?, ativo = ? WHERE id = ?";
+        String sql = "UPDATE cliente SET razao_social = ?, nome_fantasia = ?, documento = ?, inscricao_estadual = ?, tipo_pessoa = ?::tipo_pessoa_enum, tipo_entrega = ?::tipo_entrega_enum, email = ?, telefone = ?, ativo = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

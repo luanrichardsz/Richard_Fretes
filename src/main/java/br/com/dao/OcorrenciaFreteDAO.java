@@ -11,7 +11,7 @@ import java.util.List;
 public class OcorrenciaFreteDAO extends ConnectionFactory {
 
     public void salvar(OcorrenciaFrete ocorrencia) {
-        String sql = "INSERT INTO ocorrencia_frete (frete_id, tipo, data_hora, municipio, uf, latitude, longitude, descricao, recebedor_nome, recebedor_documento, foto_evidencia_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ocorrencia_frete (frete_id, tipo, data_hora, municipio, uf, latitude, longitude, descricao, recebedor_nome, recebedor_documento, foto_evidencia_url) VALUES (?, ?::tipo_ocorrencia_enum, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -41,7 +41,7 @@ public class OcorrenciaFreteDAO extends ConnectionFactory {
     }
 
     public void atualizar(OcorrenciaFrete ocorrencia) {
-        String sql = "UPDATE ocorrencia_frete SET frete_id = ?, tipo = ?, data_hora = ?, municipio = ?, uf = ?, latitude = ?, longitude = ?, descricao = ?, recebedor_nome = ?, recebedor_documento = ?, foto_evidencia_url = ? WHERE id = ?";
+        String sql = "UPDATE ocorrencia_frete SET frete_id = ?, tipo = ?::tipo_ocorrencia_enum, data_hora = ?, municipio = ?, uf = ?, latitude = ?, longitude = ?, descricao = ?, recebedor_nome = ?, recebedor_documento = ?, foto_evidencia_url = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

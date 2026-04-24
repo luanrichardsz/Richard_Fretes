@@ -11,7 +11,7 @@ import java.util.List;
 public class VeiculoDAO extends ConnectionFactory {
 
     public void salvar(Veiculo veiculo) {
-        String sql = "INSERT INTO veiculo (placa, renavam, rntrc, ano_fabricacao, ano_modelo, tipo, tipo_outros, quantidade_eixos, combustivel, tara_kg, capacidade_carga_kg, volume_m3, status, adicionado_em, motorista_id, manutencao_pendente, seguro_validade) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO veiculo (placa, renavam, rntrc, ano_fabricacao, ano_modelo, tipo, tipo_outros, quantidade_eixos, combustivel, tara_kg, capacidade_carga_kg, volume_m3, status, adicionado_em, motorista_id, manutencao_pendente, seguro_validade) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::status_veiculo_enum, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -47,7 +47,7 @@ public class VeiculoDAO extends ConnectionFactory {
     }
 
     public void atualizar(Veiculo veiculo) {
-        String sql = "UPDATE veiculo SET placa = ?, renavam = ?, rntrc = ?, ano_fabricacao = ?, ano_modelo = ?, tipo = ?, tipo_outros = ?, quantidade_eixos = ?, combustivel = ?, tara_kg = ?, capacidade_carga_kg = ?, volume_m3 = ?, status = ?, motorista_id = ?, manutencao_pendente = ?, seguro_validade = ? WHERE id = ?";
+        String sql = "UPDATE veiculo SET placa = ?, renavam = ?, rntrc = ?, ano_fabricacao = ?, ano_modelo = ?, tipo = ?, tipo_outros = ?, quantidade_eixos = ?, combustivel = ?, tara_kg = ?, capacidade_carga_kg = ?, volume_m3 = ?, status = ?::status_veiculo_enum, motorista_id = ?, manutencao_pendente = ?, seguro_validade = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
