@@ -25,7 +25,7 @@ public class MotoristaServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
             return;
         }
 
@@ -35,7 +35,7 @@ public class MotoristaServlet extends HttpServlet {
                 Motorista motorista = motoristaDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("motorista", motorista);
             }
-            req.getRequestDispatcher("jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
             return;
         }
 
@@ -52,7 +52,7 @@ public class MotoristaServlet extends HttpServlet {
 
         req.setAttribute("motoristas", motoristas);
 
-        req.getRequestDispatcher("jsp/motorista/motorista.jsp")
+        req.getRequestDispatcher("/WEB-INF/jsp/motorista/motorista.jsp")
            .forward(req, resp);
     }
 

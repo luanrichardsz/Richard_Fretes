@@ -25,7 +25,7 @@ public class VeiculoServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
             return;
         }
 
@@ -35,7 +35,7 @@ public class VeiculoServlet extends HttpServlet {
                 Veiculo veiculo = veiculoDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("veiculo", veiculo);
             }
-            req.getRequestDispatcher("jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
             return;
         }
 
@@ -52,7 +52,7 @@ public class VeiculoServlet extends HttpServlet {
 
         req.setAttribute("veiculos", veiculos);
 
-        req.getRequestDispatcher("jsp/veiculo/veiculo.jsp")
+        req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp")
            .forward(req, resp);
     }
 

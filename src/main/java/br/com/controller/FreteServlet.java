@@ -26,7 +26,7 @@ public class FreteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("jsp/frete/cadastroFrete.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/frete/cadastroFrete.jsp").forward(req, resp);
             return;
         }
 
@@ -36,7 +36,7 @@ public class FreteServlet extends HttpServlet {
                 Frete frete = freteDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("frete", frete);
             }
-            req.getRequestDispatcher("jsp/frete/cadastroFrete.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/frete/cadastroFrete.jsp").forward(req, resp);
             return;
         }
 
@@ -53,7 +53,7 @@ public class FreteServlet extends HttpServlet {
 
         req.setAttribute("fretes", fretes);
 
-        req.getRequestDispatcher("jsp/frete/frete.jsp")
+        req.getRequestDispatcher("/WEB-INF/jsp/frete/frete.jsp")
            .forward(req, resp);
     }
 

@@ -22,7 +22,7 @@ public class EnderecoServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
             return;
         }
 
@@ -32,7 +32,7 @@ public class EnderecoServlet extends HttpServlet {
                 Endereco endereco = enderecoDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("endereco", endereco);
             }
-            req.getRequestDispatcher("jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
             return;
         }
 
@@ -49,7 +49,7 @@ public class EnderecoServlet extends HttpServlet {
 
         req.setAttribute("enderecos", enderecos);
 
-        req.getRequestDispatcher("jsp/endereco/endereco.jsp")
+        req.getRequestDispatcher("/WEB-INF/jsp/endereco/endereco.jsp")
            .forward(req, resp);
     }
 

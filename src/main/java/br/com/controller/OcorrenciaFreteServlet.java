@@ -25,7 +25,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
             return;
         }
 
@@ -35,7 +35,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
                 OcorrenciaFrete ocorrencia = ocorrenciaDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("ocorrencia", ocorrencia);
             }
-            req.getRequestDispatcher("jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
             return;
         }
 
@@ -52,7 +52,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
         req.setAttribute("ocorrencias", ocorrencias);
 
-        req.getRequestDispatcher("jsp/ocorrencia/ocorrenciaFrete.jsp")
+        req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/ocorrenciaFrete.jsp")
            .forward(req, resp);
     }
 

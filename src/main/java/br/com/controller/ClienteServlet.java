@@ -24,7 +24,7 @@ public class ClienteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("jsp/cliente/cadastroCliente.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
             return;
         }
 
@@ -34,7 +34,7 @@ public class ClienteServlet extends HttpServlet {
                 Cliente cliente = clienteDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("cliente", cliente);
             }
-            req.getRequestDispatcher("jsp/cliente/cadastroCliente.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
             return;
         }
 
@@ -51,7 +51,7 @@ public class ClienteServlet extends HttpServlet {
 
         req.setAttribute("clientes", clientes);
 
-        req.getRequestDispatcher("jsp/cliente/cliente.jsp")
+        req.getRequestDispatcher("/WEB-INF/jsp/cliente/cliente.jsp")
            .forward(req, resp);
     }
 
