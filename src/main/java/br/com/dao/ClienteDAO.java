@@ -126,6 +126,39 @@ public class ClienteDAO extends ConnectionFactory {
         return clientes;
     }
 
+    public Cliente autenticar(String email, String senha) {
+        String sql = "SELECT * FROM cliente WHERE email = ? AND senha = ?";
+        Cliente cliente = null;
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, email);
+            stmt.setString(2, senha);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    cliente = new Cliente();
+                    cliente.setId(rs.getInt("id"));
+                    cliente.setRazaoSocial(rs.getString("razao_social"));
+                    cliente.setNomeFantasia(rs.getString("nome_fantasia"));
+                    cliente.setDocumento(rs.getString("documento"));
+                    cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
+                    cliente.setTipoPessoa(TipoPessoa.valueOf(rs.getString("tipo_pessoa")));
+                    cliente.setTipo(TipoEntrega.valueOf(rs.getString("tipo_entrega")));
+                    cliente.setEmail(rs.getString("email"));
+                    cliente.setTelefone(rs.getString("telefone"));
+                    cliente.setAtivo(rs.getBoolean("ativo"));
+                    cliente.setCriadoEm(rs.getTimestamp("criado_em").toLocalDateTime());
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return cliente;
+    }
+
     public void deletar(Integer id) {
         String sql = "DELETE FROM cliente WHERE id = ?";
 
