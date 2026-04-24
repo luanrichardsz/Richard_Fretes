@@ -1,9 +1,11 @@
+package br.com.model;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Motorista {
 
-    // Organização
+    // Organizaï¿½ï¿½o
     public enum CategoriaCnh {
         A, B, C, D, E, AB, AC, AD, AE
     }

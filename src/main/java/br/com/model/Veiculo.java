@@ -1,3 +1,5 @@
+package br.com.model;
+
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 

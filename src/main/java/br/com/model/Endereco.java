@@ -1,3 +1,5 @@
+package br.com.model;
+
 public class Endereco {
 
     private Integer id;

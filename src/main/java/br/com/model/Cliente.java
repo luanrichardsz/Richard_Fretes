@@ -1,3 +1,5 @@
+package br.com.model;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +20,7 @@ public class Cliente {
     private Integer id;
     private String razaoSocial;
     private String nomeFantasia;
-    private String cnpj;
+    private String documento;
     private String inscricaoEstadual;
     private TipoPessoa tipoPessoa;
     private TipoEntrega tipoEntrega;
@@ -62,12 +64,12 @@ public class Cliente {
         this.nomeFantasia = nomeFantasia;
     }
 
-    public String getCnpj() {
-        return cnpj;
+    public String getDocumento() {
+        return documento;
     }
 
-    public void setCnpj(String cnpj) {
-        this.cnpj = cnpj;
+    public void setDocumento(String documento) {
+        this.documento = documento;
     }
 
     public String getInscricaoEstadual() {
