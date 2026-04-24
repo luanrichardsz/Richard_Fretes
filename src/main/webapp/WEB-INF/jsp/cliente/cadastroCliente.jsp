@@ -14,7 +14,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title><%= isEdicao ? "Editar Cliente - Richard Fretes" : "Novo Cliente - Richard Fretes" %></title>
 
-<link rel="stylesheet" href="css/styleC.css" />
+<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
 .form-grid {
@@ -34,6 +35,12 @@
 </head>
 
 <body>
+
+<header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar ao Menu">
+        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
+    </a>
+</header>
 
 <div class="container">
 
@@ -84,13 +91,13 @@
         <!-- Documento -->
         <div class="form-group">
           <label>CPF / CNPJ *</label>
-          <input type="text" name="documento" value="<%= isEdicao ? cliente.getDocumento() : "" %>" required />
+          <input type="text" name="documento" maxlength="14" value="<%= isEdicao ? cliente.getDocumento() : "" %>" required />
         </div>
 
         <!-- IE -->
         <div class="form-group">
           <label>Inscrição Estadual</label>
-          <input type="text" name="inscricaoEstadual" value="<%= isEdicao ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
+          <input type="text" name="inscricaoEstadual" maxlength="13" value="<%= isEdicao ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
         </div>
 
         <!-- Email -->
@@ -102,7 +109,7 @@
         <!-- Telefone -->
         <div class="form-group">
           <label>Telefone *</label>
-          <input type="text" name="telefone" value="<%= isEdicao ? cliente.getTelefone() : "" %>" required />
+          <input type="text" name="telefone" maxlength="11" value="<%= isEdicao ? cliente.getTelefone() : "" %>" required />
         </div>
 
         <!-- Status -->

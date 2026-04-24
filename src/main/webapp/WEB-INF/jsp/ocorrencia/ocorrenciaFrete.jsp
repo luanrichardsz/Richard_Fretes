@@ -10,11 +10,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Ocorrências - Richard Fretes</title>
 
-<link rel="stylesheet" href="css/styleC.css" />
+<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 
 </head>
 
 <body>
+
+<header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar ao Menu">
+        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
+    </a>
+</header>
+
+
 
 <div class="container">
 

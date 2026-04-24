@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title><%= isEdicao ? "Editar Motorista - Richard Fretes" : "Novo Motorista - Richard Fretes" %></title>
 
-<link rel="stylesheet" href="css/styleC.css" />
+<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 
 <style>
 .form-grid {
@@ -43,6 +43,13 @@
 
 <body>
 
+<header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar ao Menu">
+        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
+    </a>
+</header>
+
+
 <div class="container">
 
   <section class="card">
@@ -68,13 +75,13 @@
         <!-- CPF -->
         <div class="form-group">
           <label>CPF *</label>
-          <input type="text" name="cpf" value="<%= isEdicao ? motorista.getCpf() : "" %>" required />
+          <input type="text" name="cpf" maxlength="11" value="<%= isEdicao ? motorista.getCpf() : "" %>" required />
         </div>
 
         <!-- RG -->
         <div class="form-group">
           <label>RG *</label>
-          <input type="text" name="rg" value="<%= isEdicao ? motorista.getRg() : "" %>" required />
+          <input type="text" name="rg" maxlength="9" value="<%= isEdicao ? motorista.getRg() : "" %>" required />
         </div>
 
         <!-- Data Nascimento -->
@@ -86,7 +93,7 @@
         <!-- Telefone -->
         <div class="form-group">
           <label>Telefone *</label>
-          <input type="tel" name="telefone" value="<%= isEdicao ? motorista.getTelefone() : "" %>" required />
+          <input type="tel" name="telefone" maxlength="11" value="<%= isEdicao ? motorista.getTelefone() : "" %>" required />
         </div>
 
         <!-- EMERGÊNCIA -->
@@ -101,7 +108,7 @@
         <!-- Telefone Emergência -->
         <div class="form-group">
           <label>Telefone</label>
-          <input type="tel" name="telefoneEmergencia" value="<%= isEdicao ? (motorista.getTelefoneEmergencia() != null ? motorista.getTelefoneEmergencia() : "") : "" %>" />
+          <input type="tel" name="telefoneEmergencia" maxlength="11" value="<%= isEdicao ? (motorista.getTelefoneEmergencia() != null ? motorista.getTelefoneEmergencia() : "") : "" %>" />
         </div>
 
         <!-- Parentesco -->
@@ -205,5 +212,31 @@
 
 </div>
 
+<script>
+    document.querySelector('form').addEventListener('submit', function(e) {
+      const dataNascimento = document.getElementById('dataNascimento').value;
+      if (!dataNascimento) return;
+
+      const dataInput = new Date(dataNascimento);
+      const hoje = new Date();
+      
+      // Calcula a idade
+      let idade = hoje.getFullYear() - dataInput.getFullYear();
+      const m = hoje.getMonth() - dataInput.getMonth();
+      if (m < 0 || (m === 0 && hoje.getDate() < dataInput.getDate())) {
+          idade--;
+      }
+
+      if (idade < 18) {
+          alert("O motorista deve ter pelo menos 18 anos!");
+          e.preventDefault(); // Impede o envio do formulário
+      }
+      
+      if (idade > 100) {
+          alert("Por favor, insira uma data de nascimento válida.");
+          e.preventDefault();
+      }
+  });
+</script>
 </body>
 </html>

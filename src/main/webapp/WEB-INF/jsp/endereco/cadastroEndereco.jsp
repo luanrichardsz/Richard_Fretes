@@ -14,7 +14,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title><%= isEdicao ? "Editar Endereço - Richard Fretes" : "Novo Endereço - Richard Fretes" %></title>
 
-<link rel="stylesheet" href="css/styleC.css" />
+<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
 <style>
 .form-grid {
@@ -34,6 +35,13 @@
 </head>
 
 <body>
+
+<header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar ao Menu">
+        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
+    </a>
+</header>
+
 
 <div class="container">
 

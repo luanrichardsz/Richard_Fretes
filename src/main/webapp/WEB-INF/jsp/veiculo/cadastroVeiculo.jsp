@@ -15,7 +15,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title><%= isEdicao ? "Editar Veículo - Richard Fretes" : "Novo Veículo - Richard Fretes" %></title>
 
-<link rel="stylesheet" href="css/styleC.css" />
+<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 
 <style>
 .form-grid {
@@ -42,6 +42,14 @@
 </head>
 
 <body>
+
+<header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar ao Menu">
+        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
+    </a>
+</header>
+
+
 
 <div class="container">
 
@@ -83,13 +91,13 @@
         <!-- Ano Fabricação -->
         <div class="form-group">
           <label>Ano Fabricação *</label>
-          <input type="number" name="anoFabricacao" value="<%= isEdicao ? veiculo.getAnoFabricacao() : "" %>" required />
+          <input type="number" name="anoFabricacao" maxlength="4" value="<%= isEdicao ? veiculo.getAnoFabricacao() : "" %>" required />
         </div>
 
         <!-- Ano Modelo -->
         <div class="form-group">
           <label>Ano Modelo *</label>
-          <input type="number" name="anoModelo" value="<%= isEdicao ? veiculo.getAnoModelo() : "" %>" required />
+          <input type="number" name="anoModelo" maxlength="4" value="<%= isEdicao ? veiculo.getAnoModelo() : "" %>" required />
         </div>
 
         <!-- Combustível -->

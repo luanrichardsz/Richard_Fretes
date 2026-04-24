@@ -12,12 +12,12 @@
 
 <div class="main-wrapper">
     <header class="brand-header">
-        <h1>RICHARD <span>FRETES</span></h1>
+        <h1>Richard <span>Fretes</span></h1>
     </header>
 
     <div class="container" id="container">
         <div class="form-container sign-up-container">
-            <form action="cadastro" method="post">
+            <form action="login" method="post">
                 <h2>Criar Conta</h2>
                 <p>Junte-se à maior rede de fretes</p>
                 <input type="text" name="nome" placeholder="Nome Completo" required />
@@ -30,7 +30,7 @@
         <div class="form-container sign-in-container">
             <form action="login" method="post">
                 <h2>Login</h2>
-                <p>Bem-vindo de volta, parceiro!</p>
+                <p>Bem-vindo de volta!</p>
                 
                 <%-- Mensagem de erro dinâmica --%>
                 <% String erro = (String) request.getAttribute("erro");
@@ -40,7 +40,7 @@
 
                 <input type="email" name="email" placeholder="E-mail" required />
                 <input type="password" name="senha" placeholder="Senha" required />
-                <a href="#" class="forgot-pass">Esqueceu a senha?</a>
+                <!-- <a href="#" class="forgot-pass">Esqueceu a senha?</a> -->
                 <button type="submit" class="btn-main">Entrar</button>
             </form>
         </div>

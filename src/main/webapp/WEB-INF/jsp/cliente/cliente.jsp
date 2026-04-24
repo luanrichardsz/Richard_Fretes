@@ -10,11 +10,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Clientes - Richard Fretes</title>
 
-<link rel="stylesheet" href="css/styleC.css" />
+<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
 
 </head>
 
 <body>
+
+<header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar ao Menu">
+        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
+    </a>
+</header>
 
 <div class="container">
 
@@ -53,7 +61,7 @@
       <thead>
         <tr>
           <th>Tipo</th>
-          <th>Nome</th>
+          <th>Razão Social</th>
           <th>Documento</th>
           <th>Município</th>
           <th>Contato</th>
@@ -78,7 +86,7 @@
             </span>
           </td>
 
-          <!-- Nome -->
+          <!-- Razão Social -->
           <td>
             <%= c.getTipoPessoa().toString().equals("PJ") 
                 ? c.getRazaoSocial() 
