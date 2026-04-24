@@ -1,0 +1,110 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page isELIgnored="true" %>
+<%@ page import="java.util.List" %>
+<%@ page import="br.com.model.Motorista" %>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Motoristas - Richard Fretes</title>
+
+<link rel="stylesheet" href="css/styleC.css" />
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Toolbar -->
+  <section class="card toolbar">
+    <div class="toolbar-row">
+      
+      <div class="filters">
+        <input type="text" placeholder="Buscar" />
+
+        <select>
+          <option>Todos os status</option>
+          <option>ATIVO</option>
+          <option>INATIVO</option>
+          <option>SUSPENSO</option>
+        </select>
+      </div>
+
+      <a href="motoristas?acao=novo">
+        <button class="btn-primary">
+          + Novo Motorista
+        </button>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- Table -->
+  <section class="card">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>CPF</th>
+          <th>CNH</th>
+          <th>Categoria</th>
+          <th>Telefone</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%
+          List<Motorista> motoristas = (List<Motorista>) request.getAttribute("motoristas");
+
+          if (motoristas != null && !motoristas.isEmpty()) {
+              for (Motorista m : motoristas) {
+        %>
+
+        <tr>
+          <td><%= m.getNomeCompleto() %></td>
+          <td><%= m.getCpf() %></td>
+          <td><%= m.getNumeroCnh() %></td>
+          <td><%= m.getCategoriaCnh() %></td>
+          <td><%= m.getTelefone() %></td>
+          <td>
+            <span class="badge <%= m.getStatus().toString().equals("ATIVO") ? "green" : m.getStatus().toString().equals("SUSPENSO") ? "red" : "gray" %>">
+              <%= m.getStatus() %>
+            </span>
+          </td>
+          <td>
+            <a href="motoristas?acao=editar&id=<%= m.getId() %>">
+              <button class="btn-small">Editar</button>
+            </a>
+            <a href="motoristas?acao=deletar&id=<%= m.getId() %>" onclick="return confirm('Tem certeza?')">
+              <button class="btn-small btn-danger">Deletar</button>
+            </a>
+          </td>
+        </tr>
+
+        <%
+              }
+          } else {
+        %>
+
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 20px;">
+            Nenhum motorista cadastrado
+          </td>
+        </tr>
+
+        <%
+          }
+        %>
+      </tbody>
+    </table>
+  </section>
+
+</div>
+
+</body>
+</html>
