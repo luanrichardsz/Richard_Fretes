@@ -27,15 +27,15 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = req.getSession();
             // Guardamos o objeto Cliente inteiro na sessão
             session.setAttribute("usuarioAutenticado", cliente);
-            resp.sendRedirect("clientes");
+            req.getRequestDispatcher("/WEB-INF/jsp/menu/menu.jsp").forward(req, resp);
         } else {
             req.setAttribute("erro", "Credenciais inválidas para Richard Fretes.");
-            req.getRequestDispatcher("login.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
         }
     }
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        req.getRequestDispatcher("jsp/login/login.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
     }
 }
