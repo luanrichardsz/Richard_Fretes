@@ -74,9 +74,47 @@ input, select {
   background: #e5e7eb;
   cursor: pointer;
   border-radius: 4px;
+  text-decoration: none;
+  color: black;
 }
 
 .btn-small.danger {
   background: #ef4444;
   color: white;
+}
+
+/* Header com Logo */
+.top-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background: #fff;
+  border-bottom: 2px solid #1d4ed8;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.logo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background: #f0f0f0;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  border: 2px solid transparent;
+}
+
+.logo-btn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  transform: scale(1.05);
+}
+
+.logo-btn img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
 }
