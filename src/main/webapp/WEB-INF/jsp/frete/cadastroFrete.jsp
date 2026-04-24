@@ -17,6 +17,7 @@
 
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
 .form-grid {
@@ -41,9 +42,7 @@
 <body>
 
 <header class="top-header">
-    <a href="menu" class="logo-btn" title="Voltar ao Menu">
-        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
-    </a>
+    <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
 

@@ -25,7 +25,7 @@
             <h1>R<span>F</span></h1>
         </div>
         <nav class="side-nav">
-            <a href="#" class="active" title="Home"><i class="fas fa-home"></i></a>
+            <a href="#" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
             <a href="clientes" title="Clientes"><i class="fas fa-users"></i></a>
             <a href="motoristas" title="Motoristas"><i class="fas fa-id-card"></i></a>
             <a href="veiculos" title="Veículos"><i class="fas fa-truck"></i></a>

@@ -16,6 +16,7 @@
 <title><%= isEdicao ? "Editar Ocorrência - Richard Fretes" : "Nova Ocorrência - Richard Fretes" %></title>
 
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
 .form-grid {
@@ -37,9 +38,7 @@
 <body>
 
 <header class="top-header">
-    <a href="menu" class="logo-btn" title="Voltar ao Menu">
-        <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Logo Richard Fretes">
-    </a>
+    <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
 
