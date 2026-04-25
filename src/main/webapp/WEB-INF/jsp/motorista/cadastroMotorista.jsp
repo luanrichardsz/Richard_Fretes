@@ -13,8 +13,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= isEdicao ? "Editar Motorista - Richard Fretes" : "Novo Motorista - Richard Fretes" %></title>
+<title><%= isEdicao ? "Editar Motorista" : "Novo Motorista" %></title>
 
+<link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 

@@ -12,7 +12,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= isEdicao ? "Editar Cliente - Richard Fretes" : "Novo Cliente - Richard Fretes" %></title>
+<title><%= isEdicao ? "Editar Cliente" : "Novo Cliente" %></title>
 
 <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />

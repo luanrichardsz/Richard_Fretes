@@ -4,7 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Richard Fretes | Acesso ao Sistema</title>
+    <title>Acesso ao Sistema</title>
+    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
     <link rel="stylesheet" href="css/styleLogin.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
@@ -20,7 +21,20 @@
             <form action="login" method="post">
                 <h2>Criar Conta</h2>
                 <p>Junte-se à maior rede de fretes</p>
-                <input type="text" name="nome" placeholder="Nome Completo" required />
+                
+                <%-- Mensagem de sucesso dinâmica --%>
+                <% String sucessoCadastro = (String) request.getAttribute("sucesso");
+                   if (sucessoCadastro != null) { %>
+                    <div class="success-msg" style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;"><%= sucessoCadastro %></div>
+                <% } %>
+                
+                <%-- Mensagem de erro dinâmica --%>
+                <% String erroCadastro = (String) request.getAttribute("erro");
+                   if (erroCadastro != null) { %>
+                    <div class="error-msg"><%= erroCadastro %></div>
+                <% } %>
+                
+                <input type="text" name="usuario" placeholder="Nome de Usuário" required />
                 <input type="email" name="email" placeholder="E-mail" required />
                 <input type="password" name="senha" placeholder="Senha" required />
                 <button type="submit" class="btn-main">Cadastrar</button>
@@ -31,6 +45,12 @@
             <form action="login" method="post">
                 <h2>Login</h2>
                 <p>Bem-vindo de volta!</p>
+                
+                <%-- Mensagem de sucesso dinâmica --%>
+                <% String sucesso = (String) request.getAttribute("sucesso");
+                   if (sucesso != null) { %>
+                    <div class="success-msg" style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;"><%= sucesso %></div>
+                <% } %>
                 
                 <%-- Mensagem de erro dinâmica --%>
                 <% String erro = (String) request.getAttribute("erro");

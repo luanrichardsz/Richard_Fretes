@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="br.com.model.Cliente" %>
+<%@ page import="br.com.model.Usuario" %>
 <%
-    Cliente usuario = (Cliente) session.getAttribute("usuarioAutenticado");
+    Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
     if (usuario == null) {
         response.sendRedirect("login"); 
         return;
@@ -12,7 +12,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Menu | Richard Fretes</title>
+    <title>Richard Fretes</title>
+    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
     <link rel="stylesheet" href="/RichardFretes/css/styleMenu.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,7 +26,7 @@
             <h1>R<span>F</span></h1>
         </div>
         <nav class="side-nav">
-            <a href="#" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
+            <a href="#" class="logo-btn active" title="Home"><i class="fas fa-home"></i></a>
             <a href="clientes" title="Clientes"><i class="fas fa-users"></i></a>
             <a href="motoristas" title="Motoristas"><i class="fas fa-id-card"></i></a>
             <a href="veiculos" title="Veículos"><i class="fas fa-truck"></i></a>
@@ -37,8 +38,18 @@
     <main class="main-content">
         <header class="main-header">
             <div class="welcome-text">
-                <h2>Olá, <span><%= usuario.getNomeFantasia() %></span></h2>
-                <p>Painel Administrativo Richard Fretes</p>
+                <h2>Olá, <span><%= usuario.getUsuario() %> !</span></h2>
+                <p>Painel Administrativo -
+                <%
+                    if (usuario.isAdmin()) {
+                        out.print("Richard Fretes");
+                    } else if (usuario.getClienteId() != null) {
+                        out.print("Sua Empresa");
+                    } else {
+                        out.print("Richard Fretes");
+                    }
+                %>
+                </p>
             </div>
             <div class="header-brand">
                 <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Icon da Richad Fretes">
