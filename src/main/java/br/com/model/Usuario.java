@@ -9,6 +9,8 @@ public class Usuario {
     private Integer clienteId;
     private boolean ativo;
     
+    private Cliente cliente;
+
     // Getters e Setters
 
     public Integer getId() {
@@ -53,6 +55,10 @@ public class Usuario {
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
-
-    
+    public Cliente getCliente() {
+        return cliente;
+    }
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
 }
