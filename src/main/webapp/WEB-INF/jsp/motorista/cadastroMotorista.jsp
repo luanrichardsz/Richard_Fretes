@@ -2,6 +2,16 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="br.com.model.Motorista" %>
 <%@ page import="br.com.model.Motorista.*" %>
+<%@ page import="br.com.model.Usuario" %>
+<%@ page import="br.com.model.Cliente" %>
+<%@ page import="java.util.List" %>
+<%
+    Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioAutenticado");
+    if (usuarioLogado == null) {
+        response.sendRedirect("login");
+        return;
+    }
+%>
 
 <% 
   Motorista motorista = (Motorista) request.getAttribute("motorista");
@@ -95,6 +105,28 @@
           <label>Telefone *</label>
           <input type="tel" name="telefone" maxlength="11" value="<%= isEdicao ? motorista.getTelefone() : "" %>" required />
         </div>
+
+        <% if (usuarioLogado != null && usuarioLogado.isAdmin()) { %>
+          <!-- Empresa -->
+          <div class="form-group">
+            <label>Empresa Selecionada *</label>
+            <select name="clienteId" required>
+              <option value="">Selecione uma empresa</option>
+              <% 
+                List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");
+                if (clientes != null) {
+                  for (Cliente cliente : clientes) {
+              %>
+                <option value="<%= cliente.getId() %>" <%= isEdicao && motorista.getClienteId() != null && motorista.getClienteId().equals(cliente.getId()) ? "selected" : "" %>>
+                  <%= cliente.getNomeFantasia() %>
+                </option>
+              <% 
+                  }
+                }
+              %>
+            </select>
+          </div>
+        <% } %>
 
         <!-- EMERGÊNCIA -->
         <div class="section-title">Contato de Emergência</div>
