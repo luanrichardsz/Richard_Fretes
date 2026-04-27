@@ -30,6 +30,8 @@ public class Veiculo {
     private Integer motoristaId; 
     private boolean manutencaoPendente;
     private LocalDate seguroValidade;
+    private Integer clienteId;
+    private Cliente cliente;
 
     public Veiculo() {
         this.status = StatusVeiculo.DISPONIVEL;
@@ -184,5 +186,21 @@ public class Veiculo {
         this.seguroValidade = seguroValidade;
     }
 
+    public Integer getClienteId() {
+        return clienteId;
+    }
 
+    public void setClienteId(Integer clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    
 }

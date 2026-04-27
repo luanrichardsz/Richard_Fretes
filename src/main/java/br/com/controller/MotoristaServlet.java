@@ -1,8 +1,11 @@
 package br.com.controller;
 
 import br.com.dao.MotoristaDAO;
+import br.com.dao.ClienteDAO;
 import br.com.model.Motorista;
 import br.com.model.Motorista.*;
+import br.com.model.Usuario;
+import br.com.model.Cliente;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -25,6 +28,11 @@ public class MotoristaServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
+            Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+            if (usuarioLogado != null && usuarioLogado.isAdmin()) {
+                List<Cliente> clientes = new ClienteDAO().listarTodos();
+                req.setAttribute("clientes", clientes);
+            }
             req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
             return;
         }
@@ -34,6 +42,11 @@ public class MotoristaServlet extends HttpServlet {
             if (idParam != null && !idParam.isEmpty()) {
                 Motorista motorista = motoristaDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("motorista", motorista);
+            }
+            Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+            if (usuarioLogado != null && usuarioLogado.isAdmin()) {
+                List<Cliente> clientes = new ClienteDAO().listarTodos();
+                req.setAttribute("clientes", clientes);
             }
             req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
             return;
@@ -60,6 +73,13 @@ public class MotoristaServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
+        
         Motorista motorista = new Motorista();
 
         // Verificar se é uma atualização (edição) ou novo motorista
@@ -91,6 +111,17 @@ public class MotoristaServlet extends HttpServlet {
         motorista.setChavePix(req.getParameter("chavePix"));
         motorista.setTipoPix(TipoPix.valueOf(req.getParameter("tipoPix")));
         motorista.setStatus(StatusMotorista.valueOf(req.getParameter("status")));
+        
+        // LÓGICA DE CLIENTE ID
+        if(usuarioLogado.isAdmin()) {
+            String cliIdParam = req.getParameter("clienteId");
+            if(cliIdParam != null) {
+                motorista.setClienteId(Integer.parseInt(cliIdParam));
+            }
+        } else {
+            // Se for responsável, pega obrigatoriamente da sessão
+            motorista.setClienteId(usuarioLogado.getClienteId());
+        }
 
         if (!isEdicao) {
             motorista.setAdicionadoEm(LocalDateTime.now());

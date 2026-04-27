@@ -14,8 +14,8 @@ import java.util.List;
 public class MotoristaDAO extends ConnectionFactory {
 
     public void salvar(Motorista motorista) {
-        String sql = "INSERT INTO motorista (nome_completo, rg, cpf, data_nascimento, telefone, nome_emergencia, telefone_emergencia, parentesco_emergencia, numero_cnh, categoria_cnh, validade_cnh, validade_toxicologico, tipo_vinculo, chave_pix, tipo_pix, status, adicionado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::categoria_cnh_enum, ?, ?, ?::tipo_vinculo_enum, ?, ?::tipo_pix_enum, ?, ?::status_motorista_enum)";
-
+        String sql = "INSERT INTO motorista (nome_completo, rg, cpf, data_nascimento, telefone, nome_emergencia, telefone_emergencia, parentesco_emergencia, numero_cnh, categoria_cnh, validade_cnh, validade_toxicologico, tipo_vinculo, chave_pix, tipo_pix, status, adicionado_em, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?::categoria_cnh_enum, ?, ?, ?::tipo_vinculo_enum, ?, ?::tipo_pix_enum, ?::status_motorista_enum, ?, ?)";
+        
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -36,6 +36,7 @@ public class MotoristaDAO extends ConnectionFactory {
             stmt.setString(15, motorista.getTipoPix().name());
             stmt.setString(16, motorista.getStatus().name());
             stmt.setTimestamp(17, Timestamp.valueOf(motorista.getAdicionadoEm()));
+            stmt.setInt(18, motorista.getClienteId());
 
             stmt.executeUpdate();
 

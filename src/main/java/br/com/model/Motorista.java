@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class Motorista {
 
-    // Organiza��o
+    // Organização
     public enum CategoriaCnh {
         A, B, C, D, E, AB, AC, AD, AE
     }
@@ -46,6 +46,10 @@ public class Motorista {
     private TipoPix tipoPix;
     private StatusMotorista status;
     private LocalDateTime adicionadoEm;
+
+    // Empresa
+    private Integer clienteId;
+    private Cliente cliente;
 
     public Motorista() {
         this.status = StatusMotorista.ATIVO;
@@ -196,5 +200,21 @@ public class Motorista {
 
     public void setAdicionadoEm(LocalDateTime adicionadoEm) {
         this.adicionadoEm = adicionadoEm;
+    }
+
+    public Integer getClienteId() {
+        return clienteId;
+    }
+
+    public void setClienteId(Integer clienteId) {
+        this.clienteId = clienteId;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
     }
 }
