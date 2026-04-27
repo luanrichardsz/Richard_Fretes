@@ -55,16 +55,6 @@
 
       <div class="form-grid">
 
-        <!-- Tipo Pessoa -->
-        <div class="form-group">
-          <label>Tipo Pessoa *</label>
-          <select name="tipoPessoa" required>
-            <option value="">Selecione</option>
-            <option value="FISICA" <%= isEdicao && cliente.getTipoPessoa() != null && cliente.getTipoPessoa().name().equals("FISICA") ? "selected" : "" %>>Pessoa Física</option>
-            <option value="JURIDICA" <%= isEdicao && cliente.getTipoPessoa() != null && cliente.getTipoPessoa().name().equals("JURIDICA") ? "selected" : "" %>>Pessoa Jurídica</option>
-          </select>
-        </div>
-
         <!-- Tipo Entrega -->
         <div class="form-group">
           <label>Tipo de Entrega *</label>
@@ -78,7 +68,7 @@
 
         <!-- Razão Social -->
         <div class="form-group full">
-          <label>Razão Social / Nome *</label>
+          <label>Razão Social *</label>
           <input type="text" name="razaoSocial" value="<%= isEdicao ? cliente.getRazaoSocial() : "" %>" required />
         </div>
 
@@ -90,7 +80,7 @@
 
         <!-- Documento -->
         <div class="form-group">
-          <label>CPF / CNPJ *</label>
+          <label>CNPJ *</label>
           <input type="text" name="documento" maxlength="14" value="<%= isEdicao ? cliente.getDocumento() : "" %>" required />
         </div>
 

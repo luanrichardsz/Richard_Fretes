@@ -59,9 +59,8 @@
     <table class="data-table">
       <thead>
         <tr>
-          <th>Tipo</th>
           <th>Razão Social</th>
-          <th>Documento</th>
+          <th>CNPJ</th>
           <th>Município</th>
           <th>Contato</th>
           <th>Status</th>
@@ -78,25 +77,14 @@
         %>
 
         <tr>
-          <!-- Tipo -->
-          <td>
-            <span class="badge <%= c.getTipoPessoa().toString().equals("PJ") ? "blue" : "gray" %>">
-              <%= c.getTipoPessoa() %>
-            </span>
-          </td>
-
           <!-- Razão Social -->
           <td>
-            <%= c.getTipoPessoa().toString().equals("PJ") 
-                ? c.getRazaoSocial() 
-                : c.getNomeFantasia() %>
+            <%= c.getRazaoSocial() %>
           </td>
 
           <!-- Documento -->
           <td>
-            <%= c.getTipoPessoa().toString().equals("PJ") 
-                ? c.getDocumento() 
-                : "-" %>
+            <%= c.getDocumento() %>
           </td>
 
           <!-- Município (placeholder) -->

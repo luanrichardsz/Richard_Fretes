@@ -12,17 +12,11 @@ public class Cliente {
         AMBOS
     }
 
-    public enum TipoPessoa {
-        FISICA,
-        JURIDICA
-    }
-
     private Integer id;
     private String razaoSocial;
     private String nomeFantasia;
     private String documento;
     private String inscricaoEstadual;
-    private TipoPessoa tipoPessoa;
     private TipoEntrega tipoEntrega;
     private String email;
     private String senha;
@@ -79,14 +73,6 @@ public class Cliente {
 
     public void setInscricaoEstadual(String inscricaoEstadual) {
         this.inscricaoEstadual = inscricaoEstadual;
-    }
-
-    public TipoPessoa getTipoPessoa() {
-        return tipoPessoa;
-    }
-
-    public void setTipoPessoa(TipoPessoa tipoPessoa) {
-        this.tipoPessoa = tipoPessoa;
     }
 
     public TipoEntrega getTipoEntrega() {

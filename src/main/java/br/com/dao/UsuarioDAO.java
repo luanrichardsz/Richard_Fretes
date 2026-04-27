@@ -2,6 +2,7 @@ package br.com.dao;
 
 import br.com.connection.ConnectionFactory;
 import br.com.model.Usuario;
+import br.com.model.Cliente;
 
 import java.sql.*;
 
@@ -33,7 +34,7 @@ public class UsuarioDAO extends ConnectionFactory {
     }
 
     public Usuario autenticar(String email, String senha) {
-        String sql = "SELECT id, usuario, email, is_administrador, cliente_id, ativo FROM usuario WHERE email = ? AND senha = ? AND ativo = true";
+        String sql = "SELECT u.*, c.razao_social FROM usuario u LEFT JOIN cliente c ON u.cliente_id = c.id WHERE u.email = ? AND u.senha = ? AND u.ativo = true";
         Usuario usuario = null;
 
         try (Connection conn = getConnection();
@@ -51,6 +52,14 @@ public class UsuarioDAO extends ConnectionFactory {
                     usuario.setAdmin(rs.getBoolean("is_administrador"));
                     usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
                     usuario.setAtivo(rs.getBoolean("ativo"));
+
+                    if (usuario.getClienteId() != null) {
+                        Cliente cliente = new Cliente();
+                        cliente.setId(usuario.getClienteId());
+                        cliente.setRazaoSocial(rs.getString("razao_social"));
+                        usuario.setCliente(cliente);
+                    }
+                    return usuario;
                 }
             }
         } catch (SQLException e) {
@@ -130,6 +139,22 @@ public class UsuarioDAO extends ConnectionFactory {
 
             stmt.setBoolean(1, isAdmin);
             stmt.setInt(2, id);
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void atualizarPerfil(Integer id, String usuario, String email) {
+        String sql = "UPDATE usuario SET usuario = ?, email = ? WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, usuario);
+            stmt.setString(2, email);
+            stmt.setInt(3, id);
 
             stmt.executeUpdate();
         } catch (SQLException e) {

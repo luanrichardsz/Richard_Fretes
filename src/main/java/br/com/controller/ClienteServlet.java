@@ -61,17 +61,12 @@ public class ClienteServlet extends HttpServlet {
 
         Cliente cliente = new Cliente();
 
-        // Verificar se é uma atualização (edição) ou novo cliente
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.isEmpty();
 
         if (isEdicao) {
             cliente.setId(Integer.parseInt(idParam));
         }
-
-        cliente.setTipoPessoa(
-            TipoPessoa.valueOf(req.getParameter("tipoPessoa"))
-        );
 
         cliente.setTipo(
             TipoEntrega.valueOf(req.getParameter("tipoEntrega"))
@@ -89,7 +84,6 @@ public class ClienteServlet extends HttpServlet {
         );
 
         if (!isEdicao) {
-            // 🔥 MUITO IMPORTANTE (seu DAO exige isso para novo cliente)
             cliente.setCriadoEm(LocalDateTime.now());
             clienteDAO.salvar(cliente);
         } else {
