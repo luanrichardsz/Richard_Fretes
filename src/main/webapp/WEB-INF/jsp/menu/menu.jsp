@@ -27,7 +27,11 @@
         </div>
         <nav class="side-nav">
             <a href="#" class="logo-btn active" title="Home"><i class="fas fa-home"></i></a>
-            <a href="clientes" title="Clientes"><i class="fas fa-users"></i></a>
+            
+            <% if (usuario.isAdmin()) { %>
+                <a href="clientes" title="Clientes"><i class="fas fa-users"></i></a>
+            <% } %>
+            
             <a href="motoristas" title="Motoristas"><i class="fas fa-id-card"></i></a>
             <a href="veiculos" title="Veículos"><i class="fas fa-truck"></i></a>
             <a href="fretes" title="Fretes"><i class="fas fa-route"></i></a>
@@ -43,10 +47,8 @@
                 <%
                     if (usuario.isAdmin()) {
                         out.print("Richard Fretes");
-                    } else if (usuario.getClienteId() != null) {
-                        out.print("Sua Empresa");
                     } else {
-                        out.print("Richard Fretes");
+                        out.print(usuario.getCliente().getRazaoSocial());
                     }
                 %>
                 </p>
@@ -58,6 +60,7 @@
 
         <section class="menu-grid">
             
+            <% if (usuario.isAdmin()) { %>
             <a href="clientes" class="menu-card">
                 <div class="card-icon"><i class="fas fa-users"></i></div>
                 <div class="card-info">
@@ -66,6 +69,7 @@
                 </div>
                 <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
             </a>
+            <% } %>
 
             <a href="motoristas" class="menu-card">
                 <div class="card-icon"><i class="fas fa-user-tie"></i></div>
@@ -96,16 +100,16 @@
                 <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
             </a>
 
-            <a class="menu-card">
+            <!-- <a href="relatorios" class="menu-card">
                 <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
                 <div class="card-info">
                     <h3>Relatórios</h3>
                     <p>Analise lucros, KM rodados e performance da frota.</p>
                 </div>
                 <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </a>
+            </a> -->
 
-            <a class="menu-card">
+            <a href="minhaConta" class="menu-card">
                 <div class="card-icon"><i class="fas fa-user-gear"></i></div>
                 <div class="card-info">
                     <h3>Minha Conta</h3>
