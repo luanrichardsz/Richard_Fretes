@@ -21,6 +21,11 @@ CREATE TABLE veiculo (
     manutencao_pendente BOOLEAN DEFAULT FALSE,
     seguro_validade DATE,
 
+	-- Ligação com a empresa
+	cliente_id INT NOT NULL,
+
+	CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(id),
+
     -- Vinculando motorista a veiculo (Um motorista pode ter varios veiculos, mas um veiculo tem apenas um motorista principal)
     CONSTRAINT fk_motorista_veiculo
         FOREIGN KEY (motorista_id) 
