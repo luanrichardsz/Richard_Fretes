@@ -5,6 +5,8 @@ import br.com.model.Usuario;
 import br.com.model.Cliente;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UsuarioDAO extends ConnectionFactory {
 
@@ -155,6 +157,99 @@ public class UsuarioDAO extends ConnectionFactory {
             stmt.setString(1, usuario);
             stmt.setString(2, email);
             stmt.setInt(3, id);
+
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Usuario> listarTodos() {
+        String sql = "SELECT id, usuario, email, is_administrador, cliente_id, ativo FROM usuario WHERE ativo = true ORDER BY usuario";
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setId(rs.getInt("id"));
+                    usuario.setUsuario(rs.getString("usuario"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setAdmin(rs.getBoolean("is_administrador"));
+                    usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
+                    usuario.setAtivo(rs.getBoolean("ativo"));
+                    usuarios.add(usuario);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return usuarios;
+    }
+
+    public List<Usuario> listarUsuariosSemCliente() {
+        String sql = "SELECT id, usuario, email, is_administrador, cliente_id, ativo FROM usuario WHERE cliente_id IS NULL AND ativo = true AND is_administrador = false ORDER BY usuario";
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setId(rs.getInt("id"));
+                    usuario.setUsuario(rs.getString("usuario"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setAdmin(rs.getBoolean("is_administrador"));
+                    usuario.setClienteId(null);
+                    usuario.setAtivo(rs.getBoolean("ativo"));
+                    usuarios.add(usuario);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return usuarios;
+    }
+
+    public List<Usuario> listarUsuariosNaoAdmin() {
+        String sql = "SELECT id, usuario, email, is_administrador, cliente_id, ativo FROM usuario WHERE ativo = true AND is_administrador = false ORDER BY usuario";
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Usuario usuario = new Usuario();
+                    usuario.setId(rs.getInt("id"));
+                    usuario.setUsuario(rs.getString("usuario"));
+                    usuario.setEmail(rs.getString("email"));
+                    usuario.setAdmin(rs.getBoolean("is_administrador"));
+                    usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
+                    usuario.setAtivo(rs.getBoolean("ativo"));
+                    usuarios.add(usuario);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return usuarios;
+    }
+
+    public void atualizarClienteDoUsuario(Integer usuarioId, Integer clienteId) {
+        String sql = "UPDATE usuario SET cliente_id = ? WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setObject(1, clienteId, Types.INTEGER);
+            stmt.setInt(2, usuarioId);
 
             stmt.executeUpdate();
         } catch (SQLException e) {

@@ -1,7 +1,9 @@
 package br.com.controller;
 
 import br.com.dao.ClienteDAO;
+import br.com.dao.UsuarioDAO;
 import br.com.model.Cliente;
+import br.com.model.Usuario;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +19,7 @@ import br.com.model.Cliente.*;
 public class ClienteServlet extends HttpServlet {
 
     private ClienteDAO clienteDAO = new ClienteDAO();
+    private UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -24,6 +27,8 @@ public class ClienteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
+            List<Usuario> usuarios = usuarioDAO.listarUsuariosSemCliente();
+            req.setAttribute("usuarios", usuarios);
             req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
             return;
         }
@@ -34,6 +39,8 @@ public class ClienteServlet extends HttpServlet {
                 Cliente cliente = clienteDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("cliente", cliente);
             }
+            List<Usuario> usuarios = usuarioDAO.listarUsuariosNaoAdmin();
+            req.setAttribute("usuarios", usuarios);
             req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
             return;
         }
@@ -78,16 +85,39 @@ public class ClienteServlet extends HttpServlet {
         cliente.setInscricaoEstadual(req.getParameter("inscricaoEstadual"));
         cliente.setEmail(req.getParameter("email"));
         cliente.setTelefone(req.getParameter("telefone"));
+        cliente.setAtivo(true);
 
-        cliente.setAtivo(
-            Boolean.parseBoolean(req.getParameter("ativo"))
-        );
+        String usuarioIdParam = req.getParameter("usuarioId");
+        Integer usuarioId = null;
+        
+        if (usuarioIdParam != null && !usuarioIdParam.isEmpty() && !usuarioIdParam.equals("0")) {
+            usuarioId = Integer.parseInt(usuarioIdParam);
+        }
 
-        if (!isEdicao) {
+        if (isEdicao) {
+            Cliente clienteAntigo = clienteDAO.buscarPorId(cliente.getId());
+            if (clienteAntigo != null) {
+                List<Usuario> usuariosAntigos = usuarioDAO.listarTodos();
+                for (Usuario u : usuariosAntigos) {
+                    if (u.getClienteId() != null && u.getClienteId().equals(cliente.getId())) {
+                        usuarioDAO.atualizarClienteDoUsuario(u.getId(), null);
+                        break;
+                    }
+                }
+            }
+            
+            clienteDAO.atualizar(cliente);
+            
+            if (usuarioId != null) {
+                usuarioDAO.atualizarClienteDoUsuario(usuarioId, cliente.getId());
+            }
+        } else {
             cliente.setCriadoEm(LocalDateTime.now());
             clienteDAO.salvar(cliente);
-        } else {
-            clienteDAO.atualizar(cliente);
+            
+            if (usuarioId != null) {
+                usuarioDAO.atualizarClienteDoUsuario(usuarioId, cliente.getId());
+            }
         }
 
         resp.sendRedirect("clientes");

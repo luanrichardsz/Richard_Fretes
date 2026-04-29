@@ -1,10 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ page import="br.com.model.Cliente" %>
+<%@ page import="br.com.model.Usuario" %>
+<%@ page import="java.util.List" %>
 
 <% 
   Cliente cliente = (Cliente) request.getAttribute("cliente");
   boolean isEdicao = cliente != null;
+  List<Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
 %>
 
 <!DOCTYPE html>
@@ -102,18 +105,28 @@
           <input type="text" name="telefone" maxlength="11" value="<%= isEdicao ? cliente.getTelefone() : "" %>" required />
         </div>
 
-        <!-- Status -->
-        <div class="form-group">
-          <label>Status</label>
-          <select name="ativo">
-            <option value="true" <%= isEdicao && cliente.isAtivo() ? "selected" : "" %>>Ativo</option>
-            <option value="false" <%= isEdicao && !cliente.isAtivo() ? "selected" : "" %>>Inativo</option>
+        <!-- Usuário Responsável -->
+        <div class="form-group full">
+          <label>Usuário Responsável *</label>
+          <select name="usuarioId" required>
+            <option value="">Selecione um usuário</option>
+            <% 
+              if (usuarios != null) {
+                for (Usuario u : usuarios) {
+                  boolean selected = isEdicao && u.getClienteId() != null && u.getClienteId().equals(cliente.getId());
+            %>
+              <option value="<%= u.getId() %>" <%= selected ? "selected" : "" %>>
+                <%= u.getUsuario() %> (<%= u.getEmail() %>)
+              </option>
+            <% 
+                }
+              }
+            %>
           </select>
         </div>
 
       </div>
 
-      <!-- Botões -->
       <div style="margin-top:20px;">
         <button type="submit" class="btn-primary"><%= isEdicao ? "Atualizar Cliente" : "Salvar Cliente" %></button>
         <a href="clientes" class="btn-small">Cancelar</a>
