@@ -11,7 +11,7 @@ import java.util.List;
 public class VeiculoDAO extends ConnectionFactory {
 
     public void salvar(Veiculo veiculo) {
-        String sql = "INSERT INTO veiculo (placa, renavam, rntrc, ano_fabricacao, ano_modelo, tipo, tipo_outros, quantidade_eixos, combustivel, tara_kg, capacidade_carga_kg, volume_m3, status, adicionado_em, motorista_id, manutencao_pendente, seguro_validade) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::status_veiculo_enum, ?, ?, ?, ?)";
+        String sql = "INSERT INTO veiculo (placa, renavam, rntrc, ano_fabricacao, ano_modelo, tipo, tipo_outros, quantidade_eixos, combustivel, tara_kg, capacidade_carga_kg, volume_m3, status, adicionado_em, motorista_id, manutencao_pendente, seguro_validade, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::status_veiculo_enum, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -33,6 +33,7 @@ public class VeiculoDAO extends ConnectionFactory {
             stmt.setObject(15, veiculo.getMotoristaId());
             stmt.setBoolean(16, veiculo.isManutencaoPendente());
             stmt.setDate(17, veiculo.getSeguroValidade() != null ? Date.valueOf(veiculo.getSeguroValidade()) : null);
+            stmt.setObject(18, veiculo.getClienteId());
 
             stmt.executeUpdate();
 
@@ -47,7 +48,7 @@ public class VeiculoDAO extends ConnectionFactory {
     }
 
     public void atualizar(Veiculo veiculo) {
-        String sql = "UPDATE veiculo SET placa = ?, renavam = ?, rntrc = ?, ano_fabricacao = ?, ano_modelo = ?, tipo = ?, tipo_outros = ?, quantidade_eixos = ?, combustivel = ?, tara_kg = ?, capacidade_carga_kg = ?, volume_m3 = ?, status = ?::status_veiculo_enum, motorista_id = ?, manutencao_pendente = ?, seguro_validade = ? WHERE id = ?";
+        String sql = "UPDATE veiculo SET placa = ?, renavam = ?, rntrc = ?, ano_fabricacao = ?, ano_modelo = ?, tipo = ?, tipo_outros = ?, quantidade_eixos = ?, combustivel = ?, tara_kg = ?, capacidade_carga_kg = ?, volume_m3 = ?, status = ?::status_veiculo_enum, motorista_id = ?, manutencao_pendente = ?, seguro_validade = ?, cliente_id = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -68,7 +69,8 @@ public class VeiculoDAO extends ConnectionFactory {
             stmt.setObject(14, veiculo.getMotoristaId());
             stmt.setBoolean(15, veiculo.isManutencaoPendente());
             stmt.setDate(16, veiculo.getSeguroValidade() != null ? Date.valueOf(veiculo.getSeguroValidade()) : null);
-            stmt.setInt(17, veiculo.getId());
+            stmt.setObject(17, veiculo.getClienteId());
+            stmt.setInt(18, veiculo.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -190,6 +192,28 @@ public class VeiculoDAO extends ConnectionFactory {
         veiculo.setMotoristaId(rs.getObject("motorista_id") != null ? rs.getInt("motorista_id") : null);
         veiculo.setManutencaoPendente(rs.getBoolean("manutencao_pendente"));
         veiculo.setSeguroValidade(rs.getDate("seguro_validade") != null ? rs.getDate("seguro_validade").toLocalDate() : null);
+        veiculo.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
         return veiculo;
+    }
+
+    public List<Veiculo> listarPorCliente(Integer clienteId) {
+        List<Veiculo> veiculos = new ArrayList<>();
+        String sql = "SELECT * FROM veiculo WHERE cliente_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, clienteId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    veiculos.add(mapearResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return veiculos;
     }
 }

@@ -215,6 +215,28 @@ public class FreteDAO extends ConnectionFactory {
         return fretes;
     }
 
+    public List<Frete> listarPorCliente(Integer clienteId) {
+        List<Frete> fretes = new ArrayList<>();
+        String sql = "SELECT * FROM frete WHERE remetente_id = ? OR destinatario_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, clienteId);
+            stmt.setInt(2, clienteId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    fretes.add(mapearResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return fretes;
+    }
+
     public void deletar(Integer id) {
         String sql = "DELETE FROM frete WHERE id = ?";
 

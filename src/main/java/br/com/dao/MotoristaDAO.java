@@ -51,7 +51,7 @@ public class MotoristaDAO extends ConnectionFactory {
     }
 
     public void atualizar(Motorista motorista) {
-        String sql = "UPDATE motorista SET nome_completo = ?, rg = ?, cpf = ?, data_nascimento = ?, telefone = ?, nome_emergencia = ?, telefone_emergencia = ?, parentesco_emergencia = ?, numero_cnh = ?, categoria_cnh = ?::categoria_cnh_enum, validade_cnh = ?, validade_toxicologico = ?, tipo_vinculo = ?::tipo_vinculo_enum, chave_pix = ?, tipo_pix = ?::tipo_pix_enum, status = ?::status_motorista_enum WHERE id = ?";
+        String sql = "UPDATE motorista SET nome_completo = ?, rg = ?, cpf = ?, data_nascimento = ?, telefone = ?, nome_emergencia = ?, telefone_emergencia = ?, parentesco_emergencia = ?, numero_cnh = ?, categoria_cnh = ?::categoria_cnh_enum, validade_cnh = ?, validade_toxicologico = ?, tipo_vinculo = ?::tipo_vinculo_enum, chave_pix = ?, tipo_pix = ?::tipo_pix_enum, status = ?::status_motorista_enum, cliente_id = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -72,7 +72,8 @@ public class MotoristaDAO extends ConnectionFactory {
             stmt.setString(14, motorista.getChavePix());
             stmt.setString(15, motorista.getTipoPix().name());
             stmt.setString(16, motorista.getStatus().name());
-            stmt.setInt(17, motorista.getId());
+            stmt.setInt(17, motorista.getClienteId());
+            stmt.setInt(18, motorista.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -173,6 +174,28 @@ public class MotoristaDAO extends ConnectionFactory {
         motorista.setTipoPix(TipoPix.valueOf(rs.getString("tipo_pix")));
         motorista.setStatus(StatusMotorista.valueOf(rs.getString("status")));
         motorista.setAdicionadoEm(rs.getTimestamp("adicionado_em").toLocalDateTime());
+        motorista.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
         return motorista;
+    }
+
+    public List<Motorista> listarPorCliente(Integer clienteId) {
+        List<Motorista> motoristas = new ArrayList<>();
+        String sql = "SELECT * FROM motorista WHERE cliente_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, clienteId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    motoristas.add(mapearResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return motoristas;
     }
 }

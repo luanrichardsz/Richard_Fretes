@@ -3,6 +3,7 @@ package br.com.controller;
 import br.com.dao.OcorrenciaFreteDAO;
 import br.com.model.OcorrenciaFrete;
 import br.com.model.OcorrenciaFrete.TipoOcorrencia;
+import br.com.model.Usuario;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/ocorrencias")
@@ -21,6 +23,13 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
         String acao = req.getParameter("acao");
 
@@ -48,7 +57,17 @@ public class OcorrenciaFreteServlet extends HttpServlet {
             return;
         }
 
-        List<OcorrenciaFrete> ocorrencias = ocorrenciaDAO.listarTodas();
+        List<OcorrenciaFrete> ocorrencias;
+        
+        if (usuarioLogado.isAdmin()) {
+            ocorrencias = ocorrenciaDAO.listarTodas();
+        } else {
+            if (usuarioLogado.getClienteId() != null) {
+                ocorrencias = ocorrenciaDAO.listarPorCliente(usuarioLogado.getClienteId());
+            } else {
+                ocorrencias = new ArrayList<>();
+            }
+        }
 
         req.setAttribute("ocorrencias", ocorrencias);
 

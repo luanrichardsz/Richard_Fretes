@@ -3,6 +3,7 @@ package br.com.controller;
 import br.com.dao.VeiculoDAO;
 import br.com.model.Veiculo;
 import br.com.model.Veiculo.StatusVeiculo;
+import br.com.model.Usuario;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/veiculos")
@@ -21,6 +23,13 @@ public class VeiculoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
         String acao = req.getParameter("acao");
 
@@ -48,7 +57,17 @@ public class VeiculoServlet extends HttpServlet {
             return;
         }
 
-        List<Veiculo> veiculos = veiculoDAO.listarTodos();
+        List<Veiculo> veiculos;
+        
+        if (usuarioLogado.isAdmin()) {
+            veiculos = veiculoDAO.listarTodos();
+        } else {
+            if (usuarioLogado.getClienteId() != null) {
+                veiculos = veiculoDAO.listarPorCliente(usuarioLogado.getClienteId());
+            } else {
+                veiculos = new ArrayList<>();
+            }
+        }
 
         req.setAttribute("veiculos", veiculos);
 
@@ -59,6 +78,13 @@ public class VeiculoServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
         Veiculo veiculo = new Veiculo();
 
@@ -96,6 +122,15 @@ public class VeiculoServlet extends HttpServlet {
         String seguroParam = req.getParameter("seguroValidade");
         if (seguroParam != null && !seguroParam.isEmpty()) {
             veiculo.setSeguroValidade(LocalDate.parse(seguroParam));
+        }
+
+        if (usuarioLogado.isAdmin()) {
+            String clienteIdParam = req.getParameter("clienteId");
+            if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
+                veiculo.setClienteId(Integer.parseInt(clienteIdParam));
+            }
+        } else {
+            veiculo.setClienteId(usuarioLogado.getClienteId());
         }
 
         if (!isEdicao) {

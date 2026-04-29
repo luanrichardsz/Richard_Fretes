@@ -2,6 +2,7 @@ package br.com.controller;
 
 import br.com.dao.EnderecoDAO;
 import br.com.model.Endereco;
+import br.com.model.Usuario;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -9,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/enderecos")
@@ -18,6 +20,13 @@ public class EnderecoServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
         String acao = req.getParameter("acao");
 
@@ -45,7 +54,17 @@ public class EnderecoServlet extends HttpServlet {
             return;
         }
 
-        List<Endereco> enderecos = enderecoDAO.listarTodos();
+        List<Endereco> enderecos;
+        
+        if (usuarioLogado.isAdmin()) {
+            enderecos = enderecoDAO.listarTodos();
+        } else {
+            if (usuarioLogado.getClienteId() != null) {
+                enderecos = enderecoDAO.listarPorCliente(usuarioLogado.getClienteId());
+            } else {
+                enderecos = new ArrayList<>();
+            }
+        }
 
         req.setAttribute("enderecos", enderecos);
 
@@ -57,6 +76,13 @@ public class EnderecoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
+
         Endereco endereco = new Endereco();
 
         // Verificar se é uma atualização (edição) ou novo endereço
@@ -67,7 +93,12 @@ public class EnderecoServlet extends HttpServlet {
             endereco.setId(Integer.parseInt(idParam));
         }
 
-        endereco.setClienteId(Integer.parseInt(req.getParameter("clienteId")));
+        if (usuarioLogado.isAdmin()) {
+            endereco.setClienteId(Integer.parseInt(req.getParameter("clienteId")));
+        } else {
+            endereco.setClienteId(usuarioLogado.getClienteId());
+        }
+
         endereco.setCep(req.getParameter("cep"));
         endereco.setLogradouro(req.getParameter("logradouro"));
         endereco.setNumero(req.getParameter("numero"));

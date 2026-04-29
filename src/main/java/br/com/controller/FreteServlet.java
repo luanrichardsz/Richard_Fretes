@@ -3,6 +3,7 @@ package br.com.controller;
 import br.com.dao.FreteDAO;
 import br.com.model.Frete;
 import br.com.model.Frete.StatusFrete;
+import br.com.model.Usuario;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/fretes")
@@ -22,6 +24,13 @@ public class FreteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
         String acao = req.getParameter("acao");
 
@@ -49,7 +58,17 @@ public class FreteServlet extends HttpServlet {
             return;
         }
 
-        List<Frete> fretes = freteDAO.listarTodos();
+        List<Frete> fretes;
+        
+        if (usuarioLogado.isAdmin()) {
+            fretes = freteDAO.listarTodos();
+        } else {
+            if (usuarioLogado.getClienteId() != null) {
+                fretes = freteDAO.listarPorCliente(usuarioLogado.getClienteId());
+            } else {
+                fretes = new ArrayList<>();
+            }
+        }
 
         req.setAttribute("fretes", fretes);
 

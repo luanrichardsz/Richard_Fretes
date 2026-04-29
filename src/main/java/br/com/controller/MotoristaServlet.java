@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/motoristas")
@@ -25,11 +26,17 @@ public class MotoristaServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        
+        if(usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
+
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-            if (usuarioLogado != null && usuarioLogado.isAdmin()) {
+            if (usuarioLogado.isAdmin()) {
                 List<Cliente> clientes = new ClienteDAO().listarTodos();
                 req.setAttribute("clientes", clientes);
             }
@@ -43,8 +50,7 @@ public class MotoristaServlet extends HttpServlet {
                 Motorista motorista = motoristaDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("motorista", motorista);
             }
-            Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-            if (usuarioLogado != null && usuarioLogado.isAdmin()) {
+            if (usuarioLogado.isAdmin()) {
                 List<Cliente> clientes = new ClienteDAO().listarTodos();
                 req.setAttribute("clientes", clientes);
             }
@@ -61,7 +67,17 @@ public class MotoristaServlet extends HttpServlet {
             return;
         }
 
-        List<Motorista> motoristas = motoristaDAO.listarTodos();
+        List<Motorista> motoristas;
+        
+        if (usuarioLogado.isAdmin()) {
+            motoristas = motoristaDAO.listarTodos();
+        } else {
+            if (usuarioLogado.getClienteId() != null) {
+                motoristas = motoristaDAO.listarPorCliente(usuarioLogado.getClienteId());
+            } else {
+                motoristas = new ArrayList<>();
+            }
+        }
 
         req.setAttribute("motoristas", motoristas);
 

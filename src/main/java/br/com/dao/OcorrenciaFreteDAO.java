@@ -194,6 +194,31 @@ public class OcorrenciaFreteDAO extends ConnectionFactory {
         }
     }
 
+    public List<OcorrenciaFrete> listarPorCliente(Integer clienteId) {
+        List<OcorrenciaFrete> ocorrencias = new ArrayList<>();
+        String sql = "SELECT of.* FROM ocorrencia_frete of " +
+                     "JOIN frete f ON of.frete_id = f.id " +
+                     "WHERE f.remetente_id = ? OR f.destinatario_id = ? " +
+                     "ORDER BY of.data_hora DESC";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, clienteId);
+            stmt.setInt(2, clienteId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    ocorrencias.add(mapearResultSet(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return ocorrencias;
+    }
+
     private OcorrenciaFrete mapearResultSet(ResultSet rs) throws SQLException {
         OcorrenciaFrete ocorrencia = new OcorrenciaFrete();
         ocorrencia.setId(rs.getInt("id"));
