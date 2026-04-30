@@ -2,10 +2,23 @@
 <%@ page isELIgnored="false" %>
 <%@ page import="br.com.model.Veiculo" %>
 <%@ page import="br.com.model.Veiculo.StatusVeiculo" %>
+<%@ page import="br.com.model.Usuario" %>
+<%@ page import="br.com.model.Cliente" %>
+<%@ page import="br.com.model.Motorista" %>
+<%@ page import="java.util.List" %>
+
+<%
+    Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioAutenticado");
+    if (usuarioLogado == null) {
+        response.sendRedirect("login");
+        return;
+    }
+%>
 
 <% 
   Veiculo veiculo = (Veiculo) request.getAttribute("veiculo");
-  boolean isEdicao = veiculo != null;
+  boolean possuiDados = veiculo != null;
+  boolean isEdicao = veiculo != null && veiculo.getId() != null;
 %>
 
 <!DOCTYPE html>
@@ -56,6 +69,12 @@
   <section class="card">
     <h2><%= isEdicao ? "Editar Veículo" : "Novo Veículo" %></h2>
 
+    <% if (request.getAttribute("erro") != null) { %>
+      <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
+        <%= request.getAttribute("erro") %>
+      </div>
+    <% } %>
+
     <form action="veiculos" method="post">
       
       <% if (isEdicao) { %>
@@ -70,20 +89,41 @@
         <!-- Placa -->
         <div class="form-group">
           <label>Placa *</label>
-          <input type="text" name="placa" value="<%= isEdicao ? veiculo.getPlaca() : "" %>" required maxlength="8" />
+          <input type="text" id="placa" name="placa" value="<%= possuiDados ? veiculo.getPlaca() : "" %>" required maxlength="8" />
         </div>
 
         <!-- RENAVAM -->
         <div class="form-group">
           <label>RENAVAM *</label>
-          <input type="text" name="renavam" value="<%= isEdicao ? veiculo.getRenavam() : "" %>" required />
+          <input type="text" id="renavam" name="renavam" maxlength="11" inputmode="numeric" value="<%= possuiDados ? veiculo.getRenavam() : "" %>" required />
         </div>
 
         <!-- RNTRC -->
         <div class="form-group">
           <label>RNTRC</label>
-          <input type="text" name="rntrc" value="<%= isEdicao ? (veiculo.getRntrc() != null ? veiculo.getRntrc() : "") : "" %>" />
+          <input type="text" id="rntrc" name="rntrc" maxlength="8" inputmode="numeric" value="<%= possuiDados ? (veiculo.getRntrc() != null ? veiculo.getRntrc() : "") : "" %>" />
         </div>
+
+        <% if (usuarioLogado.isAdmin()) { %>
+          <div class="form-group">
+            <label>Empresa Selecionada *</label>
+            <select name="clienteId" required>
+              <option value="">Selecione uma empresa</option>
+              <%
+                List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");
+                if (clientes != null) {
+                  for (Cliente cliente : clientes) {
+              %>
+                <option value="<%= cliente.getId() %>" <%= possuiDados && veiculo.getClienteId() != null && veiculo.getClienteId().equals(cliente.getId()) ? "selected" : "" %>>
+                  <%= cliente.getNomeFantasia() %>
+                </option>
+              <%
+                  }
+                }
+              %>
+            </select>
+          </div>
+        <% } %>
 
         <!-- CARACTERÍSTICAS -->
         <div class="section-title">Características do Veículo</div>
@@ -91,13 +131,13 @@
         <!-- Ano Fabricação -->
         <div class="form-group">
           <label>Ano Fabricação *</label>
-          <input type="number" name="anoFabricacao" maxlength="4" value="<%= isEdicao ? veiculo.getAnoFabricacao() : "" %>" required />
+          <input type="number" name="anoFabricacao" maxlength="4" value="<%= possuiDados ? veiculo.getAnoFabricacao() : "" %>" required />
         </div>
 
         <!-- Ano Modelo -->
         <div class="form-group">
           <label>Ano Modelo *</label>
-          <input type="number" name="anoModelo" maxlength="4" value="<%= isEdicao ? veiculo.getAnoModelo() : "" %>" required />
+          <input type="number" name="anoModelo" maxlength="4" value="<%= possuiDados ? veiculo.getAnoModelo() : "" %>" required />
         </div>
 
         <!-- Combustível -->
@@ -105,29 +145,29 @@
           <label>Combustível *</label>
           <select name="combustivel" required>
             <option value="">Selecione</option>
-            <option value="Diesel" <%= isEdicao && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("Diesel") ? "selected" : "" %>>Diesel</option>
-            <option value="Gasolina" <%= isEdicao && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("Gasolina") ? "selected" : "" %>>Gasolina</option>
-            <option value="Etanol" <%= isEdicao && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("Etanol") ? "selected" : "" %>>Etanol</option>
-            <option value="GNV" <%= isEdicao && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("GNV") ? "selected" : "" %>>GNV</option>
+            <option value="Diesel" <%= possuiDados && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("Diesel") ? "selected" : "" %>>Diesel</option>
+            <option value="Gasolina" <%= possuiDados && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("Gasolina") ? "selected" : "" %>>Gasolina</option>
+            <option value="Etanol" <%= possuiDados && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("Etanol") ? "selected" : "" %>>Etanol</option>
+            <option value="GNV" <%= possuiDados && veiculo.getCombustivel() != null && veiculo.getCombustivel().equals("GNV") ? "selected" : "" %>>GNV</option>
           </select>
         </div>
 
         <!-- Tipo -->
         <div class="form-group">
           <label>Tipo *</label>
-          <input type="text" name="tipo" value="<%= isEdicao ? veiculo.getTipo() : "" %>" required />
+          <input type="text" name="tipo" value="<%= possuiDados ? veiculo.getTipo() : "" %>" required />
         </div>
 
         <!-- Tipo Outros -->
         <div class="form-group">
           <label>Tipo Outros</label>
-          <input type="text" name="tipoOutros" value="<%= isEdicao ? (veiculo.getTipoOutros() != null ? veiculo.getTipoOutros() : "") : "" %>" />
+          <input type="text" name="tipoOutros" value="<%= possuiDados ? (veiculo.getTipoOutros() != null ? veiculo.getTipoOutros() : "") : "" %>" />
         </div>
 
         <!-- Quantidade Eixos -->
         <div class="form-group">
           <label>Quantidade Eixos *</label>
-          <input type="number" name="quantidadeEixos" value="<%= isEdicao ? veiculo.getQuantidadeEixos() : "" %>" required />
+          <input type="number" name="quantidadeEixos" value="<%= possuiDados ? veiculo.getQuantidadeEixos() : "" %>" required />
         </div>
 
         <!-- CAPACIDADE E PESO -->
@@ -136,19 +176,19 @@
         <!-- Tara (kg) -->
         <div class="form-group">
           <label>Tara (kg) *</label>
-          <input type="number" name="taraKg" value="<%= isEdicao ? veiculo.getTaraKg() : "" %>" required />
+          <input type="number" name="taraKg" value="<%= possuiDados ? veiculo.getTaraKg() : "" %>" required />
         </div>
 
         <!-- Capacidade Carga (kg) -->
         <div class="form-group">
           <label>Capacidade Carga (kg) *</label>
-          <input type="number" name="capacidadeCargaKg" value="<%= isEdicao ? veiculo.getCapacidadeCargaKg() : "" %>" required />
+          <input type="number" name="capacidadeCargaKg" value="<%= possuiDados ? veiculo.getCapacidadeCargaKg() : "" %>" required />
         </div>
 
         <!-- Volume (m³) -->
         <div class="form-group">
           <label>Volume (m³)</label>
-          <input type="number" name="volumeM3" value="<%= isEdicao ? veiculo.getVolumeM3() : "" %>" />
+          <input type="number" name="volumeM3" value="<%= possuiDados ? veiculo.getVolumeM3() : "" %>" />
         </div>
 
         <!-- OPERACIONAL -->
@@ -160,7 +200,7 @@
           <select name="status" required>
             <option value="">Selecione</option>
             <% for (StatusVeiculo status : StatusVeiculo.values()) { %>
-              <option value="<%= status.name() %>" <%= isEdicao && veiculo.getStatus() != null && veiculo.getStatus().name().equals(status.name()) ? "selected" : "" %>>
+              <option value="<%= status.name() %>" <%= possuiDados && veiculo.getStatus() != null && veiculo.getStatus().name().equals(status.name()) ? "selected" : "" %>>
                 <%= status.name() %>
               </option>
             <% } %>
@@ -169,20 +209,34 @@
 
         <!-- Motorista ID -->
         <div class="form-group">
-          <label>Motorista ID</label>
-          <input type="number" name="motoristaId" value="<%= isEdicao ? (veiculo.getMotoristaId() != null ? veiculo.getMotoristaId() : "") : "" %>" />
+          <label>Motorista</label>
+          <select name="motoristaId">
+            <option value="">Selecione um motorista</option>
+            <%
+              List<Motorista> motoristas = (List<Motorista>) request.getAttribute("motoristas");
+              if (motoristas != null) {
+                for (Motorista motorista : motoristas) {
+            %>
+              <option value="<%= motorista.getId() %>" <%= possuiDados && veiculo.getMotoristaId() != null && veiculo.getMotoristaId().equals(motorista.getId()) ? "selected" : "" %>>
+                <%= motorista.getNomeCompleto() %>
+              </option>
+            <%
+                }
+              }
+            %>
+          </select>
         </div>
 
         <!-- Seguro Validade -->
         <div class="form-group">
           <label>Seguro Validade</label>
-          <input type="date" name="seguroValidade" value="<%= isEdicao ? (veiculo.getSeguroValidade() != null ? veiculo.getSeguroValidade() : "") : "" %>" />
+          <input type="date" name="seguroValidade" value="<%= possuiDados ? (veiculo.getSeguroValidade() != null ? veiculo.getSeguroValidade() : "") : "" %>" />
         </div>
 
         <!-- Manutenção Pendente -->
         <div class="form-group">
           <label>
-            <input type="checkbox" name="manutencaoPendente" value="true" <%= isEdicao && veiculo.isManutencaoPendente() ? "checked" : "" %> />
+            <input type="checkbox" name="manutencaoPendente" value="true" <%= possuiDados && veiculo.isManutencaoPendente() ? "checked" : "" %> />
             Manutenção Pendente
           </label>
         </div>
@@ -199,6 +253,8 @@
   </section>
 
 </div>
+
+<script src="/RichardFretes/js/funcoesCadastroV.js"></script>
 
 </body>
 </html>

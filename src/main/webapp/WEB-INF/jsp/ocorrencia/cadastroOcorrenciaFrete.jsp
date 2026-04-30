@@ -5,7 +5,8 @@
 
 <% 
   OcorrenciaFrete ocorrencia = (OcorrenciaFrete) request.getAttribute("ocorrencia");
-  boolean isEdicao = ocorrencia != null;
+  boolean possuiDados = ocorrencia != null;
+  boolean isEdicao = ocorrencia != null && ocorrencia.getId() != null;
 %>
 
 <!DOCTYPE html>
@@ -49,6 +50,12 @@
   <section class="card">
     <h2><%= isEdicao ? "Editar Ocorrência" : "Nova Ocorrência" %></h2>
 
+    <% if (request.getAttribute("erro") != null) { %>
+      <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
+        <%= request.getAttribute("erro") %>
+      </div>
+    <% } %>
+
     <form action="ocorrencias" method="post">
       
       <% if (isEdicao) { %>
@@ -60,7 +67,7 @@
         <!-- Frete ID -->
         <div class="form-group">
           <label>Frete ID *</label>
-          <input type="number" name="freteId" value="<%= isEdicao ? ocorrencia.getFreteId() : "" %>" required />
+          <input type="number" name="freteId" value="<%= possuiDados ? ocorrencia.getFreteId() : "" %>" required />
         </div>
 
         <!-- Tipo Ocorrência -->
@@ -69,7 +76,7 @@
           <select name="tipo" required>
             <option value="">Selecione</option>
             <% for (TipoOcorrencia tipo : TipoOcorrencia.values()) { %>
-              <option value="<%= tipo.name() %>" <%= isEdicao && ocorrencia.getTipo() != null && ocorrencia.getTipo().name().equals(tipo.name()) ? "selected" : "" %>>
+              <option value="<%= tipo.name() %>" <%= possuiDados && ocorrencia.getTipo() != null && ocorrencia.getTipo().name().equals(tipo.name()) ? "selected" : "" %>>
                 <%= tipo.name() %>
               </option>
             <% } %>
@@ -79,49 +86,49 @@
         <!-- Município -->
         <div class="form-group">
           <label>Município *</label>
-          <input type="text" name="municipio" value="<%= isEdicao ? ocorrencia.getMunicipio() : "" %>" required />
+          <input type="text" name="municipio" value="<%= possuiDados ? ocorrencia.getMunicipio() : "" %>" required />
         </div>
 
         <!-- UF -->
         <div class="form-group">
           <label>UF *</label>
-          <input type="text" name="uf" value="<%= isEdicao ? ocorrencia.getUf() : "" %>" maxlength="2" required />
+          <input type="text" id="uf" name="uf" value="<%= possuiDados ? ocorrencia.getUf() : "" %>" maxlength="2" required />
         </div>
 
         <!-- Latitude -->
         <div class="form-group">
           <label>Latitude</label>
-          <input type="number" step="0.000001" name="latitude" value="<%= isEdicao ? (ocorrencia.getLatitude() != null ? ocorrencia.getLatitude() : "") : "" %>" />
+          <input type="number" step="0.000001" name="latitude" value="<%= possuiDados ? (ocorrencia.getLatitude() != null ? ocorrencia.getLatitude() : "") : "" %>" />
         </div>
 
         <!-- Longitude -->
         <div class="form-group">
           <label>Longitude</label>
-          <input type="number" step="0.000001" name="longitude" value="<%= isEdicao ? (ocorrencia.getLongitude() != null ? ocorrencia.getLongitude() : "") : "" %>" />
+          <input type="number" step="0.000001" name="longitude" value="<%= possuiDados ? (ocorrencia.getLongitude() != null ? ocorrencia.getLongitude() : "") : "" %>" />
         </div>
 
         <!-- Descrição -->
         <div class="form-group full">
           <label>Descrição</label>
-          <textarea name="descricao" rows="3"><%= isEdicao ? (ocorrencia.getDescricao() != null ? ocorrencia.getDescricao() : "") : "" %></textarea>
+          <textarea name="descricao" rows="3"><%= possuiDados ? (ocorrencia.getDescricao() != null ? ocorrencia.getDescricao() : "") : "" %></textarea>
         </div>
 
         <!-- Recebedor Nome -->
         <div class="form-group">
           <label>Recebedor Nome</label>
-          <input type="text" name="recebedorNome" value="<%= isEdicao ? (ocorrencia.getRecebedorNome() != null ? ocorrencia.getRecebedorNome() : "") : "" %>" />
+          <input type="text" name="recebedorNome" value="<%= possuiDados ? (ocorrencia.getRecebedorNome() != null ? ocorrencia.getRecebedorNome() : "") : "" %>" />
         </div>
 
         <!-- Recebedor Documento -->
         <div class="form-group">
           <label>Recebedor Documento</label>
-          <input type="text" name="recebedorDocumento" value="<%= isEdicao ? (ocorrencia.getRecebedorDocumento() != null ? ocorrencia.getRecebedorDocumento() : "") : "" %>" />
+          <input type="text" id="recebedorDocumento" name="recebedorDocumento" maxlength="18" inputmode="numeric" value="<%= possuiDados ? (ocorrencia.getRecebedorDocumento() != null ? ocorrencia.getRecebedorDocumento() : "") : "" %>" />
         </div>
 
         <!-- Foto Evidência URL -->
         <div class="form-group full">
           <label>Foto Evidência URL</label>
-          <input type="url" name="fotoEvidenciaUrl" value="<%= isEdicao ? (ocorrencia.getFotoEvidenciaUrl() != null ? ocorrencia.getFotoEvidenciaUrl() : "") : "" %>" />
+          <input type="url" name="fotoEvidenciaUrl" value="<%= possuiDados ? (ocorrencia.getFotoEvidenciaUrl() != null ? ocorrencia.getFotoEvidenciaUrl() : "") : "" %>" />
         </div>
 
       </div>
@@ -136,6 +143,8 @@
   </section>
 
 </div>
+
+<script src="/RichardFretes/js/funcoesCadastroO.js"></script>
 
 </body>
 </html>

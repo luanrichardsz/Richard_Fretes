@@ -6,7 +6,8 @@
 
 <% 
   Cliente cliente = (Cliente) request.getAttribute("cliente");
-  boolean isEdicao = cliente != null;
+  boolean possuiDados = cliente != null;
+  boolean isEdicao = cliente != null && cliente.getId() != null;
   List<Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
 %>
 
@@ -50,6 +51,12 @@
   <section class="card">
     <h2><%= isEdicao ? "Editar Cliente" : "Novo Cliente" %></h2>
 
+    <% if (request.getAttribute("erro") != null) { %>
+      <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
+        <%= request.getAttribute("erro") %>
+      </div>
+    <% } %>
+
     <form action="clientes" method="post">
       
       <% if (isEdicao) { %>
@@ -61,48 +68,48 @@
         <!-- Razão Social -->
         <div class="form-group full">
           <label>Razão Social *</label>
-          <input type="text" name="razaoSocial" value="<%= isEdicao ? cliente.getRazaoSocial() : "" %>" required />
+          <input type="text" name="razaoSocial" value="<%= possuiDados ? cliente.getRazaoSocial() : "" %>" required />
         </div>
 
         <!-- Nome Fantasia -->
         <div class="form-group full">
           <label>Nome Fantasia</label>
-          <input type="text" name="nomeFantasia" value="<%= isEdicao ? (cliente.getNomeFantasia() != null ? cliente.getNomeFantasia() : "") : "" %>" />
+          <input type="text" name="nomeFantasia" value="<%= possuiDados ? (cliente.getNomeFantasia() != null ? cliente.getNomeFantasia() : "") : "" %>" />
         </div>
 
         <!-- Documento -->
         <div class="form-group">
           <label>CNPJ *</label>
-          <input type="text" name="documento" maxlength="18" inputmode="numeric" value="<%= isEdicao ? cliente.getDocumento() : "" %>" required />
+          <input type="text" id="documento" name="documento" maxlength="18" inputmode="numeric" value="<%= possuiDados ? cliente.getDocumento() : "" %>" required />
         </div>
 
         <!-- IE -->
         <div class="form-group">
-          <label>Inscrição Estadual</label>
-          <input type="text" name="inscricaoEstadual" maxlength="14" inputmode="numeric" value="<%= isEdicao ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
+          <label>Inscrição Estadual (Sem Pontuação)</label>
+          <input type="text" name="inscricaoEstadual" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="14" inputmode="numeric" value="<%= possuiDados ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
         </div>
 
         <!-- Email -->
         <div class="form-group">
           <label>Email *</label>
-          <input type="email" name="email" value="<%= isEdicao ? cliente.getEmail() : "" %>" required />
+          <input type="email" name="email" value="<%= possuiDados ? cliente.getEmail() : "" %>" required />
         </div>
 
         <!-- Telefone -->
         <div class="form-group">
           <label>Telefone *</label>
-          <input type="text" name="telefone" maxlength="15" inputmode="numeric" value="<%= isEdicao ? cliente.getTelefone() : "" %>" required />
+          <input type="text" id="telefone" name="telefone" minlength="15" maxlength="15" inputmode="numeric" value="<%= possuiDados ? cliente.getTelefone() : "" %>" required />
         </div>
 
         <!-- Usuário Responsável -->
         <div class="form-group full">
           <label>Usuário Responsável *</label>
           <select name="usuarioId" required>
-            <option value="">Selecione um usuário</option>
+            <option value="0">Selecione um usuário</option>
             <% 
               if (usuarios != null) {
                 for (Usuario u : usuarios) {
-                  boolean selected = isEdicao && u.getClienteId() != null && u.getClienteId().equals(cliente.getId());
+                  boolean selected = possuiDados && cliente.getId() != null && u.getClienteId() != null && u.getClienteId().equals(cliente.getId());
             %>
               <option value="<%= u.getId() %>" <%= selected ? "selected" : "" %>>
                 <%= u.getUsuario() %> (<%= u.getEmail() %>)
@@ -126,48 +133,7 @@
 
 </div>
 
-<script>
-function aplicarMascaraCnpj(valor) {
-  var numeros = valor.replace(/\D/g, "").slice(0, 14);
-
-  return numeros
-    .replace(/^(\d{2})(\d)/, "$1.$2")
-    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
-    .replace(/\.(\d{3})(\d)/, ".$1/$2")
-    .replace(/(\d{4})(\d)/, "$1-$2");
-}
-
-function aplicarMascaraTelefone(valor) {
-  var numeros = valor.replace(/\D/g, "").slice(0, 11);
-
-  if (numeros.length <= 10) {
-    return numeros
-      .replace(/^(\d{2})(\d)/, "($1) $2")
-      .replace(/(\d{4})(\d)/, "$1-$2");
-  }
-
-  return numeros
-    .replace(/^(\d{2})(\d)/, "($1) $2")
-    .replace(/(\d{5})(\d)/, "$1-$2");
-}
-
-function configurarMascara(nomeCampo, formatador) {
-  var campo = document.querySelector('input[name="' + nomeCampo + '"]');
-
-  if (!campo) {
-    return;
-  }
-
-  campo.addEventListener("input", function () {
-    campo.value = formatador(campo.value);
-  });
-
-  campo.value = formatador(campo.value);
-}
-
-configurarMascara("documento", aplicarMascaraCnpj);
-configurarMascara("telefone", aplicarMascaraTelefone);
-</script>
+<script src="/RichardFretes/js/funcoesCadastroC.js"></script>
 
 </body>
 </html>

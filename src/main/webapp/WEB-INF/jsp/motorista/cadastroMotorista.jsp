@@ -15,7 +15,8 @@
 
 <% 
   Motorista motorista = (Motorista) request.getAttribute("motorista");
-  boolean isEdicao = motorista != null;
+  boolean possuiDados = motorista != null;
+  boolean isEdicao = motorista != null && motorista.getId() != null;
 %>
 
 <!DOCTYPE html>
@@ -65,6 +66,12 @@
   <section class="card">
     <h2><%= isEdicao ? "Editar Motorista" : "Novo Motorista" %></h2>
 
+    <% if (request.getAttribute("erro") != null) { %>
+      <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
+        <%= request.getAttribute("erro") %>
+      </div>
+    <% } %>
+
     <form action="motoristas" method="post">
       
       <% if (isEdicao) { %>
@@ -79,31 +86,31 @@
         <!-- Nome Completo -->
         <div class="form-group full">
           <label>Nome Completo *</label>
-          <input type="text" name="nomeCompleto" value="<%= isEdicao ? motorista.getNomeCompleto() : "" %>" required />
+          <input type="text" name="nomeCompleto" value="<%= possuiDados ? motorista.getNomeCompleto() : "" %>" required />
         </div>
 
         <!-- CPF -->
         <div class="form-group">
           <label>CPF *</label>
-          <input type="text" name="cpf" maxlength="11" value="<%= isEdicao ? motorista.getCpf() : "" %>" required />
+          <input type="text" id="cpf" name="cpf" maxlength="14" inputmode="numeric" value="<%= possuiDados ? motorista.getCpf() : "" %>" required />
         </div>
 
         <!-- RG -->
         <div class="form-group">
           <label>RG *</label>
-          <input type="text" name="rg" maxlength="9" value="<%= isEdicao ? motorista.getRg() : "" %>" required />
+          <input type="text" id="rg" name="rg" maxlength="12" inputmode="numeric" value="<%= possuiDados ? motorista.getRg() : "" %>" required />
         </div>
 
         <!-- Data Nascimento -->
         <div class="form-group">
           <label>Data Nascimento *</label>
-          <input type="date" name="dataNascimento" value="<%= isEdicao ? motorista.getDataNascimento() : "" %>" required />
+          <input type="date" id="dataNascimento" name="dataNascimento" max="<%= java.time.LocalDate.now() %>" value="<%= possuiDados ? motorista.getDataNascimento() : "" %>" required />
         </div>
 
         <!-- Telefone -->
         <div class="form-group">
           <label>Telefone *</label>
-          <input type="tel" name="telefone" maxlength="11" value="<%= isEdicao ? motorista.getTelefone() : "" %>" required />
+          <input type="tel" id="telefone" name="telefone" maxlength="15" inputmode="numeric" value="<%= possuiDados ? motorista.getTelefone() : "" %>" required />
         </div>
 
         <% if (usuarioLogado != null && usuarioLogado.isAdmin()) { %>
@@ -117,7 +124,7 @@
                 if (clientes != null) {
                   for (Cliente cliente : clientes) {
               %>
-                <option value="<%= cliente.getId() %>" <%= isEdicao && motorista.getClienteId() != null && motorista.getClienteId().equals(cliente.getId()) ? "selected" : "" %>>
+                <option value="<%= cliente.getId() %>" <%= possuiDados && motorista.getClienteId() != null && motorista.getClienteId().equals(cliente.getId()) ? "selected" : "" %>>
                   <%= cliente.getNomeFantasia() %>
                 </option>
               <% 
@@ -134,19 +141,19 @@
         <!-- Nome Emergência -->
         <div class="form-group full">
           <label>Nome da Pessoa</label>
-          <input type="text" name="nomeEmergencia" value="<%= isEdicao ? (motorista.getNomeEmergencia() != null ? motorista.getNomeEmergencia() : "") : "" %>" />
+          <input type="text" name="nomeEmergencia" value="<%= possuiDados ? (motorista.getNomeEmergencia() != null ? motorista.getNomeEmergencia() : "") : "" %>" />
         </div>
 
         <!-- Telefone Emergência -->
         <div class="form-group">
           <label>Telefone</label>
-          <input type="tel" name="telefoneEmergencia" maxlength="11" value="<%= isEdicao ? (motorista.getTelefoneEmergencia() != null ? motorista.getTelefoneEmergencia() : "") : "" %>" />
+          <input type="tel" id="telefoneEmergencia" name="telefoneEmergencia" maxlength="15" inputmode="numeric" value="<%= possuiDados ? (motorista.getTelefoneEmergencia() != null ? motorista.getTelefoneEmergencia() : "") : "" %>" />
         </div>
 
         <!-- Parentesco -->
         <div class="form-group">
           <label>Parentesco</label>
-          <input type="text" name="parentescoEmergencia" value="<%= isEdicao ? (motorista.getParentescoEmergencia() != null ? motorista.getParentescoEmergencia() : "") : "" %>" />
+          <input type="text" name="parentescoEmergencia" value="<%= possuiDados ? (motorista.getParentescoEmergencia() != null ? motorista.getParentescoEmergencia() : "") : "" %>" />
         </div>
 
         <!-- CNH -->
@@ -155,7 +162,7 @@
         <!-- Número CNH -->
         <div class="form-group">
           <label>Número CNH *</label>
-          <input type="text" name="numeroCnh" value="<%= isEdicao ? motorista.getNumeroCnh() : "" %>" required />
+          <input type="text" id="numeroCnh" name="numeroCnh" maxlength="11" inputmode="numeric" value="<%= possuiDados ? motorista.getNumeroCnh() : "" %>" required />
         </div>
 
         <!-- Categoria CNH -->
@@ -164,7 +171,7 @@
           <select name="categoriaCnh" required>
             <option value="">Selecione</option>
             <% for (CategoriaCnh cat : CategoriaCnh.values()) { %>
-              <option value="<%= cat.name() %>" <%= isEdicao && motorista.getCategoriaCnh() != null && motorista.getCategoriaCnh().name().equals(cat.name()) ? "selected" : "" %>>
+              <option value="<%= cat.name() %>" <%= possuiDados && motorista.getCategoriaCnh() != null && motorista.getCategoriaCnh().name().equals(cat.name()) ? "selected" : "" %>>
                 <%= cat.name() %>
               </option>
             <% } %>
@@ -174,13 +181,13 @@
         <!-- Validade CNH -->
         <div class="form-group">
           <label>Validade CNH *</label>
-          <input type="date" name="validadeCnh" value="<%= isEdicao ? motorista.getValidadeCnh() : "" %>" required />
+          <input type="date" name="validadeCnh" value="<%= possuiDados ? motorista.getValidadeCnh() : "" %>" required />
         </div>
 
         <!-- Validade Toxicológico -->
         <div class="form-group">
           <label>Validade Toxicológico</label>
-          <input type="date" name="validadeToxicologico" value="<%= isEdicao ? (motorista.getValidadeToxicologico() != null ? motorista.getValidadeToxicologico() : "") : "" %>" />
+          <input type="date" name="validadeToxicologico" value="<%= possuiDados ? (motorista.getValidadeToxicologico() != null ? motorista.getValidadeToxicologico() : "") : "" %>" />
         </div>
 
         <!-- FINANCEIRO -->
@@ -192,7 +199,7 @@
           <select name="tipoVinculo" required>
             <option value="">Selecione</option>
             <% for (TipoVinculo tipo : TipoVinculo.values()) { %>
-              <option value="<%= tipo.name() %>" <%= isEdicao && motorista.getTipoVinculo() != null && motorista.getTipoVinculo().name().equals(tipo.name()) ? "selected" : "" %>>
+              <option value="<%= tipo.name() %>" <%= possuiDados && motorista.getTipoVinculo() != null && motorista.getTipoVinculo().name().equals(tipo.name()) ? "selected" : "" %>>
                 <%= tipo.name() %>
               </option>
             <% } %>
@@ -202,10 +209,10 @@
         <!-- Tipo PIX -->
         <div class="form-group">
           <label>Tipo PIX *</label>
-          <select name="tipoPix" required>
+          <select id="tipoPix" name="tipoPix" required>
             <option value="">Selecione</option>
             <% for (TipoPix tipo : TipoPix.values()) { %>
-              <option value="<%= tipo.name() %>" <%= isEdicao && motorista.getTipoPix() != null && motorista.getTipoPix().name().equals(tipo.name()) ? "selected" : "" %>>
+              <option value="<%= tipo.name() %>" <%= possuiDados && motorista.getTipoPix() != null && motorista.getTipoPix().name().equals(tipo.name()) ? "selected" : "" %>>
                 <%= tipo.name() %>
               </option>
             <% } %>
@@ -215,7 +222,7 @@
         <!-- Chave PIX -->
         <div class="form-group full">
           <label>Chave PIX *</label>
-          <input type="text" name="chavePix" value="<%= isEdicao ? motorista.getChavePix() : "" %>" required />
+          <input type="text" id="chavePix" name="chavePix" value="<%= possuiDados ? motorista.getChavePix() : "" %>" required />
         </div>
 
         <!-- Status -->
@@ -224,7 +231,7 @@
           <select name="status" required>
             <option value="">Selecione</option>
             <% for (StatusMotorista status : StatusMotorista.values()) { %>
-              <option value="<%= status.name() %>" <%= isEdicao && motorista.getStatus() != null && motorista.getStatus().name().equals(status.name()) ? "selected" : "" %>>
+              <option value="<%= status.name() %>" <%= possuiDados && motorista.getStatus() != null && motorista.getStatus().name().equals(status.name()) ? "selected" : "" %>>
                 <%= status.name() %>
               </option>
             <% } %>
@@ -244,31 +251,6 @@
 
 </div>
 
-<script>
-    document.querySelector('form').addEventListener('submit', function(e) {
-      const dataNascimento = document.getElementById('dataNascimento').value;
-      if (!dataNascimento) return;
-
-      const dataInput = new Date(dataNascimento);
-      const hoje = new Date();
-      
-      // Calcula a idade
-      let idade = hoje.getFullYear() - dataInput.getFullYear();
-      const m = hoje.getMonth() - dataInput.getMonth();
-      if (m < 0 || (m === 0 && hoje.getDate() < dataInput.getDate())) {
-          idade--;
-      }
-
-      if (idade < 18) {
-          alert("O motorista deve ter pelo menos 18 anos!");
-          e.preventDefault(); // Impede o envio do formulário
-      }
-      
-      if (idade > 100) {
-          alert("Por favor, insira uma data de nascimento válida.");
-          e.preventDefault();
-      }
-  });
-</script>
+<script src="/RichardFretes/js/funcoesCadastroM.js"></script>
 </body>
 </html>

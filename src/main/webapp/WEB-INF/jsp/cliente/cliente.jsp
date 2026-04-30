@@ -61,7 +61,7 @@
         <tr>
           <th>Razão Social</th>
           <th>CNPJ</th>
-          <th>Município</th>
+          <!-- <th>Município</th> -->
           <th>Contato</th>
           <th>Status</th>
           <th>Ações</th>
@@ -87,8 +87,8 @@
             <%= c.getDocumento() %>
           </td>
 
-          <!-- Município (placeholder) -->
-          <td>-</td>
+          <!-- Município (placeholder)
+          <td>-</td> -->
 
           <!-- Contato -->
           <td>
