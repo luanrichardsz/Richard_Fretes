@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.model.Endereco" %>
-<%@ page import="br.com.model.Usuario" %>
-<%@ page import="br.com.model.Cliente" %>
+<%@ page import="br.com.endereco.Endereco" %>
+<%@ page import="br.com.usuario.Usuario" %>
+<%@ page import="br.com.cliente.Cliente" %>
 <%@ page import="java.util.List" %>
 
 <%
@@ -99,12 +99,13 @@
         <div class="form-group">
           <label>CEP *</label>
           <input type="text" id="cep" name="cep" maxlength="9" inputmode="numeric" value="<%= possuiDados ? endereco.getCep() : "" %>" required />
+          <small id="cepMensagem" style="margin-top: 6px; color: #667085;"></small>
         </div>
 
         <!-- Logradouro -->
         <div class="form-group full">
           <label>Logradouro *</label>
-          <input type="text" name="logradouro" value="<%= possuiDados ? endereco.getLogradouro() : "" %>" required />
+          <input type="text" id="logradouro" name="logradouro" value="<%= possuiDados ? endereco.getLogradouro() : "" %>" required />
         </div>
 
         <!-- Número -->
@@ -122,13 +123,13 @@
         <!-- Bairro -->
         <div class="form-group">
           <label>Bairro *</label>
-          <input type="text" name="bairro" value="<%= possuiDados ? endereco.getBairro() : "" %>" required />
+          <input type="text" id="bairro" name="bairro" value="<%= possuiDados ? endereco.getBairro() : "" %>" required />
         </div>
 
         <!-- Município -->
         <div class="form-group">
           <label>Município *</label>
-          <input type="text" name="municipio" value="<%= possuiDados ? endereco.getMunicipio() : "" %>" required />
+          <input type="text" id="municipio" name="municipio" value="<%= possuiDados ? endereco.getMunicipio() : "" %>" required />
         </div>
 
         <!-- Código IBGE -->
