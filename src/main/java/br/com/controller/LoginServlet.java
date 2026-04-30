@@ -1,5 +1,8 @@
 package br.com.controller;
 
+import br.com.bo.UsuarioBO;
+import br.com.exception.CadastroException;
+import br.com.exception.NegocioException;
 import br.com.dao.UsuarioDAO;
 import br.com.model.Usuario;
 import javax.servlet.ServletException;
@@ -14,6 +17,7 @@ import javax.servlet.http.HttpSession;
 public class LoginServlet extends HttpServlet {
 
     private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private UsuarioBO usuarioBO = new UsuarioBO(usuarioDAO);
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,21 +33,6 @@ public class LoginServlet extends HttpServlet {
     }
 
     private void cadastrarUsuario(HttpServletRequest req, HttpServletResponse resp, String nomeUsuario, String email, String senha) throws ServletException, IOException {
-        
-
-        if (email == null || email.trim().isEmpty() || 
-            senha == null || senha.trim().isEmpty()) {
-            req.setAttribute("erro", "Email e senha são obrigatórios.");
-            req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
-            return;
-        }
-
-        if (usuarioDAO.existeEmail(email)) {
-            req.setAttribute("erro", "Este e-mail já está registrado no sistema.");
-            req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
-            return;
-        }
-
         Usuario novoUsuario = new Usuario();
         novoUsuario.setUsuario(nomeUsuario);
         novoUsuario.setEmail(email);
@@ -52,11 +41,11 @@ public class LoginServlet extends HttpServlet {
         novoUsuario.setAtivo(true);
 
         try {
-            usuarioDAO.salvar(novoUsuario);
+            usuarioBO.cadastrar(novoUsuario);
             req.setAttribute("sucesso", "Cadastro realizado com sucesso! Faça login para continuar.");
             req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
-        } catch (Exception e) {
-            req.setAttribute("erro", "Erro ao cadastrar usuário. Tente novamente.");
+        } catch (CadastroException e) {
+            req.setAttribute("erro", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
         }
     }
@@ -65,14 +54,13 @@ public class LoginServlet extends HttpServlet {
                             String email, String senha) 
             throws ServletException, IOException {
         
-        Usuario usuario = usuarioDAO.autenticar(email, senha);
-
-        if (usuario != null) {
+        try {
+            Usuario usuario = usuarioBO.autenticar(email, senha);
             HttpSession session = req.getSession();
             session.setAttribute("usuarioAutenticado", usuario);
             req.getRequestDispatcher("/WEB-INF/jsp/menu/menu.jsp").forward(req, resp);
-        } else {
-            req.setAttribute("erro", "Credenciais inválidas para Richard Fretes.");
+        } catch (NegocioException e) {
+            req.setAttribute("erro", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);
         }
     }

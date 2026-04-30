@@ -87,6 +87,28 @@ public class ClienteDAO extends ConnectionFactory {
         return cliente;
     }
 
+    public boolean existeDocumentoParaOutroCliente(String documento, Integer clienteIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM cliente WHERE documento = ? AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, documento);
+            stmt.setObject(2, clienteIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, clienteIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public List<Cliente> listarTodos() {
         List<Cliente> clientes = new ArrayList<>();
         String sql = "SELECT * FROM cliente";

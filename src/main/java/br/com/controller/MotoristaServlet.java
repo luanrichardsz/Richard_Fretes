@@ -1,7 +1,9 @@
 package br.com.controller;
 
+import br.com.bo.MotoristaBO;
 import br.com.dao.MotoristaDAO;
 import br.com.dao.ClienteDAO;
+import br.com.exception.CadastroException;
 import br.com.model.Motorista;
 import br.com.model.Motorista.*;
 import br.com.model.Usuario;
@@ -22,6 +24,7 @@ import java.util.List;
 public class MotoristaServlet extends HttpServlet {
 
     private MotoristaDAO motoristaDAO = new MotoristaDAO();
+    private MotoristaBO motoristaBO = new MotoristaBO(motoristaDAO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -36,11 +39,7 @@ public class MotoristaServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            if (usuarioLogado.isAdmin()) {
-                List<Cliente> clientes = new ClienteDAO().listarTodos();
-                req.setAttribute("clientes", clientes);
-            }
-            req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, null);
             return;
         }
 
@@ -50,11 +49,7 @@ public class MotoristaServlet extends HttpServlet {
                 Motorista motorista = motoristaDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("motorista", motorista);
             }
-            if (usuarioLogado.isAdmin()) {
-                List<Cliente> clientes = new ClienteDAO().listarTodos();
-                req.setAttribute("clientes", clientes);
-            }
-            req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, (Motorista) req.getAttribute("motorista"));
             return;
         }
 
@@ -100,10 +95,10 @@ public class MotoristaServlet extends HttpServlet {
 
         // Verificar se é uma atualização (edição) ou novo motorista
         String idParam = req.getParameter("id");
-        boolean isEdicao = idParam != null && !idParam.isEmpty();
+        boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            motorista.setId(Integer.parseInt(idParam));
+            motorista.setId(Integer.parseInt(idParam.trim()));
         }
 
         motorista.setNomeCompleto(req.getParameter("nomeCompleto"));
@@ -131,7 +126,7 @@ public class MotoristaServlet extends HttpServlet {
         // LÓGICA DE CLIENTE ID
         if(usuarioLogado.isAdmin()) {
             String cliIdParam = req.getParameter("clienteId");
-            if(cliIdParam != null) {
+            if(cliIdParam != null && !cliIdParam.isEmpty()) {
                 motorista.setClienteId(Integer.parseInt(cliIdParam));
             }
         } else {
@@ -139,17 +134,34 @@ public class MotoristaServlet extends HttpServlet {
             motorista.setClienteId(usuarioLogado.getClienteId());
         }
 
-        if (!isEdicao) {
-            motorista.setAdicionadoEm(LocalDateTime.now());
-            motoristaDAO.salvar(motorista);
-        } else {
-            motoristaDAO.atualizar(motorista);
-        }
+        try {
+            if (!isEdicao) {
+                motorista.setAdicionadoEm(LocalDateTime.now());
+                motoristaBO.salvar(motorista);
+            } else {
+                motoristaBO.atualizar(motorista);
+            }
 
-        resp.sendRedirect("motoristas");
+            resp.sendRedirect("motoristas");
+        } catch (CadastroException e) {
+            req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, motorista);
+        }
     }
 
     public void delete(Integer id) {
         motoristaDAO.deletar(id);
+    }
+
+    private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Motorista motorista)
+            throws ServletException, IOException {
+        req.setAttribute("motorista", motorista);
+
+        if (usuarioLogado.isAdmin()) {
+            List<Cliente> clientes = new ClienteDAO().listarTodos();
+            req.setAttribute("clientes", clientes);
+        }
+
+        req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
     }
 }

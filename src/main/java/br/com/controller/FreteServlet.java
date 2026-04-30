@@ -1,9 +1,19 @@
 package br.com.controller;
 
+import br.com.bo.FreteBO;
+import br.com.dao.ClienteDAO;
+import br.com.dao.EnderecoDAO;
 import br.com.dao.FreteDAO;
+import br.com.dao.MotoristaDAO;
+import br.com.dao.VeiculoDAO;
+import br.com.exception.FreteException;
+import br.com.model.Cliente;
+import br.com.model.Endereco;
 import br.com.model.Frete;
 import br.com.model.Frete.StatusFrete;
+import br.com.model.Motorista;
 import br.com.model.Usuario;
+import br.com.model.Veiculo;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,6 +31,11 @@ import java.util.List;
 public class FreteServlet extends HttpServlet {
 
     private FreteDAO freteDAO = new FreteDAO();
+    private FreteBO freteBO = new FreteBO(freteDAO);
+    private ClienteDAO clienteDAO = new ClienteDAO();
+    private EnderecoDAO enderecoDAO = new EnderecoDAO();
+    private MotoristaDAO motoristaDAO = new MotoristaDAO();
+    private VeiculoDAO veiculoDAO = new VeiculoDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -35,7 +50,7 @@ public class FreteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("/WEB-INF/jsp/frete/cadastroFrete.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, null);
             return;
         }
 
@@ -45,7 +60,7 @@ public class FreteServlet extends HttpServlet {
                 Frete frete = freteDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("frete", frete);
             }
-            req.getRequestDispatcher("/WEB-INF/jsp/frete/cadastroFrete.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, (Frete) req.getAttribute("frete"));
             return;
         }
 
@@ -80,14 +95,21 @@ public class FreteServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+
+        if (usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
+
         Frete frete = new Frete();
 
         // Verificar se é uma atualização (edição) ou novo frete
         String idParam = req.getParameter("id");
-        boolean isEdicao = idParam != null && !idParam.isEmpty();
+        boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            frete.setId(Integer.parseInt(idParam));
+            frete.setId(Integer.parseInt(idParam.trim()));
         }
 
         frete.setNumeroFrete(req.getParameter("numeroFrete"));
@@ -104,25 +126,56 @@ public class FreteServlet extends HttpServlet {
         frete.setPesoBruto(new BigDecimal(req.getParameter("pesoBruto")));
         frete.setVolumes(Integer.parseInt(req.getParameter("volumes")));
         frete.setValorFreteBruto(new BigDecimal(req.getParameter("valorFreteBruto")));
-        frete.setValorPedagio(new BigDecimal(req.getParameter("valorPedagio")));
-        frete.setAliquotaIcms(new BigDecimal(req.getParameter("aliquotaIcms")));
-        frete.setValorIcms(new BigDecimal(req.getParameter("valorIcms")));
+        frete.setValorPedagio(parseBigDecimalOuZero(req.getParameter("valorPedagio")));
+        frete.setAliquotaIcms(parseBigDecimalOuZero(req.getParameter("aliquotaIcms")));
+        frete.setValorIcms(parseBigDecimalOuZero(req.getParameter("valorIcms")));
         frete.setValorTotal(new BigDecimal(req.getParameter("valorTotal")));
         frete.setStatus(StatusFrete.valueOf(req.getParameter("status")));
         frete.setPrevisaoEntrega(LocalDate.parse(req.getParameter("previsaoEntrega")));
         frete.setDistanciaKm(new BigDecimal(req.getParameter("distanciaKm")));
 
-        if (!isEdicao) {
-            frete.setDataEmissao(LocalDateTime.now());
-            freteDAO.salvar(frete);
-        } else {
-            freteDAO.atualizar(frete);
-        }
+        try {
+            if (!isEdicao) {
+                frete.setDataEmissao(LocalDateTime.now());
+                freteBO.salvar(frete);
+            } else {
+                freteBO.atualizar(frete);
+            }
 
-        resp.sendRedirect("fretes");
+            resp.sendRedirect("fretes");
+        } catch (FreteException e) {
+            req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, frete);
+        }
     }
 
     public void delete(Integer id) {
         freteDAO.deletar(id);
+    }
+
+    private BigDecimal parseBigDecimalOuZero(String valor) {
+        return valor == null || valor.trim().isEmpty() ? BigDecimal.ZERO : new BigDecimal(valor);
+    }
+
+    private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Frete frete)
+            throws ServletException, IOException {
+        req.setAttribute("frete", frete);
+        req.setAttribute("clientes", clienteDAO.listarTodos());
+
+        if (usuarioLogado.isAdmin()) {
+            req.setAttribute("enderecos", enderecoDAO.listarTodos());
+            req.setAttribute("motoristas", motoristaDAO.listarTodos());
+            req.setAttribute("veiculos", veiculoDAO.listarTodos());
+        } else if (usuarioLogado.getClienteId() != null) {
+            req.setAttribute("enderecos", enderecoDAO.listarPorCliente(usuarioLogado.getClienteId()));
+            req.setAttribute("motoristas", motoristaDAO.listarPorCliente(usuarioLogado.getClienteId()));
+            req.setAttribute("veiculos", veiculoDAO.listarPorCliente(usuarioLogado.getClienteId()));
+        } else {
+            req.setAttribute("enderecos", new ArrayList<Endereco>());
+            req.setAttribute("motoristas", new ArrayList<Motorista>());
+            req.setAttribute("veiculos", new ArrayList<Veiculo>());
+        }
+
+        req.getRequestDispatcher("/WEB-INF/jsp/frete/cadastroFrete.jsp").forward(req, resp);
     }
 }

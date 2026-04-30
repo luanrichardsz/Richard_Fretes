@@ -1,7 +1,9 @@
 package br.com.controller;
 
+import br.com.bo.ClienteBO;
 import br.com.dao.ClienteDAO;
 import br.com.dao.UsuarioDAO;
+import br.com.exception.CadastroException;
 import br.com.model.Cliente;
 import br.com.model.Usuario;
 
@@ -19,6 +21,7 @@ public class ClienteServlet extends HttpServlet {
 
     private ClienteDAO clienteDAO = new ClienteDAO();
     private UsuarioDAO usuarioDAO = new UsuarioDAO();
+    private ClienteBO clienteBO = new ClienteBO(clienteDAO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -26,21 +29,17 @@ public class ClienteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            List<Usuario> usuarios = usuarioDAO.listarUsuariosSemCliente();
-            req.setAttribute("usuarios", usuarios);
-            req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
+            carregarFormulario(req, resp, null, false);
             return;
         }
 
         if ("editar".equals(acao)) {
             String idParam = req.getParameter("id");
+            Cliente cliente = null;
             if (idParam != null && !idParam.isEmpty()) {
-                Cliente cliente = clienteDAO.buscarPorId(Integer.parseInt(idParam));
-                req.setAttribute("cliente", cliente);
+                cliente = clienteDAO.buscarPorId(Integer.parseInt(idParam));
             }
-            List<Usuario> usuarios = usuarioDAO.listarUsuariosNaoAdmin();
-            req.setAttribute("usuarios", usuarios);
-            req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
+            carregarFormulario(req, resp, cliente, true);
             return;
         }
 
@@ -68,10 +67,10 @@ public class ClienteServlet extends HttpServlet {
         Cliente cliente = new Cliente();
 
         String idParam = req.getParameter("id");
-        boolean isEdicao = idParam != null && !idParam.isEmpty();
+        boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            cliente.setId(Integer.parseInt(idParam));
+            cliente.setId(Integer.parseInt(idParam.trim()));
         }
 
         cliente.setRazaoSocial(req.getParameter("razaoSocial"));
@@ -89,36 +88,53 @@ public class ClienteServlet extends HttpServlet {
             usuarioId = Integer.parseInt(usuarioIdParam);
         }
 
-        if (isEdicao) {
-            Cliente clienteAntigo = clienteDAO.buscarPorId(cliente.getId());
-            if (clienteAntigo != null) {
-                List<Usuario> usuariosAntigos = usuarioDAO.listarTodos();
-                for (Usuario u : usuariosAntigos) {
-                    if (u.getClienteId() != null && u.getClienteId().equals(cliente.getId())) {
-                        usuarioDAO.atualizarClienteDoUsuario(u.getId(), null);
-                        break;
+        try {
+            if (isEdicao) {
+                Cliente clienteAntigo = clienteDAO.buscarPorId(cliente.getId());
+                if (clienteAntigo != null) {
+                    List<Usuario> usuariosAntigos = usuarioDAO.listarTodos();
+                    for (Usuario u : usuariosAntigos) {
+                        if (u.getClienteId() != null && u.getClienteId().equals(cliente.getId())) {
+                            usuarioDAO.atualizarClienteDoUsuario(u.getId(), null);
+                            break;
+                        }
                     }
                 }
-            }
-            
-            clienteDAO.atualizar(cliente);
-            
-            if (usuarioId != null) {
-                usuarioDAO.atualizarClienteDoUsuario(usuarioId, cliente.getId());
-            }
-        } else {
-            cliente.setCriadoEm(LocalDateTime.now());
-            clienteDAO.salvar(cliente);
-            
-            if (usuarioId != null) {
-                usuarioDAO.atualizarClienteDoUsuario(usuarioId, cliente.getId());
-            }
-        }
 
-        resp.sendRedirect("clientes");
+                clienteBO.atualizar(cliente);
+
+                if (usuarioId != null) {
+                    usuarioDAO.atualizarClienteDoUsuario(usuarioId, cliente.getId());
+                }
+            } else {
+                cliente.setCriadoEm(LocalDateTime.now());
+                clienteBO.salvar(cliente);
+
+                if (usuarioId != null) {
+                    usuarioDAO.atualizarClienteDoUsuario(usuarioId, cliente.getId());
+                }
+            }
+
+            resp.sendRedirect("clientes");
+        } catch (CadastroException e) {
+            req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, cliente, isEdicao);
+        }
     }
 
     public void delete(Integer id) {
         clienteDAO.deletar(id);
+    }
+
+    private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Cliente cliente, boolean isEdicao)
+            throws ServletException, IOException {
+        req.setAttribute("cliente", cliente);
+
+        List<Usuario> usuarios = isEdicao
+            ? usuarioDAO.listarUsuariosNaoAdmin()
+            : usuarioDAO.listarUsuariosSemCliente();
+
+        req.setAttribute("usuarios", usuarios);
+        req.getRequestDispatcher("/WEB-INF/jsp/cliente/cadastroCliente.jsp").forward(req, resp);
     }
 }

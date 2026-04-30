@@ -1,6 +1,10 @@
 package br.com.controller;
 
+import br.com.bo.EnderecoBO;
+import br.com.dao.ClienteDAO;
 import br.com.dao.EnderecoDAO;
+import br.com.exception.CadastroException;
+import br.com.model.Cliente;
 import br.com.model.Endereco;
 import br.com.model.Usuario;
 
@@ -17,6 +21,7 @@ import java.util.List;
 public class EnderecoServlet extends HttpServlet {
 
     private EnderecoDAO enderecoDAO = new EnderecoDAO();
+    private EnderecoBO enderecoBO = new EnderecoBO(enderecoDAO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -31,7 +36,7 @@ public class EnderecoServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("/WEB-INF/jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, null);
             return;
         }
 
@@ -41,7 +46,7 @@ public class EnderecoServlet extends HttpServlet {
                 Endereco endereco = enderecoDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("endereco", endereco);
             }
-            req.getRequestDispatcher("/WEB-INF/jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, (Endereco) req.getAttribute("endereco"));
             return;
         }
 
@@ -87,14 +92,17 @@ public class EnderecoServlet extends HttpServlet {
 
         // Verificar se é uma atualização (edição) ou novo endereço
         String idParam = req.getParameter("id");
-        boolean isEdicao = idParam != null && !idParam.isEmpty();
+        boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            endereco.setId(Integer.parseInt(idParam));
+            endereco.setId(Integer.parseInt(idParam.trim()));
         }
 
         if (usuarioLogado.isAdmin()) {
-            endereco.setClienteId(Integer.parseInt(req.getParameter("clienteId")));
+            String clienteIdParam = req.getParameter("clienteId");
+            if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
+                endereco.setClienteId(Integer.parseInt(clienteIdParam));
+            }
         } else {
             endereco.setClienteId(usuarioLogado.getClienteId());
         }
@@ -109,16 +117,33 @@ public class EnderecoServlet extends HttpServlet {
         endereco.setUf(req.getParameter("uf"));
         endereco.setPontoReferencia(req.getParameter("pontoReferencia"));
 
-        if (!isEdicao) {
-            enderecoDAO.salvar(endereco);
-        } else {
-            enderecoDAO.atualizar(endereco);
-        }
+        try {
+            if (!isEdicao) {
+                enderecoBO.salvar(endereco);
+            } else {
+                enderecoBO.atualizar(endereco);
+            }
 
-        resp.sendRedirect("enderecos");
+            resp.sendRedirect("enderecos");
+        } catch (CadastroException e) {
+            req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, endereco);
+        }
     }
 
     public void delete(Integer id) {
         enderecoDAO.deletar(id);
+    }
+
+    private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Endereco endereco)
+            throws ServletException, IOException {
+        req.setAttribute("endereco", endereco);
+
+        if (usuarioLogado.isAdmin()) {
+            List<Cliente> clientes = new ClienteDAO().listarTodos();
+            req.setAttribute("clientes", clientes);
+        }
+
+        req.getRequestDispatcher("/WEB-INF/jsp/endereco/cadastroEndereco.jsp").forward(req, resp);
     }
 }

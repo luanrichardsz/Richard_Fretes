@@ -1,6 +1,8 @@
 package br.com.controller;
 
+import br.com.bo.OcorrenciaFreteBO;
 import br.com.dao.OcorrenciaFreteDAO;
+import br.com.exception.FreteException;
 import br.com.model.OcorrenciaFrete;
 import br.com.model.OcorrenciaFrete.TipoOcorrencia;
 import br.com.model.Usuario;
@@ -20,6 +22,7 @@ import java.util.List;
 public class OcorrenciaFreteServlet extends HttpServlet {
 
     private OcorrenciaFreteDAO ocorrenciaDAO = new OcorrenciaFreteDAO();
+    private OcorrenciaFreteBO ocorrenciaBO = new OcorrenciaFreteBO(ocorrenciaDAO);
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -83,10 +86,10 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
         // Verificar se é uma atualização (edição) ou nova ocorrência
         String idParam = req.getParameter("id");
-        boolean isEdicao = idParam != null && !idParam.isEmpty();
+        boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            ocorrencia.setId(Integer.parseInt(idParam));
+            ocorrencia.setId(Integer.parseInt(idParam.trim()));
         }
 
         ocorrencia.setFreteId(Integer.parseInt(req.getParameter("freteId")));
@@ -109,14 +112,20 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         ocorrencia.setRecebedorDocumento(req.getParameter("recebedorDocumento"));
         ocorrencia.setFotoEvidenciaUrl(req.getParameter("fotoEvidenciaUrl"));
 
-        if (!isEdicao) {
-            ocorrencia.setDataHora(LocalDateTime.now());
-            ocorrenciaDAO.salvar(ocorrencia);
-        } else {
-            ocorrenciaDAO.atualizar(ocorrencia);
-        }
+        try {
+            if (!isEdicao) {
+                ocorrencia.setDataHora(LocalDateTime.now());
+                ocorrenciaBO.salvar(ocorrencia);
+            } else {
+                ocorrenciaBO.atualizar(ocorrencia);
+            }
 
-        resp.sendRedirect("ocorrencias");
+            resp.sendRedirect("ocorrencias");
+        } catch (FreteException e) {
+            req.setAttribute("erro", e.getMessage());
+            req.setAttribute("ocorrencia", ocorrencia);
+            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+        }
     }
 
     public void delete(Integer id) {

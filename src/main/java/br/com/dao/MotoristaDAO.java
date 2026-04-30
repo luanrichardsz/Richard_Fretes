@@ -141,6 +141,50 @@ public class MotoristaDAO extends ConnectionFactory {
         return motoristas;
     }
 
+    public boolean existeCpfParaOutroMotorista(String cpf, Integer motoristaIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM motorista WHERE cpf = ? AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, cpf);
+            stmt.setObject(2, motoristaIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, motoristaIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean existeCnhParaOutroMotorista(String numeroCnh, Integer motoristaIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM motorista WHERE numero_cnh = ? AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, numeroCnh);
+            stmt.setObject(2, motoristaIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, motoristaIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public void deletar(Integer id) {
         String sql = "DELETE FROM motorista WHERE id = ?";
 

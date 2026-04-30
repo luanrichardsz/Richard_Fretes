@@ -1,6 +1,12 @@
 package br.com.controller;
 
+import br.com.bo.VeiculoBO;
+import br.com.dao.ClienteDAO;
+import br.com.dao.MotoristaDAO;
 import br.com.dao.VeiculoDAO;
+import br.com.exception.CadastroException;
+import br.com.model.Cliente;
+import br.com.model.Motorista;
 import br.com.model.Veiculo;
 import br.com.model.Veiculo.StatusVeiculo;
 import br.com.model.Usuario;
@@ -20,6 +26,8 @@ import java.util.List;
 public class VeiculoServlet extends HttpServlet {
 
     private VeiculoDAO veiculoDAO = new VeiculoDAO();
+    private VeiculoBO veiculoBO = new VeiculoBO(veiculoDAO);
+    private MotoristaDAO motoristaDAO = new MotoristaDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -34,7 +42,7 @@ public class VeiculoServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, null);
             return;
         }
 
@@ -44,7 +52,7 @@ public class VeiculoServlet extends HttpServlet {
                 Veiculo veiculo = veiculoDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("veiculo", veiculo);
             }
-            req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
+            carregarFormulario(req, resp, usuarioLogado, (Veiculo) req.getAttribute("veiculo"));
             return;
         }
 
@@ -90,10 +98,10 @@ public class VeiculoServlet extends HttpServlet {
 
         // Verificar se é uma atualização (edição) ou novo veículo
         String idParam = req.getParameter("id");
-        boolean isEdicao = idParam != null && !idParam.isEmpty();
+        boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            veiculo.setId(Integer.parseInt(idParam));
+            veiculo.setId(Integer.parseInt(idParam.trim()));
         }
 
         veiculo.setPlaca(req.getParameter("placa"));
@@ -107,7 +115,12 @@ public class VeiculoServlet extends HttpServlet {
         veiculo.setCombustivel(req.getParameter("combustivel"));
         veiculo.setTaraKg(Integer.parseInt(req.getParameter("taraKg")));
         veiculo.setCapacidadeCargaKg(Integer.parseInt(req.getParameter("capacidadeCargaKg")));
-        veiculo.setVolumeM3(Integer.parseInt(req.getParameter("volumeM3")));
+        String volumeM3Param = req.getParameter("volumeM3");
+        if (volumeM3Param != null && !volumeM3Param.isEmpty()) {
+            veiculo.setVolumeM3(Integer.parseInt(volumeM3Param));
+        } else {
+            veiculo.setVolumeM3(0);
+        }
         veiculo.setStatus(StatusVeiculo.valueOf(req.getParameter("status")));
         
         String motoristaParam = req.getParameter("motoristaId");
@@ -133,17 +146,39 @@ public class VeiculoServlet extends HttpServlet {
             veiculo.setClienteId(usuarioLogado.getClienteId());
         }
 
-        if (!isEdicao) {
-            veiculo.setAdicionadoEm(LocalDateTime.now());
-            veiculoDAO.salvar(veiculo);
-        } else {
-            veiculoDAO.atualizar(veiculo);
-        }
+        try {
+            if (!isEdicao) {
+                veiculo.setAdicionadoEm(LocalDateTime.now());
+                veiculoBO.salvar(veiculo);
+            } else {
+                veiculoBO.atualizar(veiculo);
+            }
 
-        resp.sendRedirect("veiculos");
+            resp.sendRedirect("veiculos");
+        } catch (CadastroException e) {
+            req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, veiculo);
+        }
     }
 
     public void delete(Integer id) {
         veiculoDAO.deletar(id);
+    }
+
+    private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Veiculo veiculo)
+            throws ServletException, IOException {
+        req.setAttribute("veiculo", veiculo);
+
+        if (usuarioLogado.isAdmin()) {
+            List<Cliente> clientes = new ClienteDAO().listarTodos();
+            req.setAttribute("clientes", clientes);
+            List<Motorista> motoristas = motoristaDAO.listarTodos();
+            req.setAttribute("motoristas", motoristas);
+        } else if (usuarioLogado.getClienteId() != null) {
+            List<Motorista> motoristas = motoristaDAO.listarPorCliente(usuarioLogado.getClienteId());
+            req.setAttribute("motoristas", motoristas);
+        }
+
+        req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
     }
 }

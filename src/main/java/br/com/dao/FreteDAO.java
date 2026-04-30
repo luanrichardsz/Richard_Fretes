@@ -134,6 +134,28 @@ public class FreteDAO extends ConnectionFactory {
         return frete;
     }
 
+    public boolean existeNumeroParaOutroFrete(String numeroFrete, Integer freteIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM frete WHERE numero_frete = ? AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, numeroFrete);
+            stmt.setObject(2, freteIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, freteIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public List<Frete> listarTodos() {
         List<Frete> fretes = new ArrayList<>();
         String sql = "SELECT * FROM frete";
