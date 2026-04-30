@@ -58,17 +58,6 @@
 
       <div class="form-grid">
 
-        <!-- Tipo Entrega -->
-        <div class="form-group">
-          <label>Tipo de Entrega *</label>
-          <select name="tipoEntrega" required>
-            <option value="">Selecione</option>
-            <option value="REMETENTE" <%= isEdicao && cliente.getTipoEntrega() != null && cliente.getTipoEntrega().name().equals("REMETENTE") ? "selected" : "" %>>Remetente</option>
-            <option value="DESTINATARIO" <%= isEdicao && cliente.getTipoEntrega() != null && cliente.getTipoEntrega().name().equals("DESTINATARIO") ? "selected" : "" %>>Destinatario</option>
-            <option value="AMBOS" <%= isEdicao && cliente.getTipoEntrega() != null && cliente.getTipoEntrega().name().equals("AMBOS") ? "selected" : "" %>>Ambos</option>
-          </select>
-        </div>
-
         <!-- Razão Social -->
         <div class="form-group full">
           <label>Razão Social *</label>
@@ -84,13 +73,13 @@
         <!-- Documento -->
         <div class="form-group">
           <label>CNPJ *</label>
-          <input type="text" name="documento" maxlength="14" value="<%= isEdicao ? cliente.getDocumento() : "" %>" required />
+          <input type="text" name="documento" maxlength="18" inputmode="numeric" value="<%= isEdicao ? cliente.getDocumento() : "" %>" required />
         </div>
 
         <!-- IE -->
         <div class="form-group">
           <label>Inscrição Estadual</label>
-          <input type="text" name="inscricaoEstadual" maxlength="13" value="<%= isEdicao ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
+          <input type="text" name="inscricaoEstadual" maxlength="14" inputmode="numeric" value="<%= isEdicao ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
         </div>
 
         <!-- Email -->
@@ -102,7 +91,7 @@
         <!-- Telefone -->
         <div class="form-group">
           <label>Telefone *</label>
-          <input type="text" name="telefone" maxlength="11" value="<%= isEdicao ? cliente.getTelefone() : "" %>" required />
+          <input type="text" name="telefone" maxlength="15" inputmode="numeric" value="<%= isEdicao ? cliente.getTelefone() : "" %>" required />
         </div>
 
         <!-- Usuário Responsável -->
@@ -136,6 +125,49 @@
   </section>
 
 </div>
+
+<script>
+function aplicarMascaraCnpj(valor) {
+  var numeros = valor.replace(/\D/g, "").slice(0, 14);
+
+  return numeros
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/\.(\d{3})(\d)/, ".$1/$2")
+    .replace(/(\d{4})(\d)/, "$1-$2");
+}
+
+function aplicarMascaraTelefone(valor) {
+  var numeros = valor.replace(/\D/g, "").slice(0, 11);
+
+  if (numeros.length <= 10) {
+    return numeros
+      .replace(/^(\d{2})(\d)/, "($1) $2")
+      .replace(/(\d{4})(\d)/, "$1-$2");
+  }
+
+  return numeros
+    .replace(/^(\d{2})(\d)/, "($1) $2")
+    .replace(/(\d{5})(\d)/, "$1-$2");
+}
+
+function configurarMascara(nomeCampo, formatador) {
+  var campo = document.querySelector('input[name="' + nomeCampo + '"]');
+
+  if (!campo) {
+    return;
+  }
+
+  campo.addEventListener("input", function () {
+    campo.value = formatador(campo.value);
+  });
+
+  campo.value = formatador(campo.value);
+}
+
+configurarMascara("documento", aplicarMascaraCnpj);
+configurarMascara("telefone", aplicarMascaraTelefone);
+</script>
 
 </body>
 </html>

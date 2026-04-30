@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 import java.util.List;
 import java.time.LocalDateTime;
-import br.com.model.Cliente.*;
 
 @WebServlet("/clientes")
 public class ClienteServlet extends HttpServlet {
@@ -74,10 +73,6 @@ public class ClienteServlet extends HttpServlet {
         if (isEdicao) {
             cliente.setId(Integer.parseInt(idParam));
         }
-
-        cliente.setTipo(
-            TipoEntrega.valueOf(req.getParameter("tipoEntrega"))
-        );
 
         cliente.setRazaoSocial(req.getParameter("razaoSocial"));
         cliente.setNomeFantasia(req.getParameter("nomeFantasia"));

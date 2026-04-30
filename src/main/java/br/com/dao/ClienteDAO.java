@@ -2,7 +2,6 @@ package br.com.dao;
 
 import br.com.connection.ConnectionFactory;
 import br.com.model.Cliente;
-import br.com.model.Cliente.TipoEntrega;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.List;
 public class ClienteDAO extends ConnectionFactory {
 
     public void salvar(Cliente cliente) {
-        String sql = "INSERT INTO cliente (razao_social, nome_fantasia, documento, inscricao_estadual, tipo_entrega, email, telefone, ativo, criado_em) VALUES (?, ?, ?, ?, ?::tipo_entrega_enum, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cliente (razao_social, nome_fantasia, documento, inscricao_estadual, email, telefone, ativo, criado_em) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -20,11 +19,10 @@ public class ClienteDAO extends ConnectionFactory {
             stmt.setString(2, cliente.getNomeFantasia());
             stmt.setString(3, cliente.getDocumento());
             stmt.setString(4, cliente.getInscricaoEstadual());
-            stmt.setString(5, cliente.getTipoEntrega() != null ? cliente.getTipoEntrega().name() : null);
-            stmt.setString(6, cliente.getEmail());
-            stmt.setString(7, cliente.getTelefone());
-            stmt.setBoolean(8, cliente.isAtivo());
-            stmt.setTimestamp(9, Timestamp.valueOf(cliente.getCriadoEm()));
+            stmt.setString(5, cliente.getEmail());
+            stmt.setString(6, cliente.getTelefone());
+            stmt.setBoolean(7, cliente.isAtivo());
+            stmt.setTimestamp(8, Timestamp.valueOf(cliente.getCriadoEm()));
 
             stmt.executeUpdate();
 
@@ -39,7 +37,7 @@ public class ClienteDAO extends ConnectionFactory {
     }
 
     public void atualizar(Cliente cliente) {
-        String sql = "UPDATE cliente SET razao_social = ?, nome_fantasia = ?, documento = ?, inscricao_estadual = ?, tipo_entrega = ?::tipo_entrega_enum, email = ?, telefone = ?, ativo = ? WHERE id = ?";
+        String sql = "UPDATE cliente SET razao_social = ?, nome_fantasia = ?, documento = ?, inscricao_estadual = ?, email = ?, telefone = ?, ativo = ? WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -48,11 +46,10 @@ public class ClienteDAO extends ConnectionFactory {
             stmt.setString(2, cliente.getNomeFantasia());
             stmt.setString(3, cliente.getDocumento());
             stmt.setString(4, cliente.getInscricaoEstadual());
-            stmt.setString(5, cliente.getTipoEntrega() != null ? cliente.getTipoEntrega().name() : null);
-            stmt.setString(6, cliente.getEmail());
-            stmt.setString(7, cliente.getTelefone());
-            stmt.setBoolean(8, cliente.isAtivo());
-            stmt.setInt(9, cliente.getId());
+            stmt.setString(5, cliente.getEmail());
+            stmt.setString(6, cliente.getTelefone());
+            stmt.setBoolean(7, cliente.isAtivo());
+            stmt.setInt(8, cliente.getId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -77,7 +74,6 @@ public class ClienteDAO extends ConnectionFactory {
                     cliente.setNomeFantasia(rs.getString("nome_fantasia"));
                     cliente.setDocumento(rs.getString("documento"));
                     cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
-                    cliente.setTipo(TipoEntrega.valueOf(rs.getString("tipo_entrega")));
                     cliente.setEmail(rs.getString("email"));
                     cliente.setTelefone(rs.getString("telefone"));
                     cliente.setAtivo(rs.getBoolean("ativo"));
@@ -106,7 +102,6 @@ public class ClienteDAO extends ConnectionFactory {
                 cliente.setNomeFantasia(rs.getString("nome_fantasia"));
                 cliente.setDocumento(rs.getString("documento"));
                 cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
-                cliente.setTipo(TipoEntrega.valueOf(rs.getString("tipo_entrega")));
                 cliente.setEmail(rs.getString("email"));
                 cliente.setTelefone(rs.getString("telefone"));
                 cliente.setAtivo(rs.getBoolean("ativo"));
@@ -139,7 +134,6 @@ public class ClienteDAO extends ConnectionFactory {
                     cliente.setNomeFantasia(rs.getString("nome_fantasia"));
                     cliente.setDocumento(rs.getString("documento"));
                     cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
-                    cliente.setTipo(TipoEntrega.valueOf(rs.getString("tipo_entrega")));
                     cliente.setEmail(rs.getString("email"));
                     cliente.setTelefone(rs.getString("telefone"));
                     cliente.setAtivo(rs.getBoolean("ativo"));

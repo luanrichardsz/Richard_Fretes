@@ -7,7 +7,7 @@ CREATE TABLE cliente (
     nome_fantasia VARCHAR(200),
     documento VARCHAR(14) NOT NULL UNIQUE,
     inscricao_estadual VARCHAR(20),
-    tipo_entrega tipo_entrega_enum NOT NULL DEFAULT 'AMBOS',
+    tipo_entrega tipo_entrega_enum,
     email VARCHAR(100),
     telefone VARCHAR(20),
     ativo BOOLEAN DEFAULT TRUE, 
