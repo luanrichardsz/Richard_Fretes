@@ -28,7 +28,12 @@ CREATE TABLE motorista (
     chave_pix VARCHAR(100),
     tipo_pix tipo_pix_enum,
     status status_motorista_enum DEFAULT 'ATIVO',
-    adicionado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    adicionado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+	-- Ligação com a empresa
+	cliente_id INT NOT NULL,
+
+	CONSTRAINT fk_cliente FOREIGN KEY (cliente_id) REFERENCES cliente(id)
 );
 
 CREATE INDEX idx_motorista_cpf ON motorista(cpf);

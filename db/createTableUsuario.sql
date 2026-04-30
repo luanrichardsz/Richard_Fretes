@@ -7,3 +7,17 @@ CREATE TABLE Usuario (
 	cliente_id INTEGER,
 	ativo BOOLEAN DEFAULT TRUE
 );
+
+UPDATE 
+	usuario
+SET
+	is_administrador = true	
+WHERE
+	id = 1;
+
+UPDATE 
+	usuario
+SET
+	cliente_id = 1	
+WHERE
+	id = 2;
