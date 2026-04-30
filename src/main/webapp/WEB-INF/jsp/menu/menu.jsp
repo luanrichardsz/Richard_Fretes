@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="br.com.model.Usuario" %>
+<%@ page import="br.com.usuario.Usuario" %>
 <%
     Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
     if (usuario == null) {

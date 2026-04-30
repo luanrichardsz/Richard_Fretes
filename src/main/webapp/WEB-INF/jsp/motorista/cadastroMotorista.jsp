@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.model.Motorista" %>
-<%@ page import="br.com.model.Motorista.*" %>
-<%@ page import="br.com.model.Usuario" %>
-<%@ page import="br.com.model.Cliente" %>
+<%@ page import="br.com.motorista.Motorista" %>
+<%@ page import="br.com.motorista.Motorista.*" %>
+<%@ page import="br.com.usuario.Usuario" %>
+<%@ page import="br.com.cliente.Cliente" %>
 <%@ page import="java.util.List" %>
 <%
     Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioAutenticado");

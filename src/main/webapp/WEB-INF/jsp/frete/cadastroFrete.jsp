@@ -1,11 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.model.Cliente" %>
-<%@ page import="br.com.model.Endereco" %>
-<%@ page import="br.com.model.Frete" %>
-<%@ page import="br.com.model.Frete.StatusFrete" %>
-<%@ page import="br.com.model.Motorista" %>
-<%@ page import="br.com.model.Veiculo" %>
+<%@ page import="br.com.cliente.Cliente" %>
+<%@ page import="br.com.endereco.Endereco" %>
+<%@ page import="br.com.frete.Frete" %>
+<%@ page import="br.com.frete.Frete.StatusFrete" %>
+<%@ page import="br.com.motorista.Motorista" %>
+<%@ page import="br.com.veiculo.Veiculo" %>
 <%@ page import="java.util.List" %>
 
 <% 
@@ -75,7 +75,7 @@
         <!-- Número Frete -->
         <div class="form-group">
           <label>Número Frete</label>
-          <input type="text" id="numeroFrete" name="numeroFrete" maxlength="20" value="<%= possuiDados ? frete.getNumeroFrete() : "" %>" />
+          <input type="text" id="numeroFrete" name="numeroFrete" maxlength="20" value="<%= possuiDados ? frete.getNumeroFrete() : "" %>" readonly style="background: #f3f4f6; color: #475467; cursor: not-allowed;" />
         </div>
 
         <!-- Remetente ID -->
@@ -126,14 +126,14 @@
         <!-- Endereço Origem ID -->
         <div class="form-group">
           <label>Endereço Origem *</label>
-          <select name="enderecoOrigemId" required>
+          <select id="enderecoOrigemId" name="enderecoOrigemId" required>
             <option value="">Selecione um endereço</option>
             <%
               List<Endereco> enderecos = (List<Endereco>) request.getAttribute("enderecos");
               if (enderecos != null) {
                 for (Endereco endereco : enderecos) {
             %>
-              <option value="<%= endereco.getId() %>" <%= possuiDados && frete.getEnderecoOrigemId() != null && frete.getEnderecoOrigemId().equals(endereco.getId()) ? "selected" : "" %>>
+              <option value="<%= endereco.getId() %>" data-codigo-ibge="<%= endereco.getCodigoIbge() != null ? endereco.getCodigoIbge() : "" %>" <%= possuiDados && frete.getEnderecoOrigemId() != null && frete.getEnderecoOrigemId().equals(endereco.getId()) ? "selected" : "" %>>
                 <%= endereco.getLogradouro() %>, <%= endereco.getNumero() %> - <%= endereco.getMunicipio() %>/<%= endereco.getUf() %>
               </option>
             <%
@@ -146,13 +146,13 @@
         <!-- Endereço Destino ID -->
         <div class="form-group">
           <label>Endereço Destino *</label>
-          <select name="enderecoDestinoId" required>
+          <select id="enderecoDestinoId" name="enderecoDestinoId" required>
             <option value="">Selecione um endereço</option>
             <%
               if (enderecos != null) {
                 for (Endereco endereco : enderecos) {
             %>
-              <option value="<%= endereco.getId() %>" <%= possuiDados && frete.getEnderecoDestinoId() != null && frete.getEnderecoDestinoId().equals(endereco.getId()) ? "selected" : "" %>>
+              <option value="<%= endereco.getId() %>" data-codigo-ibge="<%= endereco.getCodigoIbge() != null ? endereco.getCodigoIbge() : "" %>" <%= possuiDados && frete.getEnderecoDestinoId() != null && frete.getEnderecoDestinoId().equals(endereco.getId()) ? "selected" : "" %>>
                 <%= endereco.getLogradouro() %>, <%= endereco.getNumero() %> - <%= endereco.getMunicipio() %>/<%= endereco.getUf() %>
               </option>
             <%
@@ -217,49 +217,49 @@
         <!-- Peso Bruto -->
         <div class="form-group">
           <label>Peso Bruto (kg) *</label>
-          <input type="number" step="0.01" name="pesoBruto" value="<%= possuiDados ? frete.getPesoBruto() : "" %>" required />
+          <input type="number" step="0.01" min="0.01" name="pesoBruto" value="<%= possuiDados ? frete.getPesoBruto() : "" %>" required />
         </div>
 
         <!-- Volumes -->
         <div class="form-group">
           <label>Volumes *</label>
-          <input type="number" name="volumes" value="<%= possuiDados ? frete.getVolumes() : "" %>" required />
+          <input type="number" min="1" name="volumes" value="<%= possuiDados ? frete.getVolumes() : "" %>" required />
         </div>
 
         <!-- Distância KM -->
         <div class="form-group">
           <label>Distância (km) *</label>
-          <input type="number" step="0.01" name="distanciaKm" value="<%= possuiDados ? frete.getDistanciaKm() : "" %>" required />
+          <input type="number" step="0.01" min="0.01" name="distanciaKm" value="<%= possuiDados ? frete.getDistanciaKm() : "" %>" required />
         </div>
 
         <!-- Valor Frete Bruto -->
         <div class="form-group">
           <label>Valor Frete Bruto *</label>
-          <input type="number" step="0.01" name="valorFreteBruto" value="<%= possuiDados ? frete.getValorFreteBruto() : "" %>" required />
+          <input type="number" step="0.01" min="0.01" id="valorFreteBruto" name="valorFreteBruto" value="<%= possuiDados ? frete.getValorFreteBruto() : "" %>" required />
         </div>
 
         <!-- Valor Pedágio -->
         <div class="form-group">
           <label>Valor Pedágio</label>
-          <input type="number" step="0.01" name="valorPedagio" value="<%= possuiDados ? frete.getValorPedagio() : "" %>" />
+          <input type="number" step="0.01" min="0" id="valorPedagio" name="valorPedagio" value="<%= possuiDados ? frete.getValorPedagio() : "" %>" />
         </div>
 
         <!-- Alíquota ICMS -->
         <div class="form-group">
           <label>Alíquota ICMS (%)</label>
-          <input type="number" step="0.01" name="aliquotaIcms" value="<%= possuiDados ? frete.getAliquotaIcms() : "" %>" />
+          <input type="number" step="0.01" min="0" id="aliquotaIcms" name="aliquotaIcms" value="<%= possuiDados ? frete.getAliquotaIcms() : "" %>" />
         </div>
 
         <!-- Valor ICMS -->
         <div class="form-group">
           <label>Valor ICMS</label>
-          <input type="number" step="0.01" name="valorIcms" value="<%= possuiDados ? frete.getValorIcms() : "" %>" />
+          <input type="number" step="0.01" min="0" id="valorIcms" name="valorIcms" value="<%= possuiDados ? frete.getValorIcms() : "" %>" />
         </div>
 
         <!-- Valor Total -->
         <div class="form-group">
           <label>Valor Total *</label>
-          <input type="number" step="0.01" name="valorTotal" value="<%= possuiDados ? frete.getValorTotal() : "" %>" required />
+          <input type="number" step="0.01" min="0.01" id="valorTotal" name="valorTotal" value="<%= possuiDados ? frete.getValorTotal() : "" %>" readonly style="background: #f3f4f6; color: #475467;" required />
         </div>
 
         <!-- Status -->
@@ -284,13 +284,13 @@
         <!-- Origem IBGE -->
         <div class="form-group">
           <label>Origem IBGE</label>
-          <input type="text" id="origemIbge" name="origemIbge" maxlength="7" inputmode="numeric" value="<%= possuiDados ? (frete.getOrigemIbge() != null ? frete.getOrigemIbge() : "") : "" %>" />
+          <input type="text" id="origemIbge" name="origemIbge" maxlength="7" inputmode="numeric" value="<%= possuiDados ? (frete.getOrigemIbge() != null ? frete.getOrigemIbge() : "") : "" %>" readonly style="background: #f3f4f6; color: #475467; cursor: not-allowed;" />
         </div>
 
         <!-- Destino IBGE -->
         <div class="form-group">
           <label>Destino IBGE</label>
-          <input type="text" id="destinoIbge" name="destinoIbge" maxlength="7" inputmode="numeric" value="<%= possuiDados ? (frete.getDestinoIbge() != null ? frete.getDestinoIbge() : "") : "" %>" />
+          <input type="text" id="destinoIbge" name="destinoIbge" maxlength="7" inputmode="numeric" value="<%= possuiDados ? (frete.getDestinoIbge() != null ? frete.getDestinoIbge() : "") : "" %>" readonly style="background: #f3f4f6; color: #475467; cursor: not-allowed;" />
         </div>
 
       </div>

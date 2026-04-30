@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="true" %>
 <%@ page import="java.util.List" %>
-<%@ page import="br.com.model.Veiculo" %>
+<%@ page import="br.com.veiculo.Veiculo" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">

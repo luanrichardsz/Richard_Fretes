@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.model.OcorrenciaFrete" %>
-<%@ page import="br.com.model.OcorrenciaFrete.TipoOcorrencia" %>
+<%@ page import="br.com.ocorrenciafrete.OcorrenciaFrete" %>
+<%@ page import="br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia" %>
 
 <% 
   OcorrenciaFrete ocorrencia = (OcorrenciaFrete) request.getAttribute("ocorrencia");
