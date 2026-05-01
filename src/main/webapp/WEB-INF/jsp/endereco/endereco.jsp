@@ -1,8 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page isELIgnored="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="br.com.endereco.Endereco" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -23,13 +20,10 @@
     <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
-
 <div class="container">
 
-  <!-- Toolbar -->
   <section class="card toolbar">
     <div class="toolbar-row">
-      
       <div class="filters">
         <input type="text" placeholder="Buscar" />
 
@@ -43,16 +37,16 @@
           + Novo Endereço
         </button>
       </a>
-
     </div>
   </section>
 
-  <!-- Table -->
   <section class="card">
     <table class="data-table">
       <thead>
         <tr>
-          <th>Cliente ID</th>
+          <c:if test="${sessionScope.usuarioAutenticado.admin}">
+            <th>Cliente</th>
+          </c:if>
           <th>Logradouro</th>
           <th>Número</th>
           <th>Bairro</th>
@@ -63,44 +57,37 @@
       </thead>
 
       <tbody>
-        <%
-          List<Endereco> enderecos = (List<Endereco>) request.getAttribute("enderecos");
-
-          if (enderecos != null && !enderecos.isEmpty()) {
-              for (Endereco e : enderecos) {
-        %>
-
-        <tr>
-          <td><%= e.getClienteId() %></td>
-          <td><%= e.getLogradouro() %></td>
-          <td><%= e.getNumero() %></td>
-          <td><%= e.getBairro() %></td>
-          <td><%= e.getMunicipio() %></td>
-          <td><%= e.getUf() %></td>
-          <td>
-            <a href="enderecos?acao=editar&id=<%= e.getId() %>">
-              <button class="btn-small">Editar</button>
-            </a>
-            <a href="enderecos?acao=deletar&id=<%= e.getId() %>" onclick="return confirm('Tem certeza?')">
-              <button class="btn-small btn-danger">Deletar</button>
-            </a>
-          </td>
-        </tr>
-
-        <%
-              }
-          } else {
-        %>
-
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 20px;">
-            Nenhum endereço cadastrado
-          </td>
-        </tr>
-
-        <%
-          }
-        %>
+        <c:choose>
+          <c:when test="${not empty enderecos}">
+            <c:forEach items="${enderecos}" var="e">
+              <tr>
+                <c:if test="${sessionScope.usuarioAutenticado.admin}">
+                  <td>${e.clienteRazaoSocial}</td>
+                </c:if>
+                <td>${e.logradouro}</td>
+                <td>${e.numero}</td>
+                <td>${e.bairro}</td>
+                <td>${e.municipio}</td>
+                <td>${e.uf}</td>
+                <td>
+                  <a href="enderecos?acao=editar&id=${e.id}">
+                    <button class="btn-small">Editar</button>
+                  </a>
+                  <a href="enderecos?acao=deletar&id=${e.id}" onclick="return confirm('Tem certeza?')">
+                    <button class="btn-small btn-danger">Deletar</button>
+                  </a>
+                </td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="${sessionScope.usuarioAutenticado.admin ? 7 : 6}" style="text-align: center; padding: 20px;">
+                Nenhum endereço cadastrado
+              </td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
     </table>
   </section>

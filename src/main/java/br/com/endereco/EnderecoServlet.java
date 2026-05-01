@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/enderecos")
 public class EnderecoServlet extends HttpServlet {
@@ -63,6 +65,14 @@ public class EnderecoServlet extends HttpServlet {
         
         if (usuarioLogado.isAdmin()) {
             enderecos = enderecoDAO.listarTodos();
+            List<Cliente> clientes = new ClienteDAO().listarTodos();
+            Map<Integer, String> clientesPorId = new HashMap<>();
+            for (Cliente cliente : clientes) {
+                clientesPorId.put(cliente.getId(), cliente.getRazaoSocial());
+            }
+            for (Endereco endereco : enderecos) {
+                endereco.setClienteRazaoSocial(clientesPorId.get(endereco.getClienteId()));
+            }
         } else {
             if (usuarioLogado.getClienteId() != null) {
                 enderecos = enderecoDAO.listarPorCliente(usuarioLogado.getClienteId());

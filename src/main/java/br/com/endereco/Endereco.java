@@ -4,6 +4,7 @@ public class Endereco {
 
     private Integer id;
     private Integer clienteId;
+    private String clienteRazaoSocial;
     private String cep;
     private String logradouro;
     private String numero;
@@ -35,6 +36,14 @@ public class Endereco {
 
     public void setClienteId(Integer clienteId) {
         this.clienteId = clienteId;
+    }
+
+    public String getClienteRazaoSocial() {
+        return clienteRazaoSocial;
+    }
+
+    public void setClienteRazaoSocial(String clienteRazaoSocial) {
+        this.clienteRazaoSocial = clienteRazaoSocial;
     }
 
     public String getCep() {
