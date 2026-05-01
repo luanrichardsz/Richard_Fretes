@@ -1,4 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -21,19 +22,15 @@
             <form action="login" method="post">
                 <h2>Criar Conta</h2>
                 <p>Junte-se à maior rede de fretes</p>
-                
-                <%-- Mensagem de sucesso dinâmica --%>
-                <% String sucessoCadastro = (String) request.getAttribute("sucesso");
-                   if (sucessoCadastro != null) { %>
-                    <div class="success-msg" style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;"><%= sucessoCadastro %></div>
-                <% } %>
-                
-                <%-- Mensagem de erro dinâmica --%>
-                <% String erroCadastro = (String) request.getAttribute("erro");
-                   if (erroCadastro != null) { %>
-                    <div class="error-msg"><%= erroCadastro %></div>
-                <% } %>
-                
+
+                <c:if test="${not empty sucesso}">
+                    <div class="success-msg" style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">${sucesso}</div>
+                </c:if>
+
+                <c:if test="${not empty erro}">
+                    <div class="error-msg">${erro}</div>
+                </c:if>
+
                 <input type="text" name="usuario" placeholder="Nome de Usuário" required />
                 <input type="email" name="email" placeholder="E-mail" required />
                 <input type="password" name="senha" placeholder="Senha" required />
@@ -45,22 +42,17 @@
             <form action="login" method="post">
                 <h2>Login</h2>
                 <p>Bem-vindo de volta!</p>
-                
-                <%-- Mensagem de sucesso dinâmica --%>
-                <% String sucesso = (String) request.getAttribute("sucesso");
-                   if (sucesso != null) { %>
-                    <div class="success-msg" style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;"><%= sucesso %></div>
-                <% } %>
-                
-                <%-- Mensagem de erro dinâmica --%>
-                <% String erro = (String) request.getAttribute("erro");
-                   if (erro != null) { %>
-                    <div class="error-msg"><%= erro %></div>
-                <% } %>
+
+                <c:if test="${not empty sucesso}">
+                    <div class="success-msg" style="background-color: #4CAF50; color: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">${sucesso}</div>
+                </c:if>
+
+                <c:if test="${not empty erro}">
+                    <div class="error-msg">${erro}</div>
+                </c:if>
 
                 <input type="email" name="email" placeholder="E-mail" required />
                 <input type="password" name="senha" placeholder="Senha" required />
-                <!-- <a href="#" class="forgot-pass">Esqueceu a senha?</a> -->
                 <button type="submit" class="btn-main">Entrar</button>
             </form>
         </div>

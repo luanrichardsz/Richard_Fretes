@@ -1,8 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page isELIgnored="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="br.com.cliente.Cliente" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -25,10 +22,8 @@
 
 <div class="container">
 
-  <!-- Toolbar -->
   <section class="card toolbar">
     <div class="toolbar-row">
-      
       <div class="filters">
         <input type="text" placeholder="Buscar" />
 
@@ -50,18 +45,15 @@
           + Novo Cliente
         </button>
       </a>
-
     </div>
   </section>
 
-  <!-- Table -->
   <section class="card">
     <table class="data-table">
       <thead>
         <tr>
           <th>Razão Social</th>
           <th>CNPJ</th>
-          <!-- <th>Município</th> -->
           <th>Contato</th>
           <th>Status</th>
           <th>Ações</th>
@@ -69,68 +61,41 @@
       </thead>
 
       <tbody>
-        <%
-          List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");
-
-          if (clientes != null && !clientes.isEmpty()) {
-              for (Cliente c : clientes) {
-        %>
-
-        <tr>
-          <!-- Razão Social -->
-          <td>
-            <%= c.getRazaoSocial() %>
-          </td>
-
-          <!-- Documento -->
-          <td>
-            <%= c.getDocumento() %>
-          </td>
-
-          <!-- Município (placeholder)
-          <td>-</td> -->
-
-          <!-- Contato -->
-          <td>
-            <%= c.getEmail() %><br>
-            <%= c.getTelefone() %>
-          </td>
-
-          <!-- Status -->
-          <td>
-            <span class="badge <%= c.isAtivo() ? "green" : "red" %>">
-              <%= c.isAtivo() ? "Ativo" : "Inativo" %>
-            </span>
-          </td>
-
-          <!-- Ações -->
-          <td>
-            <a href="clientes?acao=editar&id=<%= c.getId() %>">
-              <button class="btn-small">Editar</button>
-            </a>
-          <a href="clientes?acao=deletar&id=<%= c.getId() %>"
-            onclick="return confirm('Tem certeza que deseja excluir este cliente?');">
-            <button class="btn-small danger">Excluir</button>
-          </a>
-          </td>
-        </tr>
-
-        <%
-              }
-          } else {
-        %>
-
-        <tr>
-          <td colspan="7" style="text-align:center; padding:20px;">
-            Nenhum cliente encontrado
-          </td>
-        </tr>
-
-        <%
-          }
-        %>
+        <c:choose>
+          <c:when test="${not empty clientes}">
+            <c:forEach items="${clientes}" var="c">
+              <tr>
+                <td>${c.razaoSocial}</td>
+                <td>${c.documento}</td>
+                <td>
+                  ${c.email}<br>
+                  ${c.telefone}
+                </td>
+                <td>
+                  <span class="badge ${c.ativo ? 'green' : 'red'}">
+                    ${c.ativo ? 'Ativo' : 'Inativo'}
+                  </span>
+                </td>
+                <td>
+                  <a href="clientes?acao=editar&id=${c.id}">
+                    <button class="btn-small">Editar</button>
+                  </a>
+                  <a href="clientes?acao=deletar&id=${c.id}" onclick="return confirm('Tem certeza que deseja excluir este cliente?');">
+                    <button class="btn-small danger">Excluir</button>
+                  </a>
+                </td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="5" style="text-align:center; padding:20px;">
+                Nenhum cliente encontrado
+              </td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
-
     </table>
   </section>
 

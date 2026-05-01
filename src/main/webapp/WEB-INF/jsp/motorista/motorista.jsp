@@ -1,8 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page isELIgnored="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="br.com.motorista.Motorista" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -22,13 +19,10 @@
     <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
-
 <div class="container">
 
-  <!-- Toolbar -->
   <section class="card toolbar">
     <div class="toolbar-row">
-      
       <div class="filters">
         <input type="text" placeholder="Buscar" />
 
@@ -45,11 +39,9 @@
           + Novo Motorista
         </button>
       </a>
-
     </div>
   </section>
 
-  <!-- Table -->
   <section class="card">
     <table class="data-table">
       <thead>
@@ -60,53 +52,50 @@
           <th>Categoria</th>
           <th>Telefone</th>
           <th>Status</th>
+          <th>CNH Vencida</th>
           <th>Ações</th>
         </tr>
       </thead>
 
       <tbody>
-        <%
-          List<Motorista> motoristas = (List<Motorista>) request.getAttribute("motoristas");
-
-          if (motoristas != null && !motoristas.isEmpty()) {
-              for (Motorista m : motoristas) {
-        %>
-
-        <tr>
-          <td><%= m.getNomeCompleto() %></td>
-          <td><%= m.getCpf() %></td>
-          <td><%= m.getNumeroCnh() %></td>
-          <td><%= m.getCategoriaCnh() %></td>
-          <td><%= m.getTelefone() %></td>
-          <td>
-            <span class="badge <%= m.getStatus().toString().equals("ATIVO") ? "green" : m.getStatus().toString().equals("SUSPENSO") ? "red" : "gray" %>">
-              <%= m.getStatus() %>
-            </span>
-          </td>
-          <td>
-            <a href="motoristas?acao=editar&id=<%= m.getId() %>">
-              <button class="btn-small">Editar</button>
-            </a>
-            <a href="motoristas?acao=deletar&id=<%= m.getId() %>" onclick="return confirm('Tem certeza?')">
-              <button class="btn-small btn-danger">Deletar</button>
-            </a>
-          </td>
-        </tr>
-
-        <%
-              }
-          } else {
-        %>
-
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 20px;">
-            Nenhum motorista cadastrado
-          </td>
-        </tr>
-
-        <%
-          }
-        %>
+        <c:choose>
+          <c:when test="${not empty motoristas}">
+            <c:forEach items="${motoristas}" var="m">
+              <tr>
+                <td>${m.nomeCompleto}</td>
+                <td>${m.cpf}</td>
+                <td>${m.numeroCnh}</td>
+                <td>${m.categoriaCnh}</td>
+                <td>${m.telefone}</td>
+                <td>
+                  <span class="badge ${m.status == 'ATIVO' ? 'green' : m.status == 'SUSPENSO' ? 'red' : 'gray'}">
+                    ${m.status}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge ${m.cnhVencida ? 'red' : 'green'}">
+                    ${m.cnhVencida ? 'SIM' : 'NAO'}
+                  </span>
+                </td>
+                <td>
+                  <a href="motoristas?acao=editar&id=${m.id}">
+                    <button class="btn-small">Editar</button>
+                  </a>
+                  <a href="motoristas?acao=deletar&id=${m.id}" onclick="return confirm('Tem certeza?')">
+                    <button class="btn-small btn-danger">Deletar</button>
+                  </a>
+                </td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="8" style="text-align: center; padding: 20px;">
+                Nenhum motorista cadastrado
+              </td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
     </table>
   </section>

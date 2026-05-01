@@ -1,30 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.endereco.Endereco" %>
-<%@ page import="br.com.usuario.Usuario" %>
-<%@ page import="br.com.cliente.Cliente" %>
-<%@ page import="java.util.List" %>
-
-<%
-    Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioAutenticado");
-    if (usuarioLogado == null) {
-        response.sendRedirect("login");
-        return;
-    }
-%>
-
-<% 
-  Endereco endereco = (Endereco) request.getAttribute("endereco");
-  boolean possuiDados = endereco != null;
-  boolean isEdicao = endereco != null && endereco.getId() != null;
-%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= isEdicao ? "Editar Endereço" : "Novo Endereço" %></title>
+<title>${not empty endereco.id ? 'Editar Endereço' : 'Novo Endereço'}</title>
 
 <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
@@ -54,100 +37,82 @@
     <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
-
 <div class="container">
 
   <section class="card">
-    <h2><%= isEdicao ? "Editar Endereço" : "Novo Endereço" %></h2>
+    <h2>${not empty endereco.id ? 'Editar Endereço' : 'Novo Endereço'}</h2>
 
-    <% if (request.getAttribute("erro") != null) { %>
+    <c:if test="${not empty erro}">
       <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
-        <%= request.getAttribute("erro") %>
+        ${erro}
       </div>
-    <% } %>
+    </c:if>
 
     <form action="enderecos" method="post">
-      
-      <% if (isEdicao) { %>
-        <input type="hidden" name="id" value="<%= endereco.getId() %>" />
-      <% } %>
+      <c:if test="${not empty endereco.id}">
+        <input type="hidden" name="id" value="${endereco.id}" />
+      </c:if>
 
       <div class="form-grid">
 
-        <% if (usuarioLogado.isAdmin()) { %>
+        <c:if test="${sessionScope.usuarioAutenticado.admin}">
           <div class="form-group">
             <label>Empresa Selecionada *</label>
             <select name="clienteId" required>
               <option value="">Selecione uma empresa</option>
-              <%
-                List<Cliente> clientes = (List<Cliente>) request.getAttribute("clientes");
-                if (clientes != null) {
-                  for (Cliente cliente : clientes) {
-              %>
-                <option value="<%= cliente.getId() %>" <%= possuiDados && endereco.getClienteId() != null && endereco.getClienteId().equals(cliente.getId()) ? "selected" : "" %>>
-                  <%= cliente.getNomeFantasia() %>
+              <c:forEach var="cliente" items="${clientes}">
+                <option value="${cliente.id}" ${not empty endereco.clienteId and endereco.clienteId eq cliente.id ? 'selected' : ''}>
+                  ${cliente.razaoSocial}
                 </option>
-              <%
-                  }
-                }
-              %>
+              </c:forEach>
             </select>
           </div>
-        <% } %>
+        </c:if>
 
-        <!-- CEP -->
         <div class="form-group">
           <label>CEP *</label>
-          <input type="text" id="cep" name="cep" maxlength="9" inputmode="numeric" value="<%= possuiDados ? endereco.getCep() : "" %>" required />
+          <input type="text" id="cep" name="cep" maxlength="9" inputmode="numeric" value="${endereco.cep}" required />
           <small id="cepMensagem" style="margin-top: 6px; color: #667085;"></small>
         </div>
 
-        <!-- Logradouro -->
         <div class="form-group full">
           <label>Logradouro *</label>
-          <input type="text" id="logradouro" name="logradouro" value="<%= possuiDados ? endereco.getLogradouro() : "" %>" required />
+          <input type="text" id="logradouro" name="logradouro" value="${endereco.logradouro}" required />
         </div>
 
-        <!-- Número -->
         <div class="form-group">
           <label>Número</label>
-          <input type="text" name="numero" value="<%= possuiDados ? endereco.getNumero() : "" %>" />
+          <input type="text" name="numero" value="${endereco.numero}" />
         </div>
 
-        <!-- Complemento -->
         <div class="form-group">
           <label>Complemento</label>
-          <input type="text" name="complemento" value="<%= possuiDados ? (endereco.getComplemento() != null ? endereco.getComplemento() : "") : "" %>" />
+          <input type="text" name="complemento" value="${endereco.complemento}" />
         </div>
 
-        <!-- Bairro -->
         <div class="form-group">
           <label>Bairro *</label>
-          <input type="text" id="bairro" name="bairro" value="<%= possuiDados ? endereco.getBairro() : "" %>" required />
+          <input type="text" id="bairro" name="bairro" value="${endereco.bairro}" required />
         </div>
 
-        <!-- Município -->
         <div class="form-group">
           <label>Município *</label>
-          <input type="text" id="municipio" name="municipio" value="<%= possuiDados ? endereco.getMunicipio() : "" %>" required />
+          <input type="text" id="municipio" name="municipio" value="${endereco.municipio}" required />
         </div>
 
-        <!-- Código IBGE -->
         <div class="form-group">
           <label>Código IBGE</label>
-          <input type="text" id="codigoIbge" name="codigoIbge" maxlength="7" inputmode="numeric" value="<%= possuiDados ? (endereco.getCodigoIbge() != null ? endereco.getCodigoIbge() : "") : "" %>" />
+          <input type="text" id="codigoIbge" name="codigoIbge" maxlength="7" inputmode="numeric" value="${endereco.codigoIbge}" />
         </div>
 
-        <!-- UF -->
         <div class="form-group">
           <label>UF *</label>
-          <input type="text" id="uf" name="uf" value="<%= possuiDados ? endereco.getUf() : "" %>" maxlength="2" required />
+          <input type="text" id="uf" name="uf" value="${endereco.uf}" maxlength="2" required />
         </div>
 
-        <!-- Ponto de Referência -->
         <div class="form-group full">
           <label>Ponto de Referência</label>
-          <textarea name="pontoReferencia" rows="3"><%= possuiDados ? (endereco.getPontoReferencia() != null ? endereco.getPontoReferencia() : "") : "" %></textarea>
+          <textarea name="pontoReferencia" rows="3">${endereco.pontoReferencia}</textarea>
         </div>
 
       </div>

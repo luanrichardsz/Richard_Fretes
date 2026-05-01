@@ -1,12 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="true" %>
-<%@ page import="br.com.usuario.Usuario" %>
-<%
-    Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
-    if (usuario == null) {
-        response.sendRedirect("login"); 
-        return;
-    }
-%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -27,12 +20,13 @@
         </div>
         <nav class="side-nav">
             <a href="#" class="logo-btn active" title="Home"><i class="fas fa-home"></i></a>
-            
-            <% if (usuario.isAdmin()) { %>
+
+            <c:if test="${sessionScope.usuarioAutenticado.admin}">
                 <a href="clientes" title="Clientes"><i class="fas fa-users"></i></a>
-            <% } %>
-            
+            </c:if>
+
             <a href="motoristas" title="Motoristas"><i class="fas fa-id-card"></i></a>
+            <a href="enderecos" title="Endereços"><i class="fas fa-map-location-dot"></i></a>
             <a href="veiculos" title="Veículos"><i class="fas fa-truck"></i></a>
             <a href="fretes" title="Fretes"><i class="fas fa-route"></i></a>
             <a href="login" class="logout-link" title="Sair"><i class="fas fa-sign-out-alt"></i></a>
@@ -42,15 +36,16 @@
     <main class="main-content">
         <header class="main-header">
             <div class="welcome-text">
-                <h2>Olá, <span><%= usuario.getUsuario() %> !</span></h2>
+                <h2>Olá, <span>${sessionScope.usuarioAutenticado.usuario} !</span></h2>
                 <p>Painel Administrativo -
-                <%
-                    if (usuario.isAdmin()) {
-                        out.print("Richard Fretes");
-                    } else {
-                        out.print(usuario.getCliente().getRazaoSocial());
-                    }
-                %>
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioAutenticado.admin}">
+                            Richard Fretes
+                        </c:when>
+                        <c:otherwise>
+                            ${sessionScope.usuarioAutenticado.cliente.razaoSocial}
+                        </c:otherwise>
+                    </c:choose>
                 </p>
             </div>
             <div class="header-brand">
@@ -59,23 +54,31 @@
         </header>
 
         <section class="menu-grid">
-            
-            <% if (usuario.isAdmin()) { %>
-            <a href="clientes" class="menu-card">
-                <div class="card-icon"><i class="fas fa-users"></i></div>
-                <div class="card-info">
-                    <h3>Clientes</h3>
-                    <p>Gerencie sua base de parceiros e tomadores de serviço.</p>
-                </div>
-                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </a>
-            <% } %>
+            <c:if test="${sessionScope.usuarioAutenticado.admin}">
+                <a href="clientes" class="menu-card">
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
+                    <div class="card-info">
+                        <h3>Clientes</h3>
+                        <p>Gerencie sua base de parceiros e tomadores de serviço.</p>
+                    </div>
+                    <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+                </a>
+            </c:if>
 
             <a href="motoristas" class="menu-card">
                 <div class="card-icon"><i class="fas fa-user-tie"></i></div>
                 <div class="card-info">
                     <h3>Motoristas</h3>
                     <p>Controle de CNH, exames e documentos dos condutores.</p>
+                </div>
+                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
+            </a>
+
+            <a href="enderecos" class="menu-card">
+                <div class="card-icon"><i class="fas fa-map-location-dot"></i></div>
+                <div class="card-info">
+                    <h3>Endereços</h3>
+                    <p>${sessionScope.usuarioAutenticado.admin ? 'Consulte e gerencie todos os endereços cadastrados no sistema.' : 'Acesse e organize os endereços cadastrados da sua empresa.'}</p>
                 </div>
                 <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
             </a>
@@ -100,15 +103,6 @@
                 <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
             </a>
 
-            <!-- <a href="relatorios" class="menu-card">
-                <div class="card-icon"><i class="fas fa-chart-pie"></i></div>
-                <div class="card-info">
-                    <h3>Relatórios</h3>
-                    <p>Analise lucros, KM rodados e performance da frota.</p>
-                </div>
-                <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
-            </a> -->
-
             <a href="minhaConta" class="menu-card">
                 <div class="card-icon"><i class="fas fa-user-gear"></i></div>
                 <div class="card-info">
@@ -117,7 +111,6 @@
                 </div>
                 <div class="card-arrow"><i class="fas fa-chevron-right"></i></div>
             </a>
-
         </section>
     </main>
 </div>

@@ -1,8 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page isELIgnored="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="br.com.veiculo.Veiculo" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,10 +21,8 @@
 
 <div class="container">
 
-  <!-- Toolbar -->
   <section class="card toolbar">
     <div class="toolbar-row">
-      
       <div class="filters">
         <input type="text" placeholder="Buscar por placa" />
 
@@ -45,11 +40,9 @@
           + Novo Veículo
         </button>
       </a>
-
     </div>
   </section>
 
-  <!-- Table -->
   <section class="card">
     <table class="data-table">
       <thead>
@@ -65,48 +58,39 @@
       </thead>
 
       <tbody>
-        <%
-          List<Veiculo> veiculos = (List<Veiculo>) request.getAttribute("veiculos");
-
-          if (veiculos != null && !veiculos.isEmpty()) {
-              for (Veiculo v : veiculos) {
-        %>
-
-        <tr>
-          <td><strong><%= v.getPlaca() %></strong></td>
-          <td><%= v.getTipo() %></td>
-          <td><%= v.getAnoModelo() %></td>
-          <td><%= v.getCombustivel() %></td>
-          <td><%= v.getCapacidadeCargaKg() %> kg</td>
-          <td>
-            <span class="badge <%= v.getStatus().toString().equals("DISPONIVEL") ? "green" : v.getStatus().toString().equals("EM_VIAGEM") ? "blue" : v.getStatus().toString().equals("EM_MANUTENCAO") ? "orange" : "gray" %>">
-              <%= v.getStatus() %>
-            </span>
-          </td>
-          <td>
-            <a href="veiculos?acao=editar&id=<%= v.getId() %>">
-              <button class="btn-small">Editar</button>
-            </a>
-            <a href="veiculos?acao=deletar&id=<%= v.getId() %>" onclick="return confirm('Tem certeza?')">
-              <button class="btn-small btn-danger">Deletar</button>
-            </a>
-          </td>
-        </tr>
-
-        <%
-              }
-          } else {
-        %>
-
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 20px;">
-            Nenhum veículo cadastrado
-          </td>
-        </tr>
-
-        <%
-          }
-        %>
+        <c:choose>
+          <c:when test="${not empty veiculos}">
+            <c:forEach items="${veiculos}" var="v">
+              <tr>
+                <td><strong>${v.placa}</strong></td>
+                <td>${v.tipo}</td>
+                <td>${v.anoModelo}</td>
+                <td>${v.combustivel}</td>
+                <td>${v.capacidadeCargaKg} kg</td>
+                <td>
+                  <span class="badge ${v.status == 'DISPONIVEL' ? 'green' : v.status == 'EM_VIAGEM' ? 'blue' : v.status == 'EM_MANUTENCAO' ? 'orange' : 'gray'}">
+                    ${v.status}
+                  </span>
+                </td>
+                <td>
+                  <a href="veiculos?acao=editar&id=${v.id}">
+                    <button class="btn-small">Editar</button>
+                  </a>
+                  <a href="veiculos?acao=deletar&id=${v.id}" onclick="return confirm('Tem certeza?')">
+                    <button class="btn-small btn-danger">Deletar</button>
+                  </a>
+                </td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 20px;">
+                Nenhum veículo cadastrado
+              </td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
     </table>
   </section>

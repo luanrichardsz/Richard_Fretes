@@ -1,8 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page isELIgnored="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="br.com.ocorrenciafrete.OcorrenciaFrete" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -24,10 +21,8 @@
 
 <div class="container">
 
-  <!-- Toolbar -->
   <section class="card toolbar">
     <div class="toolbar-row">
-      
       <div class="filters">
         <input type="text" placeholder="Buscar" />
 
@@ -46,11 +41,9 @@
           + Nova Ocorrência
         </button>
       </a>
-
     </div>
   </section>
 
-  <!-- Table -->
   <section class="card">
     <table class="data-table">
       <thead>
@@ -65,47 +58,38 @@
       </thead>
 
       <tbody>
-        <%
-          List<OcorrenciaFrete> ocorrencias = (List<OcorrenciaFrete>) request.getAttribute("ocorrencias");
-
-          if (ocorrencias != null && !ocorrencias.isEmpty()) {
-              for (OcorrenciaFrete o : ocorrencias) {
-        %>
-
-        <tr>
-          <td><%= o.getFreteId() %></td>
-          <td>
-            <span class="badge blue">
-              <%= o.getTipo() %>
-            </span>
-          </td>
-          <td><%= o.getMunicipio() %></td>
-          <td><%= o.getUf() %></td>
-          <td><%= o.getDataHora() %></td>
-          <td>
-            <a href="ocorrencias?acao=editar&id=<%= o.getId() %>">
-              <button class="btn-small">Editar</button>
-            </a>
-            <a href="ocorrencias?acao=deletar&id=<%= o.getId() %>" onclick="return confirm('Tem certeza?')">
-              <button class="btn-small btn-danger">Deletar</button>
-            </a>
-          </td>
-        </tr>
-
-        <%
-              }
-          } else {
-        %>
-
-        <tr>
-          <td colspan="6" style="text-align: center; padding: 20px;">
-            Nenhuma ocorrência cadastrada
-          </td>
-        </tr>
-
-        <%
-          }
-        %>
+        <c:choose>
+          <c:when test="${not empty ocorrencias}">
+            <c:forEach items="${ocorrencias}" var="o">
+              <tr>
+                <td>${o.freteId}</td>
+                <td>
+                  <span class="badge blue">
+                    ${o.tipo}
+                  </span>
+                </td>
+                <td>${o.municipio}</td>
+                <td>${o.uf}</td>
+                <td>${o.dataHora}</td>
+                <td>
+                  <a href="ocorrencias?acao=editar&id=${o.id}">
+                    <button class="btn-small">Editar</button>
+                  </a>
+                  <a href="ocorrencias?acao=deletar&id=${o.id}" onclick="return confirm('Tem certeza?')">
+                    <button class="btn-small btn-danger">Deletar</button>
+                  </a>
+                </td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 20px;">
+                Nenhuma ocorrência cadastrada
+              </td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
     </table>
   </section>

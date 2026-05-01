@@ -1,22 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.cliente.Cliente" %>
-<%@ page import="br.com.usuario.Usuario" %>
-<%@ page import="java.util.List" %>
-
-<% 
-  Cliente cliente = (Cliente) request.getAttribute("cliente");
-  boolean possuiDados = cliente != null;
-  boolean isEdicao = cliente != null && cliente.getId() != null;
-  List<Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
-%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= isEdicao ? "Editar Cliente" : "Novo Cliente" %></title>
+<title>${not empty cliente.id ? 'Editar Cliente' : 'Novo Cliente'}</title>
 
 <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
@@ -49,82 +40,67 @@
 <div class="container">
 
   <section class="card">
-    <h2><%= isEdicao ? "Editar Cliente" : "Novo Cliente" %></h2>
+    <h2>${not empty cliente.id ? 'Editar Cliente' : 'Novo Cliente'}</h2>
 
-    <% if (request.getAttribute("erro") != null) { %>
+    <c:if test="${not empty erro}">
       <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
-        <%= request.getAttribute("erro") %>
+        ${erro}
       </div>
-    <% } %>
+    </c:if>
 
     <form action="clientes" method="post">
-      
-      <% if (isEdicao) { %>
-        <input type="hidden" name="id" value="<%= cliente.getId() %>" />
-      <% } %>
+      <c:if test="${not empty cliente.id}">
+        <input type="hidden" name="id" value="${cliente.id}" />
+      </c:if>
 
       <div class="form-grid">
 
-        <!-- Razão Social -->
         <div class="form-group full">
           <label>Razão Social *</label>
-          <input type="text" name="razaoSocial" value="<%= possuiDados ? cliente.getRazaoSocial() : "" %>" required />
+          <input type="text" name="razaoSocial" value="${cliente.razaoSocial}" required />
         </div>
 
-        <!-- Nome Fantasia -->
         <div class="form-group full">
           <label>Nome Fantasia</label>
-          <input type="text" name="nomeFantasia" value="<%= possuiDados ? (cliente.getNomeFantasia() != null ? cliente.getNomeFantasia() : "") : "" %>" />
+          <input type="text" name="nomeFantasia" value="${cliente.nomeFantasia}" />
         </div>
 
-        <!-- Documento -->
         <div class="form-group">
           <label>CNPJ *</label>
-          <input type="text" id="documento" name="documento" maxlength="18" inputmode="numeric" value="<%= possuiDados ? cliente.getDocumento() : "" %>" required />
+          <input type="text" id="documento" name="documento" maxlength="18" inputmode="numeric" value="${cliente.documento}" required />
         </div>
 
-        <!-- IE -->
         <div class="form-group">
           <label>Inscrição Estadual (Sem Pontuação)</label>
-          <input type="text" name="inscricaoEstadual" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="14" inputmode="numeric" value="<%= possuiDados ? (cliente.getInscricaoEstadual() != null ? cliente.getInscricaoEstadual() : "") : "" %>" />
+          <input type="text" name="inscricaoEstadual" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="14" inputmode="numeric" value="${cliente.inscricaoEstadual}" />
         </div>
 
-        <!-- Email -->
         <div class="form-group">
           <label>Email *</label>
-          <input type="email" name="email" value="<%= possuiDados ? cliente.getEmail() : "" %>" required />
+          <input type="email" name="email" value="${cliente.email}" required />
         </div>
 
-        <!-- Telefone -->
         <div class="form-group">
           <label>Telefone *</label>
-          <input type="text" id="telefone" name="telefone" minlength="15" maxlength="15" inputmode="numeric" value="<%= possuiDados ? cliente.getTelefone() : "" %>" required />
+          <input type="text" id="telefone" name="telefone" minlength="15" maxlength="15" inputmode="numeric" value="${cliente.telefone}" required />
         </div>
 
-        <!-- Usuário Responsável -->
         <div class="form-group full">
           <label>Usuário Responsável *</label>
           <select name="usuarioId" required>
             <option value="0">Selecione um usuário</option>
-            <% 
-              if (usuarios != null) {
-                for (Usuario u : usuarios) {
-                  boolean selected = possuiDados && cliente.getId() != null && u.getClienteId() != null && u.getClienteId().equals(cliente.getId());
-            %>
-              <option value="<%= u.getId() %>" <%= selected ? "selected" : "" %>>
-                <%= u.getUsuario() %> (<%= u.getEmail() %>)
+            <c:forEach var="u" items="${usuarios}">
+              <option value="${u.id}" ${not empty cliente.id and not empty u.clienteId and u.clienteId eq cliente.id ? 'selected' : ''}>
+                ${u.usuario} (${u.email})
               </option>
-            <% 
-                }
-              }
-            %>
+            </c:forEach>
           </select>
         </div>
 
       </div>
 
       <div style="margin-top:20px;">
-        <button type="submit" class="btn-primary"><%= isEdicao ? "Atualizar Cliente" : "Salvar Cliente" %></button>
+        <button type="submit" class="btn-primary">${not empty cliente.id ? 'Atualizar Cliente' : 'Salvar Cliente'}</button>
         <a href="clientes" class="btn-small">Cancelar</a>
       </div>
 

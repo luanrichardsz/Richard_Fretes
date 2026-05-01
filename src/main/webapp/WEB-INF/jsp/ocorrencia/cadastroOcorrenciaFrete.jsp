@@ -1,20 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page isELIgnored="false" %>
-<%@ page import="br.com.ocorrenciafrete.OcorrenciaFrete" %>
-<%@ page import="br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia" %>
-
-<% 
-  OcorrenciaFrete ocorrencia = (OcorrenciaFrete) request.getAttribute("ocorrencia");
-  boolean possuiDados = ocorrencia != null;
-  boolean isEdicao = ocorrencia != null && ocorrencia.getId() != null;
-%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title><%= isEdicao ? "Editar Ocorrência" : "Nova Ocorrência" %></title>
+<title>${not empty ocorrencia.id ? 'Editar Ocorrência' : 'Nova Ocorrência'}</title>
 
 <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
 <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
@@ -43,92 +36,77 @@
     <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
-
-
 <div class="container">
 
   <section class="card">
-    <h2><%= isEdicao ? "Editar Ocorrência" : "Nova Ocorrência" %></h2>
+    <h2>${not empty ocorrencia.id ? 'Editar Ocorrência' : 'Nova Ocorrência'}</h2>
 
-    <% if (request.getAttribute("erro") != null) { %>
+    <c:if test="${not empty erro}">
       <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
-        <%= request.getAttribute("erro") %>
+        ${erro}
       </div>
-    <% } %>
+    </c:if>
 
     <form action="ocorrencias" method="post">
-      
-      <% if (isEdicao) { %>
-        <input type="hidden" name="id" value="<%= ocorrencia.getId() %>" />
-      <% } %>
+      <c:if test="${not empty ocorrencia.id}">
+        <input type="hidden" name="id" value="${ocorrencia.id}" />
+      </c:if>
 
       <div class="form-grid">
 
-        <!-- Frete ID -->
         <div class="form-group">
           <label>Frete ID *</label>
-          <input type="number" name="freteId" value="<%= possuiDados ? ocorrencia.getFreteId() : "" %>" required />
+          <input type="number" name="freteId" value="${ocorrencia.freteId}" required />
         </div>
 
-        <!-- Tipo Ocorrência -->
         <div class="form-group">
           <label>Tipo Ocorrência *</label>
           <select name="tipo" required>
             <option value="">Selecione</option>
-            <% for (TipoOcorrencia tipo : TipoOcorrencia.values()) { %>
-              <option value="<%= tipo.name() %>" <%= possuiDados && ocorrencia.getTipo() != null && ocorrencia.getTipo().name().equals(tipo.name()) ? "selected" : "" %>>
-                <%= tipo.name() %>
-              </option>
-            <% } %>
+            <c:forEach var="tipo" items="${tipoOcorrenciaOptions}">
+              <option value="${tipo}" ${ocorrencia.tipo eq tipo ? 'selected' : ''}>${tipo}</option>
+            </c:forEach>
           </select>
         </div>
 
-        <!-- Município -->
         <div class="form-group">
           <label>Município *</label>
-          <input type="text" name="municipio" value="<%= possuiDados ? ocorrencia.getMunicipio() : "" %>" required />
+          <input type="text" name="municipio" value="${ocorrencia.municipio}" required />
         </div>
 
-        <!-- UF -->
         <div class="form-group">
           <label>UF *</label>
-          <input type="text" id="uf" name="uf" value="<%= possuiDados ? ocorrencia.getUf() : "" %>" maxlength="2" required />
+          <input type="text" id="uf" name="uf" value="${ocorrencia.uf}" maxlength="2" required />
         </div>
 
-        <!-- Latitude -->
         <div class="form-group">
           <label>Latitude</label>
-          <input type="number" step="0.000001" name="latitude" value="<%= possuiDados ? (ocorrencia.getLatitude() != null ? ocorrencia.getLatitude() : "") : "" %>" />
+          <input type="number" step="0.000001" name="latitude" value="${ocorrencia.latitude}" />
         </div>
 
-        <!-- Longitude -->
         <div class="form-group">
           <label>Longitude</label>
-          <input type="number" step="0.000001" name="longitude" value="<%= possuiDados ? (ocorrencia.getLongitude() != null ? ocorrencia.getLongitude() : "") : "" %>" />
+          <input type="number" step="0.000001" name="longitude" value="${ocorrencia.longitude}" />
         </div>
 
-        <!-- Descrição -->
         <div class="form-group full">
           <label>Descrição</label>
-          <textarea name="descricao" rows="3"><%= possuiDados ? (ocorrencia.getDescricao() != null ? ocorrencia.getDescricao() : "") : "" %></textarea>
+          <textarea name="descricao" rows="3">${ocorrencia.descricao}</textarea>
         </div>
 
-        <!-- Recebedor Nome -->
         <div class="form-group">
           <label>Recebedor Nome</label>
-          <input type="text" name="recebedorNome" value="<%= possuiDados ? (ocorrencia.getRecebedorNome() != null ? ocorrencia.getRecebedorNome() : "") : "" %>" />
+          <input type="text" name="recebedorNome" value="${ocorrencia.recebedorNome}" />
         </div>
 
-        <!-- Recebedor Documento -->
         <div class="form-group">
           <label>Recebedor Documento</label>
-          <input type="text" id="recebedorDocumento" name="recebedorDocumento" maxlength="18" inputmode="numeric" value="<%= possuiDados ? (ocorrencia.getRecebedorDocumento() != null ? ocorrencia.getRecebedorDocumento() : "") : "" %>" />
+          <input type="text" id="recebedorDocumento" name="recebedorDocumento" maxlength="18" inputmode="numeric" value="${ocorrencia.recebedorDocumento}" />
         </div>
 
-        <!-- Foto Evidência URL -->
         <div class="form-group full">
           <label>Foto Evidência URL</label>
-          <input type="url" name="fotoEvidenciaUrl" value="<%= possuiDados ? (ocorrencia.getFotoEvidenciaUrl() != null ? ocorrencia.getFotoEvidenciaUrl() : "") : "" %>" />
+          <input type="url" name="fotoEvidenciaUrl" value="${ocorrencia.fotoEvidenciaUrl}" />
         </div>
 
       </div>

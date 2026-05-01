@@ -1,8 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page isELIgnored="true" %>
-<%@ page import="java.util.List" %>
-<%@ page import="br.com.frete.Frete" %>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -23,13 +21,10 @@
     <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
-
 <div class="container">
 
-  <!-- Toolbar -->
   <section class="card toolbar">
     <div class="toolbar-row">
-      
       <div class="filters">
         <input type="text" placeholder="Buscar" />
 
@@ -47,11 +42,9 @@
           + Novo Frete
         </button>
       </a>
-
     </div>
   </section>
 
-  <!-- Table -->
   <section class="card">
     <table class="data-table">
       <thead>
@@ -67,48 +60,39 @@
       </thead>
 
       <tbody>
-        <%
-          List<Frete> fretes = (List<Frete>) request.getAttribute("fretes");
-
-          if (fretes != null && !fretes.isEmpty()) {
-              for (Frete f : fretes) {
-        %>
-
-        <tr>
-          <td><%= f.getNumeroFrete() %></td>
-          <td><%= f.getRemetenteId() %></td>
-          <td><%= f.getDestinatarioId() %></td>
-          <td>
-            <span class="badge <%= f.getStatus().toString().equals("ENTREGUE") ? "green" : "orange" %>">
-              <%= f.getStatus() %>
-            </span>
-          </td>
-          <td>R$ <%= String.format("%.2f", f.getValorTotal()) %></td>
-          <td><%= f.getDataEmissao() %></td>
-          <td>
-            <a href="fretes?acao=editar&id=<%= f.getId() %>">
-              <button class="btn-small">Editar</button>
-            </a>
-            <a href="fretes?acao=deletar&id=<%= f.getId() %>" onclick="return confirm('Tem certeza?')">
-              <button class="btn-small btn-danger">Deletar</button>
-            </a>
-          </td>
-        </tr>
-
-        <%
-              }
-          } else {
-        %>
-
-        <tr>
-          <td colspan="7" style="text-align: center; padding: 20px;">
-            Nenhum frete cadastrado
-          </td>
-        </tr>
-
-        <%
-          }
-        %>
+        <c:choose>
+          <c:when test="${not empty fretes}">
+            <c:forEach items="${fretes}" var="f">
+              <tr>
+                <td>${f.numeroFrete}</td>
+                <td>${f.remetenteId}</td>
+                <td>${f.destinatarioId}</td>
+                <td>
+                  <span class="badge ${f.status == 'ENTREGUE' ? 'green' : 'orange'}">
+                    ${f.status}
+                  </span>
+                </td>
+                <td>R$ <fmt:formatNumber value="${f.valorTotal}" minFractionDigits="2" maxFractionDigits="2"/></td>
+                <td>${f.dataEmissao}</td>
+                <td>
+                  <a href="fretes?acao=editar&id=${f.id}">
+                    <button class="btn-small">Editar</button>
+                  </a>
+                  <a href="fretes?acao=deletar&id=${f.id}" onclick="return confirm('Tem certeza?')">
+                    <button class="btn-small btn-danger">Deletar</button>
+                  </a>
+                </td>
+              </tr>
+            </c:forEach>
+          </c:when>
+          <c:otherwise>
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 20px;">
+                Nenhum frete cadastrado
+              </td>
+            </tr>
+          </c:otherwise>
+        </c:choose>
       </tbody>
     </table>
   </section>
