@@ -3,6 +3,7 @@ package br.com.veiculo;
 import br.com.veiculo.VeiculoDAO;
 import br.com.exception.CadastroException;
 import br.com.veiculo.Veiculo;
+import br.com.frete.FreteDAO;
 import br.com.util.ValidationUtils;
 
 import java.time.LocalDate;
@@ -10,13 +11,19 @@ import java.time.LocalDate;
 public class VeiculoBO {
 
     private final VeiculoDAO veiculoDAO;
+    private final FreteDAO freteDAO;
 
     public VeiculoBO() {
-        this(new VeiculoDAO());
+        this(new VeiculoDAO(), new FreteDAO());
     }
 
     public VeiculoBO(VeiculoDAO veiculoDAO) {
+        this(veiculoDAO, new FreteDAO());
+    }
+
+    public VeiculoBO(VeiculoDAO veiculoDAO, FreteDAO freteDAO) {
         this.veiculoDAO = veiculoDAO;
+        this.freteDAO = freteDAO;
     }
 
     public void salvar(Veiculo veiculo) throws CadastroException {
@@ -95,6 +102,14 @@ public class VeiculoBO {
 
         if (veiculo.getClienteId() == null) {
             throw new CadastroException("Cliente responsável pelo veículo é obrigatório.");
+        }
+
+        if (emEdicao
+                && veiculo.getStatus() == Veiculo.StatusVeiculo.DISPONIVEL
+                && freteDAO.existeFreteEmTransitoParaVeiculo(veiculo.getId(), null)) {
+            throw new CadastroException(
+                "Não é permitido alterar manualmente o status do veículo para Disponível enquanto houver frete em trânsito."
+            );
         }
 
         veiculo.setPlaca(placa);

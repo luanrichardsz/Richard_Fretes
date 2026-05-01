@@ -46,7 +46,15 @@ public class ClienteServlet extends HttpServlet {
         if("deletar".equals(acao)) {
             String idParam = req.getParameter("id");
             if (idParam != null && !idParam.isEmpty()) {
-                clienteDAO.deletar(Integer.parseInt(idParam));
+                try {
+                    clienteBO.deletar(Integer.parseInt(idParam));
+                } catch (CadastroException e) {
+                    req.setAttribute("erro", e.getMessage());
+                    List<Cliente> clientes = clienteDAO.listarTodos();
+                    req.setAttribute("clientes", clientes);
+                    req.getRequestDispatcher("/WEB-INF/jsp/cliente/cliente.jsp").forward(req, resp);
+                    return;
+                }
             }
             resp.sendRedirect("clientes");
             return;

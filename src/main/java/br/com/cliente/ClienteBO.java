@@ -1,19 +1,25 @@
 package br.com.cliente;
 
-import br.com.cliente.ClienteDAO;
 import br.com.exception.CadastroException;
-import br.com.cliente.Cliente;
+import br.com.frete.FreteDAO;
+import br.com.util.ValidationUtils;
 
 public class ClienteBO {
 
     private final ClienteDAO clienteDAO;
+    private final FreteDAO freteDAO;
 
     public ClienteBO() {
-        this(new ClienteDAO());
+        this(new ClienteDAO(), new FreteDAO());
     }
 
     public ClienteBO(ClienteDAO clienteDAO) {
+        this(clienteDAO, new FreteDAO());
+    }
+
+    public ClienteBO(ClienteDAO clienteDAO, FreteDAO freteDAO) {
         this.clienteDAO = clienteDAO;
+        this.freteDAO = freteDAO;
     }
 
     public void salvar(Cliente cliente) throws CadastroException {
@@ -26,21 +32,33 @@ public class ClienteBO {
         clienteDAO.atualizar(cliente);
     }
 
+    public void deletar(Integer clienteId) throws CadastroException {
+        if (clienteId == null || clienteId <= 0) {
+            throw new CadastroException("Cliente inválido.");
+        }
+
+        if (freteDAO.existeFreteParaCliente(clienteId)) {
+            throw new CadastroException("Não é permitido excluir um cliente que possui fretes.");
+        }
+
+        clienteDAO.deletar(clienteId);
+    }
+
     private void validarCliente(Cliente cliente, boolean emEdicao) throws CadastroException {
         if (cliente == null) {
             throw new CadastroException("Cliente inválido.");
         }
 
-        if (estaVazio(cliente.getRazaoSocial())) {
+        if (ValidationUtils.estaVazio(cliente.getRazaoSocial())) {
             throw new CadastroException("Razão social é obrigatória.");
         }
 
-        if (estaVazio(cliente.getDocumento())) {
+        if (ValidationUtils.estaVazio(cliente.getDocumento())) {
             throw new CadastroException("CNPJ é obrigatório.");
         }
 
-        String documentoLimpo = manterSomenteDigitos(cliente.getDocumento());
-        if (!cnpjValido(documentoLimpo)) {
+        String documentoLimpo = ValidationUtils.manterSomenteDigitos(cliente.getDocumento());
+        if (!ValidationUtils.cnpjValido(documentoLimpo)) {
             throw new CadastroException("CNPJ inválido.");
         }
 
@@ -49,27 +67,27 @@ public class ClienteBO {
         }
 
         if (cliente.getInscricaoEstadual() != null && !cliente.getInscricaoEstadual().trim().isEmpty()) {
-            String ieLimpa = manterSomenteDigitos(cliente.getInscricaoEstadual());
+            String ieLimpa = ValidationUtils.manterSomenteDigitos(cliente.getInscricaoEstadual());
             if (ieLimpa.length() > 14) {
                 throw new CadastroException("Inscrição estadual inválida.");
             }
             cliente.setInscricaoEstadual(ieLimpa);
         }
 
-        if (estaVazio(cliente.getEmail())) {
+        if (ValidationUtils.estaVazio(cliente.getEmail())) {
             throw new CadastroException("Email é obrigatório.");
         }
 
-        if (!emailValido(cliente.getEmail())) {
+        if (!ValidationUtils.emailValido(cliente.getEmail())) {
             throw new CadastroException("Email inválido.");
         }
 
-        if (estaVazio(cliente.getTelefone())) {
+        if (ValidationUtils.estaVazio(cliente.getTelefone())) {
             throw new CadastroException("Telefone é obrigatório.");
         }
 
-        String telefoneLimpo = manterSomenteDigitos(cliente.getTelefone());
-        if (telefoneLimpo.length() < 10 || telefoneLimpo.length() > 11) {
+        String telefoneLimpo = ValidationUtils.manterSomenteDigitos(cliente.getTelefone());
+        if (!ValidationUtils.telefoneValido(telefoneLimpo)) {
             throw new CadastroException("Telefone inválido.");
         }
 
@@ -81,40 +99,5 @@ public class ClienteBO {
         if (cliente.getNomeFantasia() != null) {
             cliente.setNomeFantasia(cliente.getNomeFantasia().trim());
         }
-    }
-
-    private boolean estaVazio(String valor) {
-        return valor == null || valor.trim().isEmpty();
-    }
-
-    private String manterSomenteDigitos(String valor) {
-        return valor == null ? "" : valor.replaceAll("\\D", "");
-    }
-
-    private boolean emailValido(String email) {
-        return email != null && email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
-    }
-
-    private boolean cnpjValido(String cnpj) {
-        if (cnpj == null || cnpj.length() != 14 || cnpj.matches("(\\d)\\1{13}")) {
-            return false;
-        }
-
-        int digito1 = calcularDigitoCnpj(cnpj, new int[]{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2});
-        int digito2 = calcularDigitoCnpj(cnpj, new int[]{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2});
-
-        return digito1 == Character.getNumericValue(cnpj.charAt(12))
-            && digito2 == Character.getNumericValue(cnpj.charAt(13));
-    }
-
-    private int calcularDigitoCnpj(String cnpj, int[] pesos) {
-        int soma = 0;
-
-        for (int i = 0; i < pesos.length; i++) {
-            soma += Character.getNumericValue(cnpj.charAt(i)) * pesos[i];
-        }
-
-        int resto = soma % 11;
-        return resto < 2 ? 0 : 11 - resto;
     }
 }

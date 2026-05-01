@@ -5,16 +5,24 @@ import br.com.ocorrenciafrete.OcorrenciaFrete;
 import br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OcorrenciaFreteDAO extends ConnectionFactory {
 
     public void salvar(OcorrenciaFrete ocorrencia) {
+        try (Connection conn = getConnection()) {
+            salvar(conn, ocorrencia);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void salvar(Connection conn, OcorrenciaFrete ocorrencia) throws SQLException {
         String sql = "INSERT INTO ocorrencia_frete (frete_id, tipo, data_hora, municipio, uf, latitude, longitude, descricao, recebedor_nome, recebedor_documento, foto_evidencia_url) VALUES (?, ?::tipo_ocorrencia_enum, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, ocorrencia.getFreteId());
             stmt.setString(2, ocorrencia.getTipo().name());
@@ -35,16 +43,21 @@ public class OcorrenciaFreteDAO extends ConnectionFactory {
                     ocorrencia.setId(generatedKeys.getInt(1));
                 }
             }
+        }
+    }
+
+    public void atualizar(OcorrenciaFrete ocorrencia) {
+        try (Connection conn = getConnection()) {
+            atualizar(conn, ocorrencia);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void atualizar(OcorrenciaFrete ocorrencia) {
+    public void atualizar(Connection conn, OcorrenciaFrete ocorrencia) throws SQLException {
         String sql = "UPDATE ocorrencia_frete SET frete_id = ?, tipo = ?::tipo_ocorrencia_enum, data_hora = ?, municipio = ?, uf = ?, latitude = ?, longitude = ?, descricao = ?, recebedor_nome = ?, recebedor_documento = ?, foto_evidencia_url = ? WHERE id = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, ocorrencia.getFreteId());
             stmt.setString(2, ocorrencia.getTipo().name());
@@ -60,9 +73,30 @@ public class OcorrenciaFreteDAO extends ConnectionFactory {
             stmt.setInt(12, ocorrencia.getId());
 
             stmt.executeUpdate();
+        }
+    }
+
+    public LocalDateTime buscarUltimaDataHoraPorFrete(Integer freteId, Integer ocorrenciaIdIgnorada) {
+        String sql = "SELECT MAX(data_hora) AS ultima_data_hora FROM ocorrencia_frete "
+                + "WHERE frete_id = ? AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, freteId);
+            stmt.setObject(2, ocorrenciaIdIgnorada, Types.INTEGER);
+            stmt.setObject(3, ocorrenciaIdIgnorada, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next() && rs.getTimestamp("ultima_data_hora") != null) {
+                    return rs.getTimestamp("ultima_data_hora").toLocalDateTime();
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
     public OcorrenciaFrete buscarPorId(Integer id) {

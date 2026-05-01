@@ -78,6 +78,16 @@ public class VeiculoDAO extends ConnectionFactory {
         }
     }
 
+    public void atualizarStatus(Connection conn, Integer veiculoId, StatusVeiculo status) throws SQLException {
+        String sql = "UPDATE veiculo SET status = ?::status_veiculo_enum WHERE id = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status.name());
+            stmt.setInt(2, veiculoId);
+            stmt.executeUpdate();
+        }
+    }
+
     public Veiculo buscarPorId(Integer id) {
         String sql = "SELECT * FROM veiculo WHERE id = ?";
         Veiculo veiculo = null;

@@ -11,10 +11,17 @@ import java.util.List;
 public class FreteDAO extends ConnectionFactory {
 
     public void salvar(Frete frete) {
+        try (Connection conn = getConnection()) {
+            salvar(conn, frete);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void salvar(Connection conn, Frete frete) throws SQLException {
         String sql = "INSERT INTO frete (numero_frete, remetente_id, destinatario_id, endereco_origem_id, endereco_destino_id, motorista_id, veiculo_id, chave_nfe, origem_ibge, destino_ibge, natureza_carga, peso_bruto, volumes, valor_frete_bruto, valor_pedagio, aliquota_icms, valor_icms, valor_total, status, data_emissao, previsao_entrega, motivo_falha, data_saida, data_entrega, distancia_km) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::status_frete_enum, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, frete.getNumeroFrete());
             stmt.setInt(2, frete.getRemetenteId());
@@ -49,16 +56,21 @@ public class FreteDAO extends ConnectionFactory {
                     frete.setId(generatedKeys.getInt(1));
                 }
             }
+        }
+    }
+
+    public void atualizar(Frete frete) {
+        try (Connection conn = getConnection()) {
+            atualizar(conn, frete);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public void atualizar(Frete frete) {
+    public void atualizar(Connection conn, Frete frete) throws SQLException {
         String sql = "UPDATE frete SET numero_frete = ?, remetente_id = ?, destinatario_id = ?, endereco_origem_id = ?, endereco_destino_id = ?, motorista_id = ?, veiculo_id = ?, chave_nfe = ?, origem_ibge = ?, destino_ibge = ?, natureza_carga = ?, peso_bruto = ?, volumes = ?, valor_frete_bruto = ?, valor_pedagio = ?, aliquota_icms = ?, valor_icms = ?, valor_total = ?, status = ?::status_frete_enum, previsao_entrega = ?, motivo_falha = ?, data_saida = ?, data_entrega = ?, distancia_km = ? WHERE id = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, frete.getNumeroFrete());
             stmt.setInt(2, frete.getRemetenteId());
@@ -87,17 +99,24 @@ public class FreteDAO extends ConnectionFactory {
             stmt.setInt(25, frete.getId());
 
             stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
     public Frete buscarPorId(Integer id) {
+        try (Connection conn = getConnection()) {
+            return buscarPorId(conn, id);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Frete buscarPorId(Connection conn, Integer id) throws SQLException {
         String sql = "SELECT * FROM frete WHERE id = ?";
         Frete frete = null;
 
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, id);
 
@@ -106,8 +125,6 @@ public class FreteDAO extends ConnectionFactory {
                     frete = mapearResultSet(rs);
                 }
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
         return frete;
@@ -141,6 +158,99 @@ public class FreteDAO extends ConnectionFactory {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, numeroFrete);
+            stmt.setObject(2, freteIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, freteIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean existeFreteParaCliente(Integer clienteId) {
+        String sql = "SELECT COUNT(*) FROM frete WHERE remetente_id = ? OR destinatario_id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, clienteId);
+            stmt.setInt(2, clienteId);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean existeFreteAtivoParaMotorista(Integer motoristaId, Integer freteIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM frete WHERE motorista_id = ? "
+                + "AND status IN ('EMITIDO', 'SAIDA_CONFIRMADA', 'EM_TRANSITO') "
+                + "AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, motoristaId);
+            stmt.setObject(2, freteIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, freteIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean existeFreteEmExecucaoParaMotorista(Integer motoristaId, Integer freteIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM frete WHERE motorista_id = ? "
+                + "AND status IN ('SAIDA_CONFIRMADA', 'EM_TRANSITO') "
+                + "AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, motoristaId);
+            stmt.setObject(2, freteIdIgnorado, Types.INTEGER);
+            stmt.setObject(3, freteIdIgnorado, Types.INTEGER);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean existeFreteEmTransitoParaVeiculo(Integer veiculoId, Integer freteIdIgnorado) {
+        String sql = "SELECT COUNT(*) FROM frete WHERE veiculo_id = ? "
+                + "AND status = 'EM_TRANSITO' "
+                + "AND (? IS NULL OR id <> ?)";
+
+        try (Connection conn = getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, veiculoId);
             stmt.setObject(2, freteIdIgnorado, Types.INTEGER);
             stmt.setObject(3, freteIdIgnorado, Types.INTEGER);
 

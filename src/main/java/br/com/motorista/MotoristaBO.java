@@ -3,6 +3,7 @@ package br.com.motorista;
 import br.com.motorista.MotoristaDAO;
 import br.com.exception.CadastroException;
 import br.com.motorista.Motorista;
+import br.com.frete.FreteDAO;
 import br.com.util.ValidationUtils;
 
 import java.time.LocalDate;
@@ -11,13 +12,19 @@ import java.time.Period;
 public class MotoristaBO {
 
     private final MotoristaDAO motoristaDAO;
+    private final FreteDAO freteDAO;
 
     public MotoristaBO() {
-        this(new MotoristaDAO());
+        this(new MotoristaDAO(), new FreteDAO());
     }
 
     public MotoristaBO(MotoristaDAO motoristaDAO) {
+        this(motoristaDAO, new FreteDAO());
+    }
+
+    public MotoristaBO(MotoristaDAO motoristaDAO, FreteDAO freteDAO) {
         this.motoristaDAO = motoristaDAO;
+        this.freteDAO = freteDAO;
     }
 
     public void salvar(Motorista motorista) throws CadastroException {
@@ -104,6 +111,14 @@ public class MotoristaBO {
 
         if (motorista.getClienteId() == null) {
             throw new CadastroException("Cliente responsável pelo motorista é obrigatório.");
+        }
+
+        if (emEdicao
+                && motorista.getStatus() == Motorista.StatusMotorista.INATIVO
+                && freteDAO.existeFreteAtivoParaMotorista(motorista.getId(), null)) {
+            throw new CadastroException(
+                "Não é permitido inativar um motorista com frete em status EMITIDO, SAÍDA CONFIRMADA ou EM TRÂNSITO."
+            );
         }
 
         motorista.setNomeCompleto(motorista.getNomeCompleto().trim());
