@@ -58,7 +58,7 @@ public class LoginServlet extends HttpServlet {
             Usuario usuario = usuarioBO.autenticar(email, senha);
             HttpSession session = req.getSession();
             session.setAttribute("usuarioAutenticado", usuario);
-            req.getRequestDispatcher("/WEB-INF/jsp/menu/menu.jsp").forward(req, resp);
+            resp.sendRedirect("menu");
         } catch (NegocioException e) {
             req.setAttribute("erro", e.getMessage());
             req.getRequestDispatcher("/WEB-INF/jsp/login/login.jsp").forward(req, resp);

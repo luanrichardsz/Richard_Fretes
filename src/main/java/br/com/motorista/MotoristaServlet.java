@@ -156,6 +156,11 @@ public class MotoristaServlet extends HttpServlet {
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Motorista motorista)
             throws ServletException, IOException {
         req.setAttribute("motorista", motorista);
+        req.setAttribute("hoje", LocalDate.now());
+        req.setAttribute("categoriaCnhOptions", CategoriaCnh.values());
+        req.setAttribute("tipoVinculoOptions", TipoVinculo.values());
+        req.setAttribute("tipoPixOptions", TipoPix.values());
+        req.setAttribute("statusMotoristaOptions", StatusMotorista.values());
 
         if (usuarioLogado.isAdmin()) {
             List<Cliente> clientes = new ClienteDAO().listarTodos();

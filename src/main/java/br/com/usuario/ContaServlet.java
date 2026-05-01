@@ -21,6 +21,12 @@ public class ContaServlet extends HttpServlet {
     
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
+        if (usuario == null) {
+            resp.sendRedirect("login");
+            return;
+        }
         req.getRequestDispatcher("/WEB-INF/jsp/usuario/minhaConta.jsp").forward(req, resp);
     }
     

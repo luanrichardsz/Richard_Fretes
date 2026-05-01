@@ -14,6 +14,7 @@ import br.com.frete.Frete.StatusFrete;
 import br.com.motorista.Motorista;
 import br.com.usuario.Usuario;
 import br.com.veiculo.Veiculo;
+import br.com.util.ValidationUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -114,7 +115,16 @@ public class FreteServlet extends HttpServlet {
             frete.setId(Integer.parseInt(idParam.trim()));
         }
 
-        frete.setNumeroFrete(req.getParameter("numeroFrete"));
+        if (isEdicao) {
+            Frete freteExistente = freteDAO.buscarPorId(frete.getId());
+            if (freteExistente != null) {
+                frete.setNumeroFrete(freteExistente.getNumeroFrete());
+                frete.setStatus(freteExistente.getStatus());
+            }
+        } else {
+            frete.setNumeroFrete(req.getParameter("numeroFrete"));
+            frete.setStatus(StatusFrete.EMITIDO);
+        }
         frete.setRemetenteId(Integer.parseInt(req.getParameter("remetenteId")));
         frete.setDestinatarioId(Integer.parseInt(req.getParameter("destinatarioId")));
         frete.setEnderecoOrigemId(Integer.parseInt(req.getParameter("enderecoOrigemId")));
@@ -132,7 +142,6 @@ public class FreteServlet extends HttpServlet {
         frete.setAliquotaIcms(parseBigDecimalOuZero(req.getParameter("aliquotaIcms")));
         frete.setValorIcms(parseBigDecimalOuZero(req.getParameter("valorIcms")));
         frete.setValorTotal(parseBigDecimalOuZero(req.getParameter("valorTotal")));
-        frete.setStatus(StatusFrete.valueOf(req.getParameter("status")));
         frete.setPrevisaoEntrega(LocalDate.parse(req.getParameter("previsaoEntrega")));
         frete.setDistanciaKm(new BigDecimal(req.getParameter("distanciaKm")));
 
@@ -146,6 +155,12 @@ public class FreteServlet extends HttpServlet {
 
             resp.sendRedirect("fretes");
         } catch (FreteException e) {
+            if (isEdicao && ValidationUtils.estaVazio(frete.getNumeroFrete())) {
+                Frete freteExistente = freteDAO.buscarPorId(frete.getId());
+                if (freteExistente != null) {
+                    frete.setNumeroFrete(freteExistente.getNumeroFrete());
+                }
+            }
             req.setAttribute("erro", e.getMessage());
             carregarFormulario(req, resp, usuarioLogado, frete);
         }
@@ -162,6 +177,7 @@ public class FreteServlet extends HttpServlet {
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Frete frete)
             throws ServletException, IOException {
         req.setAttribute("frete", frete);
+        req.setAttribute("hoje", LocalDate.now());
         req.setAttribute("clientes", clienteDAO.listarTodos());
 
         if (usuarioLogado.isAdmin()) {

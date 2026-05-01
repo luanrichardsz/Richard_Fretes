@@ -219,4 +219,8 @@ public class Motorista {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
+
+    public boolean isCnhVencida() {
+        return validadeCnh != null && validadeCnh.isBefore(LocalDate.now());
+    }
 }

@@ -168,6 +168,7 @@ public class VeiculoServlet extends HttpServlet {
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Veiculo veiculo)
             throws ServletException, IOException {
         req.setAttribute("veiculo", veiculo);
+        req.setAttribute("statusVeiculoOptions", StatusVeiculo.values());
 
         if (usuarioLogado.isAdmin()) {
             List<Cliente> clientes = new ClienteDAO().listarTodos();
