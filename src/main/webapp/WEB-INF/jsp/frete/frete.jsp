@@ -23,6 +23,14 @@
 
 <div class="container">
 
+  <c:if test="${not empty erro}">
+    <section class="card">
+      <div style="padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
+        ${erro}
+      </div>
+    </section>
+  </c:if>
+
   <section class="card toolbar">
     <div class="toolbar-row">
       <div class="filters">
@@ -75,9 +83,14 @@
                 <td>R$ <fmt:formatNumber value="${f.valorTotal}" minFractionDigits="2" maxFractionDigits="2"/></td>
                 <td>${f.dataEmissao}</td>
                 <td>
-                  <a href="fretes?acao=editar&id=${f.id}">
-                    <button class="btn-small">Editar</button>
+                  <a href="fretes?acao=detalhes&id=${f.id}">
+                    <button class="btn-small">Detalhes</button>
                   </a>
+                  <c:if test="${f.status != 'ENTREGUE'}">
+                    <a href="fretes?acao=editar&id=${f.id}">
+                      <button class="btn-small">Editar</button>
+                    </a>
+                  </c:if>
                   <a href="fretes?acao=deletar&id=${f.id}" onclick="return confirm('Tem certeza?')">
                     <button class="btn-small btn-danger">Deletar</button>
                   </a>

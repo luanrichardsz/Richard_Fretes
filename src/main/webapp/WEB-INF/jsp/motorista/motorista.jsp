@@ -21,6 +21,14 @@
 
 <div class="container">
 
+  <c:if test="${not empty erro}">
+    <section class="card">
+      <div style="padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
+        ${erro}
+      </div>
+    </section>
+  </c:if>
+
   <section class="card toolbar">
     <div class="toolbar-row">
       <div class="filters">

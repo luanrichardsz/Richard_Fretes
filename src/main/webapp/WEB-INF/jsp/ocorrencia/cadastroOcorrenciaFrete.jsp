@@ -51,12 +51,23 @@
       <c:if test="${not empty ocorrencia.id}">
         <input type="hidden" name="id" value="${ocorrencia.id}" />
       </c:if>
+      <c:if test="${not empty retornoFreteId}">
+        <input type="hidden" name="retornoFreteId" value="${retornoFreteId}" />
+      </c:if>
 
       <div class="form-grid">
 
         <div class="form-group">
           <label>Frete ID *</label>
-          <input type="number" name="freteId" value="${ocorrencia.freteId}" required />
+          <c:choose>
+            <c:when test="${not empty retornoFreteId}">
+              <input type="hidden" name="freteId" value="${ocorrencia.freteId}" />
+              <input type="text" value="${ocorrencia.freteId} - ${freteRelacionado.numeroFrete}" readonly style="background: #f3f4f6; color: #475467;" />
+            </c:when>
+            <c:otherwise>
+              <input type="number" name="freteId" value="${ocorrencia.freteId}" required />
+            </c:otherwise>
+          </c:choose>
         </div>
 
         <div class="form-group">
@@ -113,7 +124,14 @@
 
       <div style="margin-top: 20px; display: flex; gap: 10px;">
         <button type="submit" class="btn-primary">Salvar</button>
-        <a href="ocorrencias"><button type="button" class="btn-secondary">Cancelar</button></a>
+        <c:choose>
+          <c:when test="${not empty retornoFreteId}">
+            <a href="fretes?acao=detalhes&id=${retornoFreteId}"><button type="button" class="btn-secondary">Cancelar</button></a>
+          </c:when>
+          <c:otherwise>
+            <a href="ocorrencias"><button type="button" class="btn-secondary">Cancelar</button></a>
+          </c:otherwise>
+        </c:choose>
       </div>
 
     </form>

@@ -1,0 +1,110 @@
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.detail-item strong,
+.timeline-step strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #1f2937;
+}
+.detail-item span,
+.timeline-step span,
+.muted {
+  color: #6b7280;
+}
+.status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.timeline {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.timeline-step {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  background: #f9fafb;
+}
+.timeline-step.active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+.timeline-step.done {
+  border-color: #16a34a;
+  background: #f0fdf4;
+}
+.timeline-step.final-negative {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.action-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+}
+.action-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+.action-card p {
+  margin-top: 0;
+  min-height: 40px;
+  color: #6b7280;
+}
+.stack {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-neutral {
+  background: #e5e7eb;
+  color: #111827;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.occurrence-list {
+  display: grid;
+  gap: 12px;
+}
+.occurrence-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+}
+.occurrence-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.inline-form textarea {
+  width: 100%;
+  min-height: 96px;
+  margin-bottom: 10px;
+}
