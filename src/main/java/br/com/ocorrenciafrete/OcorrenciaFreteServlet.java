@@ -3,9 +3,14 @@ package br.com.ocorrenciafrete;
 import br.com.ocorrenciafrete.OcorrenciaFreteBO;
 import br.com.ocorrenciafrete.OcorrenciaFreteDAO;
 import br.com.exception.FreteException;
+import br.com.endereco.Endereco;
+import br.com.endereco.EnderecoDAO;
+import br.com.frete.Frete;
+import br.com.frete.FreteDAO;
 import br.com.ocorrenciafrete.OcorrenciaFrete;
 import br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia;
 import br.com.usuario.Usuario;
+import br.com.util.ValidationUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +27,8 @@ import java.util.List;
 public class OcorrenciaFreteServlet extends HttpServlet {
 
     private OcorrenciaFreteDAO ocorrenciaDAO = new OcorrenciaFreteDAO();
+    private FreteDAO freteDAO = new FreteDAO();
+    private EnderecoDAO enderecoDAO = new EnderecoDAO();
     private OcorrenciaFreteBO ocorrenciaBO = new OcorrenciaFreteBO(ocorrenciaDAO);
 
     @Override
@@ -37,6 +44,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
+            carregarFormulario(req, usuarioLogado, criarOcorrenciaInicial(req));
             req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
             req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
             return;
@@ -48,6 +56,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
                 OcorrenciaFrete ocorrencia = ocorrenciaDAO.buscarPorId(Integer.parseInt(idParam));
                 req.setAttribute("ocorrencia", ocorrencia);
             }
+            carregarFormulario(req, usuarioLogado, (OcorrenciaFrete) req.getAttribute("ocorrencia"));
             req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
             req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
             return;
@@ -122,10 +131,17 @@ public class OcorrenciaFreteServlet extends HttpServlet {
                 ocorrenciaBO.atualizar(ocorrencia);
             }
 
+            String retornoFreteId = req.getParameter("retornoFreteId");
+            if (!ValidationUtils.estaVazio(retornoFreteId)) {
+                resp.sendRedirect("fretes?acao=detalhes&id=" + retornoFreteId);
+                return;
+            }
+
             resp.sendRedirect("ocorrencias");
         } catch (FreteException e) {
             req.setAttribute("erro", e.getMessage());
             req.setAttribute("ocorrencia", ocorrencia);
+            carregarFormulario(req, null, ocorrencia);
             req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
             req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
         }
@@ -133,5 +149,46 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
     public void delete(Integer id) {
         ocorrenciaDAO.deletar(id);
+    }
+
+    private void carregarFormulario(HttpServletRequest req, Usuario usuarioLogado, OcorrenciaFrete ocorrencia) {
+        req.setAttribute("ocorrencia", ocorrencia);
+
+        String retornoFreteId = req.getParameter("retornoFreteId");
+        if (!ValidationUtils.estaVazio(retornoFreteId)) {
+            req.setAttribute("retornoFreteId", retornoFreteId);
+        }
+
+        if (ocorrencia != null && ocorrencia.getFreteId() != null) {
+            Frete frete = freteDAO.buscarPorId(ocorrencia.getFreteId());
+            if (frete != null) {
+                req.setAttribute("freteRelacionado", frete);
+            }
+        }
+    }
+
+    private OcorrenciaFrete criarOcorrenciaInicial(HttpServletRequest req) {
+        OcorrenciaFrete ocorrencia = new OcorrenciaFrete();
+
+        String freteIdParam = req.getParameter("freteId");
+        if (!ValidationUtils.estaVazio(freteIdParam)) {
+            Frete frete = freteDAO.buscarPorId(Integer.parseInt(freteIdParam));
+            if (frete != null) {
+                ocorrencia.setFreteId(frete.getId());
+
+                Endereco destino = enderecoDAO.buscarPorId(frete.getEnderecoDestinoId());
+                if (destino != null) {
+                    ocorrencia.setMunicipio(destino.getMunicipio());
+                    ocorrencia.setUf(destino.getUf());
+                }
+            }
+        }
+
+        String tipoParam = req.getParameter("tipo");
+        if (!ValidationUtils.estaVazio(tipoParam)) {
+            ocorrencia.setTipo(TipoOcorrencia.valueOf(tipoParam));
+        }
+
+        return ocorrencia;
     }
 }
