@@ -32,8 +32,43 @@ public class VeiculoBO {
     }
 
     public void atualizar(Veiculo veiculo) throws CadastroException {
+        validarEdicaoPermitida(veiculo.getId());
         validarVeiculo(veiculo, true);
         veiculoDAO.atualizar(veiculo);
+    }
+
+    public void validarEdicaoPermitida(Integer veiculoId) throws CadastroException {
+        if (veiculoId == null || veiculoId <= 0) {
+            throw new CadastroException("Veículo inválido.");
+        }
+
+        Veiculo veiculo = veiculoDAO.buscarPorId(veiculoId);
+        if (veiculo == null) {
+            throw new CadastroException("Veículo não encontrado.");
+        }
+
+        if (veiculo.getStatus() == Veiculo.StatusVeiculo.EM_VIAGEM
+                || freteDAO.existeFreteEmTransitoParaVeiculo(veiculoId, null)) {
+            throw new CadastroException("Não é permitido editar um veículo que está em viagem.");
+        }
+    }
+
+    public void deletar(Integer veiculoId) throws CadastroException {
+        if (veiculoId == null || veiculoId <= 0) {
+            throw new CadastroException("Veículo inválido.");
+        }
+
+        Veiculo veiculo = veiculoDAO.buscarPorId(veiculoId);
+        if (veiculo == null) {
+            throw new CadastroException("Veículo não encontrado.");
+        }
+
+        if (veiculo.getStatus() == Veiculo.StatusVeiculo.EM_VIAGEM
+                || freteDAO.existeFreteEmTransitoParaVeiculo(veiculoId, null)) {
+            throw new CadastroException("Não é permitido excluir um veículo que está em viagem.");
+        }
+
+        veiculoDAO.deletar(veiculoId);
     }
 
     private void validarVeiculo(Veiculo veiculo, boolean emEdicao) throws CadastroException {

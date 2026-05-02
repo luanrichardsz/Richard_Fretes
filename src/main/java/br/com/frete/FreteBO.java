@@ -63,6 +63,8 @@ public class FreteBO {
             throw new FreteException("Frete não encontrado.");
         }
 
+        validarEdicaoPermitida(freteAtual);
+
         frete.setNumeroFrete(freteAtual.getNumeroFrete());
         frete.setDataEmissao(freteAtual.getDataEmissao());
         validarFrete(frete, true, freteAtual);
@@ -86,6 +88,25 @@ public class FreteBO {
 
     public String gerarProximoNumeroFrete() {
         return freteDAO.gerarProximoNumeroFrete(LocalDate.now().getYear());
+    }
+
+    public void validarEdicaoPermitida(Integer freteId) throws FreteException {
+        if (freteId == null || freteId <= 0) {
+            throw new FreteException("Frete inválido.");
+        }
+
+        Frete frete = freteDAO.buscarPorId(freteId);
+        if (frete == null) {
+            throw new FreteException("Frete não encontrado.");
+        }
+
+        validarEdicaoPermitida(frete);
+    }
+
+    private void validarEdicaoPermitida(Frete frete) throws FreteException {
+        if (frete.getStatus() == Frete.StatusFrete.ENTREGUE) {
+            throw new FreteException("Não é permitido editar um frete que já foi entregue.");
+        }
     }
 
     private void validarFrete(Frete frete, boolean emEdicao) throws FreteException {

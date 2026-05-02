@@ -49,8 +49,17 @@ public class VeiculoServlet extends HttpServlet {
         if ("editar".equals(acao)) {
             String idParam = req.getParameter("id");
             if (idParam != null && !idParam.isEmpty()) {
-                Veiculo veiculo = veiculoDAO.buscarPorId(Integer.parseInt(idParam));
-                req.setAttribute("veiculo", veiculo);
+                try {
+                    Integer veiculoId = Integer.parseInt(idParam);
+                    veiculoBO.validarEdicaoPermitida(veiculoId);
+                    Veiculo veiculo = veiculoDAO.buscarPorId(veiculoId);
+                    req.setAttribute("veiculo", veiculo);
+                } catch (CadastroException e) {
+                    req.setAttribute("erro", e.getMessage());
+                    carregarListagem(req, usuarioLogado);
+                    req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp").forward(req, resp);
+                    return;
+                }
             }
             carregarFormulario(req, resp, usuarioLogado, (Veiculo) req.getAttribute("veiculo"));
             return;
@@ -59,26 +68,20 @@ public class VeiculoServlet extends HttpServlet {
         if("deletar".equals(acao)) {
             String idParam = req.getParameter("id");
             if (idParam != null && !idParam.isEmpty()) {
-                veiculoDAO.deletar(Integer.parseInt(idParam));
+                try {
+                    veiculoBO.deletar(Integer.parseInt(idParam));
+                } catch (CadastroException e) {
+                    req.setAttribute("erro", e.getMessage());
+                    carregarListagem(req, usuarioLogado);
+                    req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp").forward(req, resp);
+                    return;
+                }
             }
             resp.sendRedirect("veiculos");
             return;
         }
 
-        List<Veiculo> veiculos;
-        
-        if (usuarioLogado.isAdmin()) {
-            veiculos = veiculoDAO.listarTodos();
-        } else {
-            if (usuarioLogado.getClienteId() != null) {
-                veiculos = veiculoDAO.listarPorCliente(usuarioLogado.getClienteId());
-            } else {
-                veiculos = new ArrayList<>();
-            }
-        }
-
-        req.setAttribute("veiculos", veiculos);
-
+        carregarListagem(req, usuarioLogado);
         req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp")
            .forward(req, resp);
     }
@@ -181,5 +184,19 @@ public class VeiculoServlet extends HttpServlet {
         }
 
         req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
+    }
+
+    private void carregarListagem(HttpServletRequest req, Usuario usuarioLogado) {
+        List<Veiculo> veiculos;
+
+        if (usuarioLogado.isAdmin()) {
+            veiculos = veiculoDAO.listarTodos();
+        } else if (usuarioLogado.getClienteId() != null) {
+            veiculos = veiculoDAO.listarPorCliente(usuarioLogado.getClienteId());
+        } else {
+            veiculos = new ArrayList<>();
+        }
+
+        req.setAttribute("veiculos", veiculos);
     }
 }

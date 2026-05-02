@@ -33,8 +33,21 @@ public class MotoristaBO {
     }
 
     public void atualizar(Motorista motorista) throws CadastroException {
+        validarEdicaoPermitida(motorista.getId());
         validarMotorista(motorista, true);
         motoristaDAO.atualizar(motorista);
+    }
+
+    public void validarEdicaoPermitida(Integer motoristaId) throws CadastroException {
+        if (motoristaId == null || motoristaId <= 0) {
+            throw new CadastroException("Motorista inválido.");
+        }
+
+        if (freteDAO.existeFreteEmExecucaoParaMotorista(motoristaId, null)) {
+            throw new CadastroException(
+                "Não é permitido editar um motorista com frete em status SAÍDA CONFIRMADA ou EM TRÂNSITO."
+            );
+        }
     }
 
     private void validarMotorista(Motorista motorista, boolean emEdicao) throws CadastroException {

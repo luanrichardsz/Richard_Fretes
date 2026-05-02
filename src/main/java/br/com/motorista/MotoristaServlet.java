@@ -46,8 +46,17 @@ public class MotoristaServlet extends HttpServlet {
         if ("editar".equals(acao)) {
             String idParam = req.getParameter("id");
             if (idParam != null && !idParam.isEmpty()) {
-                Motorista motorista = motoristaDAO.buscarPorId(Integer.parseInt(idParam));
-                req.setAttribute("motorista", motorista);
+                try {
+                    Integer motoristaId = Integer.parseInt(idParam);
+                    motoristaBO.validarEdicaoPermitida(motoristaId);
+                    Motorista motorista = motoristaDAO.buscarPorId(motoristaId);
+                    req.setAttribute("motorista", motorista);
+                } catch (CadastroException e) {
+                    req.setAttribute("erro", e.getMessage());
+                    carregarListagem(req, usuarioLogado);
+                    req.getRequestDispatcher("/WEB-INF/jsp/motorista/motorista.jsp").forward(req, resp);
+                    return;
+                }
             }
             carregarFormulario(req, resp, usuarioLogado, (Motorista) req.getAttribute("motorista"));
             return;
@@ -62,20 +71,7 @@ public class MotoristaServlet extends HttpServlet {
             return;
         }
 
-        List<Motorista> motoristas;
-        
-        if (usuarioLogado.isAdmin()) {
-            motoristas = motoristaDAO.listarTodos();
-        } else {
-            if (usuarioLogado.getClienteId() != null) {
-                motoristas = motoristaDAO.listarPorCliente(usuarioLogado.getClienteId());
-            } else {
-                motoristas = new ArrayList<>();
-            }
-        }
-
-        req.setAttribute("motoristas", motoristas);
-
+        carregarListagem(req, usuarioLogado);
         req.getRequestDispatcher("/WEB-INF/jsp/motorista/motorista.jsp")
            .forward(req, resp);
     }
@@ -168,5 +164,19 @@ public class MotoristaServlet extends HttpServlet {
         }
 
         req.getRequestDispatcher("/WEB-INF/jsp/motorista/cadastroMotorista.jsp").forward(req, resp);
+    }
+
+    private void carregarListagem(HttpServletRequest req, Usuario usuarioLogado) {
+        List<Motorista> motoristas;
+
+        if (usuarioLogado.isAdmin()) {
+            motoristas = motoristaDAO.listarTodos();
+        } else if (usuarioLogado.getClienteId() != null) {
+            motoristas = motoristaDAO.listarPorCliente(usuarioLogado.getClienteId());
+        } else {
+            motoristas = new ArrayList<>();
+        }
+
+        req.setAttribute("motoristas", motoristas);
     }
 }

@@ -12,6 +12,8 @@ import br.com.endereco.Endereco;
 import br.com.frete.Frete;
 import br.com.frete.Frete.StatusFrete;
 import br.com.motorista.Motorista;
+import br.com.ocorrenciafrete.OcorrenciaFrete;
+import br.com.ocorrenciafrete.OcorrenciaFreteDAO;
 import br.com.usuario.Usuario;
 import br.com.veiculo.Veiculo;
 import br.com.util.ValidationUtils;
@@ -36,6 +38,7 @@ public class FreteServlet extends HttpServlet {
     private EnderecoDAO enderecoDAO = new EnderecoDAO();
     private MotoristaDAO motoristaDAO = new MotoristaDAO();
     private VeiculoDAO veiculoDAO = new VeiculoDAO();
+    private OcorrenciaFreteDAO ocorrenciaDAO = new OcorrenciaFreteDAO();
     private FreteBO freteBO = new FreteBO(freteDAO, enderecoDAO, motoristaDAO, veiculoDAO);
 
     @Override
@@ -60,11 +63,33 @@ public class FreteServlet extends HttpServlet {
         if ("editar".equals(acao)) {
             String idParam = req.getParameter("id");
             if (idParam != null && !idParam.isEmpty()) {
-                Frete frete = freteDAO.buscarPorId(Integer.parseInt(idParam));
-                req.setAttribute("frete", frete);
+                try {
+                    Integer freteId = Integer.parseInt(idParam);
+                    freteBO.validarEdicaoPermitida(freteId);
+                    Frete frete = freteDAO.buscarPorId(freteId);
+                    req.setAttribute("frete", frete);
+                } catch (FreteException e) {
+                    req.setAttribute("erro", e.getMessage());
+                    carregarListagem(req, usuarioLogado);
+                    req.getRequestDispatcher("/WEB-INF/jsp/frete/frete.jsp").forward(req, resp);
+                    return;
+                }
             }
             carregarFormulario(req, resp, usuarioLogado, (Frete) req.getAttribute("frete"));
             return;
+        }
+
+        if ("detalhes".equals(acao)) {
+            String idParam = req.getParameter("id");
+            if (idParam != null && !idParam.isEmpty()) {
+                Frete frete = freteDAO.buscarPorId(Integer.parseInt(idParam));
+                if (frete == null || !usuarioPodeAcessarFrete(usuarioLogado, frete)) {
+                    resp.sendRedirect("fretes");
+                    return;
+                }
+                carregarDetalhesFrete(req, resp, frete);
+                return;
+            }
         }
 
         if("deletar".equals(acao)) {
@@ -76,20 +101,7 @@ public class FreteServlet extends HttpServlet {
             return;
         }
 
-        List<Frete> fretes;
-        
-        if (usuarioLogado.isAdmin()) {
-            fretes = freteDAO.listarTodos();
-        } else {
-            if (usuarioLogado.getClienteId() != null) {
-                fretes = freteDAO.listarPorCliente(usuarioLogado.getClienteId());
-            } else {
-                fretes = new ArrayList<>();
-            }
-        }
-
-        req.setAttribute("fretes", fretes);
-
+        carregarListagem(req, usuarioLogado);
         req.getRequestDispatcher("/WEB-INF/jsp/frete/frete.jsp")
            .forward(req, resp);
     }
@@ -102,6 +114,12 @@ public class FreteServlet extends HttpServlet {
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
+            return;
+        }
+
+        String acaoFrete = req.getParameter("acaoFrete");
+        if (!ValidationUtils.estaVazio(acaoFrete)) {
+            processarAcaoFrete(req, resp, usuarioLogado, acaoFrete);
             return;
         }
 
@@ -195,5 +213,125 @@ public class FreteServlet extends HttpServlet {
         }
 
         req.getRequestDispatcher("/WEB-INF/jsp/frete/cadastroFrete.jsp").forward(req, resp);
+    }
+
+    private void carregarListagem(HttpServletRequest req, Usuario usuarioLogado) {
+        List<Frete> fretes;
+
+        if (usuarioLogado.isAdmin()) {
+            fretes = freteDAO.listarTodos();
+        } else if (usuarioLogado.getClienteId() != null) {
+            fretes = freteDAO.listarPorCliente(usuarioLogado.getClienteId());
+        } else {
+            fretes = new ArrayList<>();
+        }
+
+        req.setAttribute("fretes", fretes);
+    }
+
+    private void carregarDetalhesFrete(HttpServletRequest req, HttpServletResponse resp, Frete frete)
+            throws ServletException, IOException {
+        Cliente remetente = clienteDAO.buscarPorId(frete.getRemetenteId());
+        Cliente destinatario = clienteDAO.buscarPorId(frete.getDestinatarioId());
+        Endereco origem = enderecoDAO.buscarPorId(frete.getEnderecoOrigemId());
+        Endereco destino = enderecoDAO.buscarPorId(frete.getEnderecoDestinoId());
+        Motorista motorista = motoristaDAO.buscarPorId(frete.getMotoristaId());
+        Veiculo veiculo = veiculoDAO.buscarPorId(frete.getVeiculoId());
+        List<OcorrenciaFrete> ocorrencias = ocorrenciaDAO.listarPorFrete(frete.getId());
+
+        req.setAttribute("frete", frete);
+        req.setAttribute("remetente", remetente);
+        req.setAttribute("destinatario", destinatario);
+        req.setAttribute("enderecoOrigem", origem);
+        req.setAttribute("enderecoDestino", destino);
+        req.setAttribute("motorista", motorista);
+        req.setAttribute("veiculo", veiculo);
+        req.setAttribute("ocorrencias", ocorrencias);
+        req.setAttribute("ultimaOcorrencia", ocorrencias.isEmpty() ? null : ocorrencias.get(0));
+        req.getRequestDispatcher("/WEB-INF/jsp/frete/detalheFrete.jsp").forward(req, resp);
+    }
+
+    private void processarAcaoFrete(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, String acaoFrete)
+            throws ServletException, IOException {
+        String idParam = req.getParameter("id");
+        if (ValidationUtils.estaVazio(idParam)) {
+            resp.sendRedirect("fretes");
+            return;
+        }
+
+        Frete freteAtual = freteDAO.buscarPorId(Integer.parseInt(idParam));
+        if (freteAtual == null || !usuarioPodeAcessarFrete(usuarioLogado, freteAtual)) {
+            resp.sendRedirect("fretes");
+            return;
+        }
+
+        try {
+            if ("confirmarSaida".equals(acaoFrete)) {
+                atualizarStatusFrete(freteAtual, StatusFrete.SAIDA_CONFIRMADA, null);
+            } else if ("iniciarTransito".equals(acaoFrete)) {
+                atualizarStatusFrete(freteAtual, StatusFrete.EM_TRANSITO, null);
+            } else if ("marcarNaoEntregue".equals(acaoFrete)) {
+                String motivoFalha = req.getParameter("motivoFalha");
+                if (ValidationUtils.estaVazio(motivoFalha)) {
+                    req.setAttribute("erro", "Informe o motivo da não entrega.");
+                    carregarDetalhesFrete(req, resp, freteAtual);
+                    return;
+                }
+                atualizarStatusFrete(freteAtual, StatusFrete.NAO_ENTREGUE, motivoFalha.trim());
+            } else if ("cancelarFrete".equals(acaoFrete)) {
+                atualizarStatusFrete(freteAtual, StatusFrete.CANCELADO, null);
+            }
+
+            resp.sendRedirect("fretes?acao=detalhes&id=" + freteAtual.getId());
+        } catch (FreteException e) {
+            req.setAttribute("erro", e.getMessage());
+            carregarDetalhesFrete(req, resp, freteAtual);
+        }
+    }
+
+    private void atualizarStatusFrete(Frete freteAtual, StatusFrete novoStatus, String motivoFalha) throws FreteException {
+        Frete freteAtualizado = copiarFrete(freteAtual);
+        freteAtualizado.setStatus(novoStatus);
+        freteAtualizado.setMotivoFalha(motivoFalha);
+        freteBO.atualizar(freteAtualizado);
+    }
+
+    private Frete copiarFrete(Frete origem) {
+        Frete frete = new Frete();
+        frete.setId(origem.getId());
+        frete.setNumeroFrete(origem.getNumeroFrete());
+        frete.setRemetenteId(origem.getRemetenteId());
+        frete.setDestinatarioId(origem.getDestinatarioId());
+        frete.setEnderecoOrigemId(origem.getEnderecoOrigemId());
+        frete.setEnderecoDestinoId(origem.getEnderecoDestinoId());
+        frete.setMotoristaId(origem.getMotoristaId());
+        frete.setVeiculoId(origem.getVeiculoId());
+        frete.setChaveNfe(origem.getChaveNfe());
+        frete.setOrigemIbge(origem.getOrigemIbge());
+        frete.setDestinoIbge(origem.getDestinoIbge());
+        frete.setNaturezaCarga(origem.getNaturezaCarga());
+        frete.setPesoBruto(origem.getPesoBruto());
+        frete.setVolumes(origem.getVolumes());
+        frete.setValorFreteBruto(origem.getValorFreteBruto());
+        frete.setValorPedagio(origem.getValorPedagio());
+        frete.setAliquotaIcms(origem.getAliquotaIcms());
+        frete.setValorIcms(origem.getValorIcms());
+        frete.setValorTotal(origem.getValorTotal());
+        frete.setStatus(origem.getStatus());
+        frete.setDataEmissao(origem.getDataEmissao());
+        frete.setPrevisaoEntrega(origem.getPrevisaoEntrega());
+        frete.setMotivoFalha(origem.getMotivoFalha());
+        frete.setDataSaida(origem.getDataSaida());
+        frete.setDataEntrega(origem.getDataEntrega());
+        frete.setDistanciaKm(origem.getDistanciaKm());
+        return frete;
+    }
+
+    private boolean usuarioPodeAcessarFrete(Usuario usuarioLogado, Frete frete) {
+        return usuarioLogado != null
+                && (usuarioLogado.isAdmin()
+                || (usuarioLogado.getClienteId() != null
+                && (usuarioLogado.getClienteId().equals(frete.getRemetenteId())
+                || usuarioLogado.getClienteId().equals(frete.getDestinatarioId()))));
     }
 }
