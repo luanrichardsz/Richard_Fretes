@@ -9,15 +9,18 @@ import java.util.logging.Level;
 public abstract class ConnectionFactory {
 
     private static final Logger logger = Logger.getLogger(ConnectionFactory.class.getName());
-
-    protected static final String URL = "jdbc:postgresql://localhost:5432/richard_fretes";
-    protected static final String USER = "root";
-    protected static final String PASSWORD = "1234";
+    private static final String DB_URL_ENV = "RICHARD_FRETES_DB_URL";
+    private static final String DB_USER_ENV = "RICHARD_FRETES_DB_USER";
+    private static final String DB_PASSWORD_ENV = "RICHARD_FRETES_DB_PASSWORD";
 
     protected Connection getConnection() throws SQLException {
         try {
             Class.forName("org.postgresql.Driver");
-            Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
+            Connection conn = DriverManager.getConnection(
+                getRequiredConfig(DB_URL_ENV),
+                getRequiredConfig(DB_USER_ENV),
+                getRequiredConfig(DB_PASSWORD_ENV)
+            );
             logger.info("Conexao com o banco de dados estabelecida com sucesso!");
             return conn;
         } catch (ClassNotFoundException e) {
@@ -27,6 +30,14 @@ public abstract class ConnectionFactory {
             logger.log(Level.SEVERE, "Falha ao conectar com o banco de dados: " + e.getMessage(), e);
             throw e;
         }
+    }
+
+    private String getRequiredConfig(String envName) throws SQLException {
+        String valor = System.getenv(envName);
+        if (valor == null || valor.trim().isEmpty()) {
+            throw new SQLException("Variavel de ambiente obrigatoria nao configurada: " + envName);
+        }
+        return valor.trim();
     }
 
     protected void closeConnection(Connection conn) {
