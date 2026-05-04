@@ -66,14 +66,25 @@
 
         <div class="form-group">
           <label>Remetente *</label>
-          <select name="remetenteId" required>
-            <option value="">Selecione um cliente</option>
-            <c:forEach var="cliente" items="${clientes}">
-              <option value="${cliente.id}" ${not empty frete.remetenteId and frete.remetenteId eq cliente.id ? 'selected' : ''}>
-                ${not empty cliente.nomeFantasia ? cliente.nomeFantasia : cliente.razaoSocial}
-              </option>
-            </c:forEach>
-          </select>
+          <c:choose>
+            <c:when test="${sessionScope.usuarioAutenticado.admin}">
+              <select name="remetenteId" required>
+                <option value="">Selecione um cliente</option>
+                <c:forEach var="cliente" items="${clientes}">
+                  <option value="${cliente.id}" ${not empty frete.remetenteId and frete.remetenteId eq cliente.id ? 'selected' : ''}>
+                    ${not empty cliente.nomeFantasia ? cliente.nomeFantasia : cliente.razaoSocial}
+                  </option>
+                </c:forEach>
+              </select>
+            </c:when>
+            <c:otherwise>
+              <input type="hidden" name="remetenteId" value="${frete.remetenteId}" />
+              <input type="text"
+                     value="${not empty remetenteCliente.nomeFantasia ? remetenteCliente.nomeFantasia : remetenteCliente.razaoSocial}"
+                     readonly
+                     style="background: #f3f4f6; color: #475467; cursor: not-allowed;" />
+            </c:otherwise>
+          </c:choose>
         </div>
 
         <div class="form-group">
