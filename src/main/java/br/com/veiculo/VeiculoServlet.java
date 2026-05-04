@@ -33,8 +33,8 @@ public class VeiculoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-        
-        if(usuarioLogado == null) {
+
+        if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
         }
@@ -42,48 +42,21 @@ public class VeiculoServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            carregarFormulario(req, resp, usuarioLogado, null);
+            processarNovo(req, resp, usuarioLogado);
             return;
         }
 
         if ("editar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                try {
-                    Integer veiculoId = Integer.parseInt(idParam);
-                    veiculoBO.validarEdicaoPermitida(veiculoId);
-                    Veiculo veiculo = veiculoDAO.buscarPorId(veiculoId);
-                    req.setAttribute("veiculo", veiculo);
-                } catch (CadastroException e) {
-                    req.setAttribute("erro", e.getMessage());
-                    carregarListagem(req, usuarioLogado);
-                    req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp").forward(req, resp);
-                    return;
-                }
-            }
-            carregarFormulario(req, resp, usuarioLogado, (Veiculo) req.getAttribute("veiculo"));
+            processarEdicao(req, resp, usuarioLogado);
             return;
         }
 
-        if("deletar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                try {
-                    veiculoBO.deletar(Integer.parseInt(idParam));
-                } catch (CadastroException e) {
-                    req.setAttribute("erro", e.getMessage());
-                    carregarListagem(req, usuarioLogado);
-                    req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp").forward(req, resp);
-                    return;
-                }
-            }
-            resp.sendRedirect("veiculos");
+        if ("deletar".equals(acao)) {
+            processarExclusao(req, resp);
             return;
         }
 
-        carregarListagem(req, usuarioLogado);
-        req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp")
-           .forward(req, resp);
+        processarListagem(req, resp, usuarioLogado);
     }
 
     @Override
@@ -166,6 +139,71 @@ public class VeiculoServlet extends HttpServlet {
 
     public void delete(Integer id) {
         veiculoDAO.deletar(id);
+    }
+
+    private void processarEdicao(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        try {
+            Integer veiculoId = obterIdVeiculo(req);
+            Veiculo veiculo = buscarVeiculoOuLancarErro(veiculoId);
+            veiculoBO.validarEdicaoPermitida(veiculoId);
+            carregarFormulario(req, resp, usuarioLogado, veiculo);
+        } catch (NumberFormatException e) {
+            redirecionarParaListagemComErro(req, resp, "Id do veículo inválido.");
+        } catch (CadastroException e) {
+            redirecionarParaListagemComErro(req, resp, e.getMessage());
+        }
+    }
+
+    private void processarNovo(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        carregarFormulario(req, resp, usuarioLogado, null);
+    }
+
+    private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            Integer veiculoId = obterIdVeiculo(req);
+            veiculoBO.deletar(veiculoId);
+        } catch (NumberFormatException e) {
+            req.getSession().setAttribute("erro", "Id do veículo inválido.");
+        } catch (CadastroException e) {
+            req.getSession().setAttribute("erro", e.getMessage());
+        }
+        resp.sendRedirect("veiculos");
+    }
+
+    private void processarListagem(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        Object erroSessao = req.getSession().getAttribute("erro");
+        if (erroSessao != null) {
+            req.setAttribute("erro", erroSessao);
+            req.getSession().removeAttribute("erro");
+        }
+
+        carregarListagem(req, usuarioLogado);
+        req.getRequestDispatcher("/WEB-INF/jsp/veiculo/veiculo.jsp").forward(req, resp);
+    }
+
+    private void redirecionarParaListagemComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws IOException {
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect("veiculos");
+    }
+
+    private Integer obterIdVeiculo(HttpServletRequest req) {
+        String idParam = req.getParameter("id");
+        if (idParam == null || idParam.trim().isEmpty()) {
+            throw new NumberFormatException("Id do veículo ausente.");
+        }
+        return Integer.parseInt(idParam.trim());
+    }
+
+    private Veiculo buscarVeiculoOuLancarErro(Integer veiculoId) throws CadastroException {
+        Veiculo veiculo = veiculoDAO.buscarPorId(veiculoId);
+        if (veiculo == null) {
+            throw new CadastroException("Veículo não encontrado.");
+        }
+        return veiculo;
     }
 
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Veiculo veiculo)

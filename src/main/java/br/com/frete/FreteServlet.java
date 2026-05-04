@@ -45,8 +45,8 @@ public class FreteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-        
-        if(usuarioLogado == null) {
+
+        if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
         }
@@ -54,56 +54,26 @@ public class FreteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            Frete novoFrete = new Frete();
-            novoFrete.setNumeroFrete(freteBO.gerarProximoNumeroFrete());
-            carregarFormulario(req, resp, usuarioLogado, novoFrete);
+            processarNovo(req, resp, usuarioLogado);
             return;
         }
 
         if ("editar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                try {
-                    Integer freteId = Integer.parseInt(idParam);
-                    freteBO.validarEdicaoPermitida(freteId);
-                    Frete frete = freteDAO.buscarPorId(freteId);
-                    req.setAttribute("frete", frete);
-                } catch (FreteException e) {
-                    req.setAttribute("erro", e.getMessage());
-                    carregarListagem(req, usuarioLogado);
-                    req.getRequestDispatcher("/WEB-INF/jsp/frete/frete.jsp").forward(req, resp);
-                    return;
-                }
-            }
-            carregarFormulario(req, resp, usuarioLogado, (Frete) req.getAttribute("frete"));
+            processarEdicao(req, resp, usuarioLogado);
             return;
         }
 
         if ("detalhes".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                Frete frete = freteDAO.buscarPorId(Integer.parseInt(idParam));
-                if (frete == null || !usuarioPodeAcessarFrete(usuarioLogado, frete)) {
-                    resp.sendRedirect("fretes");
-                    return;
-                }
-                carregarDetalhesFrete(req, resp, frete);
-                return;
-            }
-        }
-
-        if("deletar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                freteDAO.deletar(Integer.parseInt(idParam));
-            }
-            resp.sendRedirect("fretes");
+            processarDetalhes(req, resp, usuarioLogado);
             return;
         }
 
-        carregarListagem(req, usuarioLogado);
-        req.getRequestDispatcher("/WEB-INF/jsp/frete/frete.jsp")
-           .forward(req, resp);
+        if ("deletar".equals(acao)) {
+            processarExclusao(req, resp);
+            return;
+        }
+
+        processarListagem(req, resp, usuarioLogado);
     }
 
     @Override
@@ -190,6 +160,86 @@ public class FreteServlet extends HttpServlet {
 
     public void delete(Integer id) {
         freteDAO.deletar(id);
+    }
+
+    private void processarNovo(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        Frete novoFrete = new Frete();
+        novoFrete.setNumeroFrete(freteBO.gerarProximoNumeroFrete());
+        carregarFormulario(req, resp, usuarioLogado, novoFrete);
+    }
+
+    private void processarEdicao(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        try {
+            Integer freteId = obterIdFrete(req);
+            Frete frete = buscarFreteOuLancarErro(freteId);
+            freteBO.validarEdicaoPermitida(freteId);
+            carregarFormulario(req, resp, usuarioLogado, frete);
+        } catch (NumberFormatException e) {
+            redirecionarParaListagemComErro(req, resp, "Id do frete inválido.");
+        } catch (FreteException e) {
+            redirecionarParaListagemComErro(req, resp, e.getMessage());
+        }
+    }
+
+    private void processarDetalhes(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        try {
+            Integer freteId = obterIdFrete(req);
+            Frete frete = buscarFreteOuLancarErro(freteId);
+            if (!usuarioPodeAcessarFrete(usuarioLogado, frete)) {
+                resp.sendRedirect("fretes");
+                return;
+            }
+            carregarDetalhesFrete(req, resp, frete);
+        } catch (NumberFormatException | FreteException e) {
+            resp.sendRedirect("fretes");
+        }
+    }
+
+    private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            Integer freteId = obterIdFrete(req);
+            freteDAO.deletar(freteId);
+        } catch (NumberFormatException e) {
+            req.getSession().setAttribute("erro", "Id do frete inválido.");
+        }
+        resp.sendRedirect("fretes");
+    }
+
+    private void processarListagem(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        Object erroSessao = req.getSession().getAttribute("erro");
+        if (erroSessao != null) {
+            req.setAttribute("erro", erroSessao);
+            req.getSession().removeAttribute("erro");
+        }
+
+        carregarListagem(req, usuarioLogado);
+        req.getRequestDispatcher("/WEB-INF/jsp/frete/frete.jsp").forward(req, resp);
+    }
+
+    private void redirecionarParaListagemComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws IOException {
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect("fretes");
+    }
+
+    private Integer obterIdFrete(HttpServletRequest req) {
+        String idParam = req.getParameter("id");
+        if (ValidationUtils.estaVazio(idParam)) {
+            throw new NumberFormatException("Id do frete ausente.");
+        }
+        return Integer.parseInt(idParam.trim());
+    }
+
+    private Frete buscarFreteOuLancarErro(Integer freteId) throws FreteException {
+        Frete frete = freteDAO.buscarPorId(freteId);
+        if (frete == null) {
+            throw new FreteException("Frete não encontrado.");
+        }
+        return frete;
     }
 
     private BigDecimal parseBigDecimalOuZero(String valor) {

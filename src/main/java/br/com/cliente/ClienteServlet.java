@@ -29,43 +29,21 @@ public class ClienteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            carregarFormulario(req, resp, null, false);
+            processarNovo(req, resp);
             return;
         }
 
         if ("editar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            Cliente cliente = null;
-            if (idParam != null && !idParam.isEmpty()) {
-                cliente = clienteDAO.buscarPorId(Integer.parseInt(idParam));
-            }
-            carregarFormulario(req, resp, cliente, true);
+            processarEdicao(req, resp);
             return;
         }
 
-        if("deletar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                try {
-                    clienteBO.deletar(Integer.parseInt(idParam));
-                } catch (CadastroException e) {
-                    req.setAttribute("erro", e.getMessage());
-                    List<Cliente> clientes = clienteDAO.listarTodos();
-                    req.setAttribute("clientes", clientes);
-                    req.getRequestDispatcher("/WEB-INF/jsp/cliente/cliente.jsp").forward(req, resp);
-                    return;
-                }
-            }
-            resp.sendRedirect("clientes");
+        if ("deletar".equals(acao)) {
+            processarExclusao(req, resp);
             return;
         }
 
-        List<Cliente> clientes = clienteDAO.listarTodos();
-
-        req.setAttribute("clientes", clientes);
-
-        req.getRequestDispatcher("/WEB-INF/jsp/cliente/cliente.jsp")
-           .forward(req, resp);
+        processarListagem(req, resp);
     }
 
     @Override
@@ -78,7 +56,7 @@ public class ClienteServlet extends HttpServlet {
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            cliente.setId(Integer.parseInt(idParam.trim()));
+            cliente.setId(obterIdCliente(req));
         }
 
         cliente.setRazaoSocial(req.getParameter("razaoSocial"));
@@ -132,6 +110,71 @@ public class ClienteServlet extends HttpServlet {
 
     public void delete(Integer id) {
         clienteDAO.deletar(id);
+    }
+
+    private void processarNovo(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        carregarFormulario(req, resp, null, false);
+    }
+
+    private void processarEdicao(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        try {
+            Integer clienteId = obterIdCliente(req);
+            Cliente cliente = buscarClienteOuLancarErro(clienteId);
+            carregarFormulario(req, resp, cliente, true);
+        } catch (NumberFormatException e) {
+            redirecionarParaListagemComErro(req, resp, "Id do cliente inválido.");
+        } catch (CadastroException e) {
+            redirecionarParaListagemComErro(req, resp, e.getMessage());
+        }
+    }
+
+    private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            Integer clienteId = obterIdCliente(req);
+            clienteBO.deletar(clienteId);
+        } catch (NumberFormatException e) {
+            req.getSession().setAttribute("erro", "Id do cliente inválido.");
+        } catch (CadastroException e) {
+            req.getSession().setAttribute("erro", e.getMessage());
+        }
+        resp.sendRedirect("clientes");
+    }
+
+    private void processarListagem(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        Object erroSessao = req.getSession().getAttribute("erro");
+        if (erroSessao != null) {
+            req.setAttribute("erro", erroSessao);
+            req.getSession().removeAttribute("erro");
+        }
+
+        List<Cliente> clientes = clienteDAO.listarTodos();
+        req.setAttribute("clientes", clientes);
+        req.getRequestDispatcher("/WEB-INF/jsp/cliente/cliente.jsp").forward(req, resp);
+    }
+
+    private void redirecionarParaListagemComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws IOException {
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect("clientes");
+    }
+
+    private Integer obterIdCliente(HttpServletRequest req) {
+        String idParam = req.getParameter("id");
+        if (idParam == null || idParam.trim().isEmpty()) {
+            throw new NumberFormatException("Id do cliente ausente.");
+        }
+        return Integer.parseInt(idParam.trim());
+    }
+
+    private Cliente buscarClienteOuLancarErro(Integer clienteId) throws CadastroException {
+        Cliente cliente = clienteDAO.buscarPorId(clienteId);
+        if (cliente == null) {
+            throw new CadastroException("Cliente não encontrado.");
+        }
+        return cliente;
     }
 
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Cliente cliente, boolean isEdicao)

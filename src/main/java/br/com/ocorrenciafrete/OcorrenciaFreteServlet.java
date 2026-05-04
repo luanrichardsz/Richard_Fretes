@@ -35,8 +35,8 @@ public class OcorrenciaFreteServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-        
-        if(usuarioLogado == null) {
+
+        if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
         }
@@ -44,49 +44,21 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            carregarFormulario(req, usuarioLogado, criarOcorrenciaInicial(req));
-            req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
-            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+            processarNovo(req, resp, usuarioLogado);
             return;
         }
 
         if ("editar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                OcorrenciaFrete ocorrencia = ocorrenciaDAO.buscarPorId(Integer.parseInt(idParam));
-                req.setAttribute("ocorrencia", ocorrencia);
-            }
-            carregarFormulario(req, usuarioLogado, (OcorrenciaFrete) req.getAttribute("ocorrencia"));
-            req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
-            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+            processarEdicao(req, resp, usuarioLogado);
             return;
         }
 
-        if("deletar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                ocorrenciaDAO.deletar(Integer.parseInt(idParam));
-            }
-            resp.sendRedirect("ocorrencias");
+        if ("deletar".equals(acao)) {
+            processarExclusao(req, resp);
             return;
         }
 
-        List<OcorrenciaFrete> ocorrencias;
-        
-        if (usuarioLogado.isAdmin()) {
-            ocorrencias = ocorrenciaDAO.listarTodas();
-        } else {
-            if (usuarioLogado.getClienteId() != null) {
-                ocorrencias = ocorrenciaDAO.listarPorCliente(usuarioLogado.getClienteId());
-            } else {
-                ocorrencias = new ArrayList<>();
-            }
-        }
-
-        req.setAttribute("ocorrencias", ocorrencias);
-
-        req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/ocorrenciaFrete.jsp")
-           .forward(req, resp);
+        processarListagem(req, resp, usuarioLogado);
     }
 
     @Override
@@ -149,6 +121,82 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
     public void delete(Integer id) {
         ocorrenciaDAO.deletar(id);
+    }
+
+    private void processarNovo(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        carregarFormulario(req, usuarioLogado, criarOcorrenciaInicial(req));
+        req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
+        req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+    }
+
+    private void processarEdicao(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        try {
+            Integer ocorrenciaId = obterIdOcorrencia(req);
+            OcorrenciaFrete ocorrencia = buscarOcorrenciaOuLancarErro(ocorrenciaId);
+            carregarFormulario(req, usuarioLogado, ocorrencia);
+            req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
+            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+        } catch (NumberFormatException e) {
+            redirecionarParaListagemComErro(req, resp, "Id da ocorrência inválido.");
+        } catch (FreteException e) {
+            redirecionarParaListagemComErro(req, resp, e.getMessage());
+        }
+    }
+
+    private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            Integer ocorrenciaId = obterIdOcorrencia(req);
+            ocorrenciaDAO.deletar(ocorrenciaId);
+        } catch (NumberFormatException e) {
+            req.getSession().setAttribute("erro", "Id da ocorrência inválido.");
+        }
+        resp.sendRedirect("ocorrencias");
+    }
+
+    private void processarListagem(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        Object erroSessao = req.getSession().getAttribute("erro");
+        if (erroSessao != null) {
+            req.setAttribute("erro", erroSessao);
+            req.getSession().removeAttribute("erro");
+        }
+
+        List<OcorrenciaFrete> ocorrencias;
+
+        if (usuarioLogado.isAdmin()) {
+            ocorrencias = ocorrenciaDAO.listarTodas();
+        } else if (usuarioLogado.getClienteId() != null) {
+            ocorrencias = ocorrenciaDAO.listarPorCliente(usuarioLogado.getClienteId());
+        } else {
+            ocorrencias = new ArrayList<>();
+        }
+
+        req.setAttribute("ocorrencias", ocorrencias);
+        req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/ocorrenciaFrete.jsp").forward(req, resp);
+    }
+
+    private void redirecionarParaListagemComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws IOException {
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect("ocorrencias");
+    }
+
+    private Integer obterIdOcorrencia(HttpServletRequest req) {
+        String idParam = req.getParameter("id");
+        if (ValidationUtils.estaVazio(idParam)) {
+            throw new NumberFormatException("Id da ocorrência ausente.");
+        }
+        return Integer.parseInt(idParam.trim());
+    }
+
+    private OcorrenciaFrete buscarOcorrenciaOuLancarErro(Integer ocorrenciaId) throws FreteException {
+        OcorrenciaFrete ocorrencia = ocorrenciaDAO.buscarPorId(ocorrenciaId);
+        if (ocorrencia == null) {
+            throw new FreteException("Ocorrência não encontrada.");
+        }
+        return ocorrencia;
     }
 
     private void carregarFormulario(HttpServletRequest req, Usuario usuarioLogado, OcorrenciaFrete ocorrencia) {

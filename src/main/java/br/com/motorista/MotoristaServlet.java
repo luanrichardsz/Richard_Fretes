@@ -30,8 +30,8 @@ public class MotoristaServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-        
-        if(usuarioLogado == null) {
+
+        if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
         }
@@ -39,41 +39,21 @@ public class MotoristaServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            carregarFormulario(req, resp, usuarioLogado, null);
+            processarNovo(req, resp, usuarioLogado);
             return;
         }
 
         if ("editar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                try {
-                    Integer motoristaId = Integer.parseInt(idParam);
-                    motoristaBO.validarEdicaoPermitida(motoristaId);
-                    Motorista motorista = motoristaDAO.buscarPorId(motoristaId);
-                    req.setAttribute("motorista", motorista);
-                } catch (CadastroException e) {
-                    req.setAttribute("erro", e.getMessage());
-                    carregarListagem(req, usuarioLogado);
-                    req.getRequestDispatcher("/WEB-INF/jsp/motorista/motorista.jsp").forward(req, resp);
-                    return;
-                }
-            }
-            carregarFormulario(req, resp, usuarioLogado, (Motorista) req.getAttribute("motorista"));
+            processarEdicao(req, resp, usuarioLogado);
             return;
         }
 
-        if("deletar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                motoristaDAO.deletar(Integer.parseInt(idParam));
-            }
-            resp.sendRedirect("motoristas");
+        if ("deletar".equals(acao)) {
+            processarExclusao(req, resp);
             return;
         }
 
-        carregarListagem(req, usuarioLogado);
-        req.getRequestDispatcher("/WEB-INF/jsp/motorista/motorista.jsp")
-           .forward(req, resp);
+        processarListagem(req, resp, usuarioLogado);
     }
 
     @Override
@@ -81,20 +61,18 @@ public class MotoristaServlet extends HttpServlet {
             throws ServletException, IOException {
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-        
-        if(usuarioLogado == null) {
+
+        if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
         }
-        
-        Motorista motorista = new Motorista();
 
-        // Verificar se é uma atualização (edição) ou novo motorista
+        Motorista motorista = new Motorista();
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            motorista.setId(Integer.parseInt(idParam.trim()));
+            motorista.setId(obterIdMotorista(req));
         }
 
         motorista.setNomeCompleto(req.getParameter("nomeCompleto"));
@@ -108,25 +86,23 @@ public class MotoristaServlet extends HttpServlet {
         motorista.setNumeroCnh(req.getParameter("numeroCnh"));
         motorista.setCategoriaCnh(CategoriaCnh.valueOf(req.getParameter("categoriaCnh")));
         motorista.setValidadeCnh(LocalDate.parse(req.getParameter("validadeCnh")));
-        
+
         String validadeToxParam = req.getParameter("validadeToxicologico");
         if (validadeToxParam != null && !validadeToxParam.isEmpty()) {
             motorista.setValidadeToxicologico(LocalDate.parse(validadeToxParam));
         }
-        
+
         motorista.setTipoVinculo(TipoVinculo.valueOf(req.getParameter("tipoVinculo")));
         motorista.setChavePix(req.getParameter("chavePix"));
         motorista.setTipoPix(TipoPix.valueOf(req.getParameter("tipoPix")));
         motorista.setStatus(StatusMotorista.valueOf(req.getParameter("status")));
-        
-        // LÓGICA DE CLIENTE ID
-        if(usuarioLogado.isAdmin()) {
+
+        if (usuarioLogado.isAdmin()) {
             String cliIdParam = req.getParameter("clienteId");
-            if(cliIdParam != null && !cliIdParam.isEmpty()) {
+            if (cliIdParam != null && !cliIdParam.isEmpty()) {
                 motorista.setClienteId(Integer.parseInt(cliIdParam));
             }
         } else {
-            // Se for responsável, pega obrigatoriamente da sessão
             motorista.setClienteId(usuarioLogado.getClienteId());
         }
 
@@ -147,6 +123,69 @@ public class MotoristaServlet extends HttpServlet {
 
     public void delete(Integer id) {
         motoristaDAO.deletar(id);
+    }
+
+    private void processarEdicao(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        try {
+            Integer motoristaId = obterIdMotorista(req);
+            Motorista motorista = buscarMotoristaOuLancarErro(motoristaId);
+            motoristaBO.validarEdicaoPermitida(motoristaId);
+            carregarFormulario(req, resp, usuarioLogado, motorista);
+        } catch (NumberFormatException e) {
+            redirecionarParaListagemComErro(req, resp, "Id do motorista inválido.");
+        } catch (CadastroException e) {
+            redirecionarParaListagemComErro(req, resp, e.getMessage());
+        }
+    }
+
+    private void processarNovo(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        carregarFormulario(req, resp, usuarioLogado, null);
+    }
+
+    private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            Integer motoristaId = obterIdMotorista(req);
+            motoristaDAO.deletar(motoristaId);
+        } catch (NumberFormatException e) {
+            req.getSession().setAttribute("erro", "Id do motorista inválido.");
+        }
+        resp.sendRedirect("motoristas");
+    }
+
+    private void processarListagem(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        Object erroSessao = req.getSession().getAttribute("erro");
+        if (erroSessao != null) {
+            req.setAttribute("erro", erroSessao);
+            req.getSession().removeAttribute("erro");
+        }
+
+        carregarListagem(req, usuarioLogado);
+        req.getRequestDispatcher("/WEB-INF/jsp/motorista/motorista.jsp").forward(req, resp);
+    }
+
+    private void redirecionarParaListagemComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws IOException {
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect("motoristas");
+    }
+
+    private Integer obterIdMotorista(HttpServletRequest req) {
+        String idParam = req.getParameter("id");
+        if (idParam == null || idParam.trim().isEmpty()) {
+            throw new NumberFormatException("Id do motorista ausente.");
+        }
+        return Integer.parseInt(idParam.trim());
+    }
+
+    private Motorista buscarMotoristaOuLancarErro(Integer motoristaId) throws CadastroException {
+        Motorista motorista = motoristaDAO.buscarPorId(motoristaId);
+        if (motorista == null) {
+            throw new CadastroException("Motorista não encontrado.");
+        }
+        return motorista;
     }
 
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Motorista motorista)

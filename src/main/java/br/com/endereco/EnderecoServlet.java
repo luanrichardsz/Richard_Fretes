@@ -29,8 +29,8 @@ public class EnderecoServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
-        
-        if(usuarioLogado == null) {
+
+        if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
         }
@@ -38,53 +38,21 @@ public class EnderecoServlet extends HttpServlet {
         String acao = req.getParameter("acao");
 
         if ("novo".equals(acao)) {
-            carregarFormulario(req, resp, usuarioLogado, null);
+            processarNovo(req, resp, usuarioLogado);
             return;
         }
 
         if ("editar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                Endereco endereco = enderecoDAO.buscarPorId(Integer.parseInt(idParam));
-                req.setAttribute("endereco", endereco);
-            }
-            carregarFormulario(req, resp, usuarioLogado, (Endereco) req.getAttribute("endereco"));
+            processarEdicao(req, resp, usuarioLogado);
             return;
         }
 
-        if("deletar".equals(acao)) {
-            String idParam = req.getParameter("id");
-            if (idParam != null && !idParam.isEmpty()) {
-                enderecoDAO.deletar(Integer.parseInt(idParam));
-            }
-            resp.sendRedirect("enderecos");
+        if ("deletar".equals(acao)) {
+            processarExclusao(req, resp);
             return;
         }
 
-        List<Endereco> enderecos;
-        
-        if (usuarioLogado.isAdmin()) {
-            enderecos = enderecoDAO.listarTodos();
-            List<Cliente> clientes = new ClienteDAO().listarTodos();
-            Map<Integer, String> clientesPorId = new HashMap<>();
-            for (Cliente cliente : clientes) {
-                clientesPorId.put(cliente.getId(), cliente.getRazaoSocial());
-            }
-            for (Endereco endereco : enderecos) {
-                endereco.setClienteRazaoSocial(clientesPorId.get(endereco.getClienteId()));
-            }
-        } else {
-            if (usuarioLogado.getClienteId() != null) {
-                enderecos = enderecoDAO.listarPorCliente(usuarioLogado.getClienteId());
-            } else {
-                enderecos = new ArrayList<>();
-            }
-        }
-
-        req.setAttribute("enderecos", enderecos);
-
-        req.getRequestDispatcher("/WEB-INF/jsp/endereco/endereco.jsp")
-           .forward(req, resp);
+        processarListagem(req, resp, usuarioLogado);
     }
 
     @Override
@@ -105,7 +73,7 @@ public class EnderecoServlet extends HttpServlet {
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
         if (isEdicao) {
-            endereco.setId(Integer.parseInt(idParam.trim()));
+            endereco.setId(obterIdEndereco(req));
         }
 
         if (usuarioLogado.isAdmin()) {
@@ -143,6 +111,86 @@ public class EnderecoServlet extends HttpServlet {
 
     public void delete(Integer id) {
         enderecoDAO.deletar(id);
+    }
+
+    private void processarNovo(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        carregarFormulario(req, resp, usuarioLogado, null);
+    }
+
+    private void processarEdicao(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        try {
+            Integer enderecoId = obterIdEndereco(req);
+            Endereco endereco = buscarEnderecoOuLancarErro(enderecoId);
+            carregarFormulario(req, resp, usuarioLogado, endereco);
+        } catch (NumberFormatException e) {
+            redirecionarParaListagemComErro(req, resp, "Id do endereço inválido.");
+        } catch (CadastroException e) {
+            redirecionarParaListagemComErro(req, resp, e.getMessage());
+        }
+    }
+
+    private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            Integer enderecoId = obterIdEndereco(req);
+            enderecoDAO.deletar(enderecoId);
+        } catch (NumberFormatException e) {
+            req.getSession().setAttribute("erro", "Id do endereço inválido.");
+        }
+        resp.sendRedirect("enderecos");
+    }
+
+    private void processarListagem(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
+            throws ServletException, IOException {
+        Object erroSessao = req.getSession().getAttribute("erro");
+        if (erroSessao != null) {
+            req.setAttribute("erro", erroSessao);
+            req.getSession().removeAttribute("erro");
+        }
+
+        List<Endereco> enderecos;
+
+        if (usuarioLogado.isAdmin()) {
+            enderecos = enderecoDAO.listarTodos();
+            List<Cliente> clientes = new ClienteDAO().listarTodos();
+            Map<Integer, String> clientesPorId = new HashMap<>();
+            for (Cliente cliente : clientes) {
+                clientesPorId.put(cliente.getId(), cliente.getRazaoSocial());
+            }
+            for (Endereco endereco : enderecos) {
+                endereco.setClienteRazaoSocial(clientesPorId.get(endereco.getClienteId()));
+            }
+        } else if (usuarioLogado.getClienteId() != null) {
+            enderecos = enderecoDAO.listarPorCliente(usuarioLogado.getClienteId());
+        } else {
+            enderecos = new ArrayList<>();
+        }
+
+        req.setAttribute("enderecos", enderecos);
+        req.getRequestDispatcher("/WEB-INF/jsp/endereco/endereco.jsp").forward(req, resp);
+    }
+
+    private void redirecionarParaListagemComErro(HttpServletRequest req, HttpServletResponse resp, String mensagem)
+            throws IOException {
+        req.getSession().setAttribute("erro", mensagem);
+        resp.sendRedirect("enderecos");
+    }
+
+    private Integer obterIdEndereco(HttpServletRequest req) {
+        String idParam = req.getParameter("id");
+        if (idParam == null || idParam.trim().isEmpty()) {
+            throw new NumberFormatException("Id do endereço ausente.");
+        }
+        return Integer.parseInt(idParam.trim());
+    }
+
+    private Endereco buscarEnderecoOuLancarErro(Integer enderecoId) throws CadastroException {
+        Endereco endereco = enderecoDAO.buscarPorId(enderecoId);
+        if (endereco == null) {
+            throw new CadastroException("Endereço não encontrado.");
+        }
+        return endereco;
     }
 
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Endereco endereco)
