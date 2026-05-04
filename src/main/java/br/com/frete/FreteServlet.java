@@ -143,7 +143,11 @@ public class FreteServlet extends HttpServlet {
             frete.setNumeroFrete(req.getParameter("numeroFrete"));
             frete.setStatus(StatusFrete.EMITIDO);
         }
-        frete.setRemetenteId(Integer.parseInt(req.getParameter("remetenteId")));
+        if (usuarioLogado.isAdmin()) {
+            frete.setRemetenteId(Integer.parseInt(req.getParameter("remetenteId")));
+        } else {
+            frete.setRemetenteId(usuarioLogado.getClienteId());
+        }
         frete.setDestinatarioId(Integer.parseInt(req.getParameter("destinatarioId")));
         frete.setEnderecoOrigemId(Integer.parseInt(req.getParameter("enderecoOrigemId")));
         frete.setEnderecoDestinoId(Integer.parseInt(req.getParameter("enderecoDestinoId")));
@@ -194,6 +198,14 @@ public class FreteServlet extends HttpServlet {
 
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Frete frete)
             throws ServletException, IOException {
+        if (!usuarioLogado.isAdmin() && usuarioLogado.getClienteId() != null) {
+            if (frete == null) {
+                frete = new Frete();
+            }
+            frete.setRemetenteId(usuarioLogado.getClienteId());
+            req.setAttribute("remetenteCliente", clienteDAO.buscarPorId(usuarioLogado.getClienteId()));
+        }
+
         req.setAttribute("frete", frete);
         req.setAttribute("hoje", LocalDate.now());
         req.setAttribute("clientes", clienteDAO.listarTodos());
