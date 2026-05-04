@@ -53,7 +53,7 @@
                 <i class="fas fa-route"></i>
             </a>
 
-            <a href="login" class="logout-link" title="Sair" aria-label="Sair">
+            <a href="logout" class="logout-link" title="Sair" aria-label="Sair">
                 <i class="fas fa-right-from-bracket"></i>
             </a>
         </nav>

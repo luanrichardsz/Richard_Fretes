@@ -205,6 +205,10 @@ body {
     font-weight: 600;
 }
 
+.api-alert {
+    display: none;
+}
+
 /* Cards flutuantes */
 .floating-card {
     position: absolute;

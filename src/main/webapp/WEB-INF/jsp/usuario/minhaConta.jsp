@@ -28,7 +28,7 @@
             <a href="/RichardFretes/enderecos" title="Endereços"><i class="fas fa-map-location-dot"></i></a>
             <a href="/RichardFretes/veiculos" title="Veículos"><i class="fas fa-truck"></i></a>
             <a href="/RichardFretes/fretes" title="Fretes"><i class="fas fa-route"></i></a>
-            <a href="/RichardFretes/login" class="logout-link" title="Sair"><i class="fas fa-sign-out-alt"></i></a>
+            <a href="/RichardFretes/logout" class="logout-link" title="Sair"><i class="fas fa-sign-out-alt"></i></a>
         </nav>
     </aside>
 
