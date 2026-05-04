@@ -1,14 +1,16 @@
 package br.com.usuario;
 
 import br.com.connection.ConnectionFactory;
-import br.com.usuario.Usuario;
 import br.com.cliente.Cliente;
+import br.com.security.PasswordService;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UsuarioDAO extends ConnectionFactory {
+
+    private final PasswordService passwordService = new PasswordService();
 
     public void salvar(Usuario usuario) {
         String sql = "INSERT INTO usuario (usuario, email, senha, is_administrador, cliente_id, ativo) VALUES (?, ?, ?, ?, ?, ?)";
@@ -36,39 +38,20 @@ public class UsuarioDAO extends ConnectionFactory {
     }
 
     public Usuario autenticar(String email, String senha) {
-        String sql = "SELECT u.*, c.razao_social FROM usuario u LEFT JOIN cliente c ON u.cliente_id = c.id WHERE u.email = ? AND u.senha = ? AND u.ativo = true";
-        Usuario usuario = null;
-
-        try (Connection conn = getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, email);
-            stmt.setString(2, senha);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    usuario = new Usuario();
-                    usuario.setId(rs.getInt("id"));
-                    usuario.setUsuario(rs.getString("usuario"));
-                    usuario.setEmail(rs.getString("email"));
-                    usuario.setAdmin(rs.getBoolean("is_administrador"));
-                    usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
-                    usuario.setAtivo(rs.getBoolean("ativo"));
-
-                    if (usuario.getClienteId() != null) {
-                        Cliente cliente = new Cliente();
-                        cliente.setId(usuario.getClienteId());
-                        cliente.setRazaoSocial(rs.getString("razao_social"));
-                        usuario.setCliente(cliente);
-                    }
-                    return usuario;
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        Usuario usuario = buscarPorEmail(email);
+        if (usuario == null || usuario.getSenha() == null || !usuario.isAtivo()) {
+            return null;
         }
 
-        return usuario;
+        if (passwordService.matches(senha, usuario.getSenha())) {
+            if (passwordService.needsRehash(usuario.getSenha())) {
+                atualizarSenha(usuario.getId(), passwordService.hash(senha));
+            }
+            usuario.setSenha(null);
+            return usuario;
+        }
+
+        return null;
     }
 
     public Boolean existeEmail(String email) {
@@ -92,7 +75,7 @@ public class UsuarioDAO extends ConnectionFactory {
     }
 
     public Usuario buscarPorEmail(String email) {
-        String sql = "SELECT id, usuario, email, is_administrador, cliente_id, ativo FROM usuario WHERE email = ?";
+        String sql = "SELECT u.*, c.razao_social FROM usuario u LEFT JOIN cliente c ON u.cliente_id = c.id WHERE u.email = ?";
         Usuario usuario = null;
 
         try (Connection conn = getConnection();
@@ -102,13 +85,7 @@ public class UsuarioDAO extends ConnectionFactory {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    usuario = new Usuario();
-                    usuario.setId(rs.getInt("id"));
-                    usuario.setUsuario(rs.getString("usuario"));
-                    usuario.setEmail(rs.getString("email"));
-                    usuario.setAdmin(rs.getBoolean("is_administrador"));
-                    usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
-                    usuario.setAtivo(rs.getBoolean("ativo"));
+                    usuario = mapearUsuario(rs, true);
                 }
             }
         } catch (SQLException e) {
@@ -174,12 +151,7 @@ public class UsuarioDAO extends ConnectionFactory {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Usuario usuario = new Usuario();
-                    usuario.setId(rs.getInt("id"));
-                    usuario.setUsuario(rs.getString("usuario"));
-                    usuario.setEmail(rs.getString("email"));
-                    usuario.setAdmin(rs.getBoolean("is_administrador"));
-                    usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
-                    usuario.setAtivo(rs.getBoolean("ativo"));
+                    usuario = mapearUsuario(rs, false);
                     usuarios.add(usuario);
                 }
             }
@@ -200,12 +172,8 @@ public class UsuarioDAO extends ConnectionFactory {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Usuario usuario = new Usuario();
-                    usuario.setId(rs.getInt("id"));
-                    usuario.setUsuario(rs.getString("usuario"));
-                    usuario.setEmail(rs.getString("email"));
-                    usuario.setAdmin(rs.getBoolean("is_administrador"));
+                    usuario = mapearUsuario(rs, false);
                     usuario.setClienteId(null);
-                    usuario.setAtivo(rs.getBoolean("ativo"));
                     usuarios.add(usuario);
                 }
             }
@@ -226,12 +194,7 @@ public class UsuarioDAO extends ConnectionFactory {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Usuario usuario = new Usuario();
-                    usuario.setId(rs.getInt("id"));
-                    usuario.setUsuario(rs.getString("usuario"));
-                    usuario.setEmail(rs.getString("email"));
-                    usuario.setAdmin(rs.getBoolean("is_administrador"));
-                    usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
-                    usuario.setAtivo(rs.getBoolean("ativo"));
+                    usuario = mapearUsuario(rs, false);
                     usuarios.add(usuario);
                 }
             }
@@ -255,5 +218,32 @@ public class UsuarioDAO extends ConnectionFactory {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private Usuario mapearUsuario(ResultSet rs, boolean incluirSenha) throws SQLException {
+        Usuario usuario = new Usuario();
+        usuario.setId(rs.getInt("id"));
+        usuario.setUsuario(rs.getString("usuario"));
+        usuario.setEmail(rs.getString("email"));
+        usuario.setAdmin(rs.getBoolean("is_administrador"));
+        usuario.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
+        usuario.setAtivo(rs.getBoolean("ativo"));
+
+        if (incluirSenha) {
+            usuario.setSenha(rs.getString("senha"));
+        }
+
+        if (usuario.getClienteId() != null) {
+            Cliente cliente = new Cliente();
+            cliente.setId(usuario.getClienteId());
+            try {
+                cliente.setRazaoSocial(rs.getString("razao_social"));
+            } catch (SQLException ignored) {
+                // Algumas consultas nao trazem a razao social.
+            }
+            usuario.setCliente(cliente);
+        }
+
+        return usuario;
     }
 }

@@ -5,17 +5,24 @@ import br.com.exception.CadastroException;
 import br.com.exception.NegocioException;
 import br.com.usuario.Usuario;
 import br.com.util.ValidationUtils;
+import br.com.security.PasswordService;
 
 public class UsuarioBO {
 
     private final UsuarioDAO usuarioDAO;
+    private final PasswordService passwordService;
 
     public UsuarioBO() {
-        this(new UsuarioDAO());
+        this(new UsuarioDAO(), new PasswordService());
     }
 
     public UsuarioBO(UsuarioDAO usuarioDAO) {
+        this(usuarioDAO, new PasswordService());
+    }
+
+    public UsuarioBO(UsuarioDAO usuarioDAO, PasswordService passwordService) {
         this.usuarioDAO = usuarioDAO;
+        this.passwordService = passwordService;
     }
 
     public void cadastrar(Usuario usuario) throws CadastroException {
@@ -49,7 +56,7 @@ public class UsuarioBO {
 
         usuario.setUsuario(usuario.getUsuario().trim());
         usuario.setEmail(usuario.getEmail().trim());
-        usuario.setSenha(usuario.getSenha().trim());
+        usuario.setSenha(passwordService.hash(usuario.getSenha().trim()));
         usuarioDAO.salvar(usuario);
     }
 
@@ -110,6 +117,6 @@ public class UsuarioBO {
             throw new NegocioException("Senha atual está incorreta.");
         }
 
-        usuarioDAO.atualizarSenha(usuarioAtual.getId(), novaSenha);
+        usuarioDAO.atualizarSenha(usuarioAtual.getId(), passwordService.hash(novaSenha));
     }
 }
