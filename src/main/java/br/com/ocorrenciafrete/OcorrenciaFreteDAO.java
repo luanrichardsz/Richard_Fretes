@@ -1,7 +1,6 @@
 package br.com.ocorrenciafrete;
 
 import br.com.connection.ConnectionFactory;
-import br.com.ocorrenciafrete.OcorrenciaFrete;
 import br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia;
 
 import java.sql.*;

@@ -1,13 +1,10 @@
 package br.com.ocorrenciafrete;
 
-import br.com.ocorrenciafrete.OcorrenciaFreteBO;
-import br.com.ocorrenciafrete.OcorrenciaFreteDAO;
 import br.com.exception.FreteException;
 import br.com.endereco.Endereco;
 import br.com.endereco.EnderecoDAO;
 import br.com.frete.Frete;
 import br.com.frete.FreteDAO;
-import br.com.ocorrenciafrete.OcorrenciaFrete;
 import br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia;
 import br.com.usuario.Usuario;
 import br.com.util.ValidationUtils;

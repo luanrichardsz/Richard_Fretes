@@ -1,10 +1,7 @@
 package br.com.motorista;
 
-import br.com.motorista.MotoristaBO;
-import br.com.motorista.MotoristaDAO;
 import br.com.cliente.ClienteDAO;
 import br.com.exception.CadastroException;
-import br.com.motorista.Motorista;
 import br.com.motorista.Motorista.*;
 import br.com.usuario.Usuario;
 import br.com.cliente.Cliente;

@@ -1,7 +1,6 @@
 package br.com.motorista;
 
 import br.com.connection.ConnectionFactory;
-import br.com.motorista.Motorista;
 import br.com.motorista.Motorista.CategoriaCnh;
 import br.com.motorista.Motorista.StatusMotorista;
 import br.com.motorista.Motorista.TipoPix;

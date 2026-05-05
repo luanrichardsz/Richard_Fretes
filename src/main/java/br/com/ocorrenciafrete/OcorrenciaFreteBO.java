@@ -1,13 +1,11 @@
 package br.com.ocorrenciafrete;
 
 import br.com.connection.ConnectionFactory;
-import br.com.ocorrenciafrete.OcorrenciaFreteDAO;
 import br.com.exception.FreteException;
 import br.com.frete.Frete;
 import br.com.frete.FreteDAO;
 import br.com.veiculo.Veiculo;
 import br.com.veiculo.VeiculoDAO;
-import br.com.ocorrenciafrete.OcorrenciaFrete;
 import br.com.util.ValidationUtils;
 
 import java.sql.Connection;

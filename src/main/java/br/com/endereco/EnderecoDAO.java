@@ -1,7 +1,6 @@
 package br.com.endereco;
 
 import br.com.connection.ConnectionFactory;
-import br.com.endereco.Endereco;
 
 import java.sql.*;
 import java.util.ArrayList;

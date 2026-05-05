@@ -1,11 +1,9 @@
 package br.com.usuario;
 
-import br.com.usuario.UsuarioDAO;
 import br.com.exception.CadastroException;
 import br.com.exception.NegocioException;
-import br.com.usuario.Usuario;
 import br.com.util.ValidationUtils;
-import br.com.security.PasswordService;
+import br.com.seguranca.PasswordService;
 
 public class UsuarioBO {
 

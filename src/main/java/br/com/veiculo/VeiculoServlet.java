@@ -1,13 +1,10 @@
 package br.com.veiculo;
 
-import br.com.veiculo.VeiculoBO;
 import br.com.cliente.ClienteDAO;
 import br.com.motorista.MotoristaDAO;
-import br.com.veiculo.VeiculoDAO;
 import br.com.exception.CadastroException;
 import br.com.cliente.Cliente;
 import br.com.motorista.Motorista;
-import br.com.veiculo.Veiculo;
 import br.com.veiculo.Veiculo.StatusVeiculo;
 import br.com.usuario.Usuario;
 

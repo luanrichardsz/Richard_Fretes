@@ -1,10 +1,7 @@
 package br.com.cliente;
 
-import br.com.cliente.ClienteBO;
-import br.com.cliente.ClienteDAO;
 import br.com.usuario.UsuarioDAO;
 import br.com.exception.CadastroException;
-import br.com.cliente.Cliente;
 import br.com.usuario.Usuario;
 
 import javax.servlet.ServletException;

@@ -1,8 +1,6 @@
 package br.com.veiculo;
 
-import br.com.veiculo.VeiculoDAO;
 import br.com.exception.CadastroException;
-import br.com.veiculo.Veiculo;
 import br.com.frete.FreteDAO;
 import br.com.util.ValidationUtils;
 

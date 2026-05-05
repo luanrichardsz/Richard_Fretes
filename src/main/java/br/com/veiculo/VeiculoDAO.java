@@ -1,7 +1,6 @@
 package br.com.veiculo;
 
 import br.com.connection.ConnectionFactory;
-import br.com.veiculo.Veiculo;
 import br.com.veiculo.Veiculo.StatusVeiculo;
 
 import java.sql.*;

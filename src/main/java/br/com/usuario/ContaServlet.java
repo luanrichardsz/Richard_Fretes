@@ -1,10 +1,7 @@
 package br.com.usuario;
 
-import br.com.usuario.UsuarioBO;
-import br.com.usuario.UsuarioDAO;
 import br.com.exception.CadastroException;
 import br.com.exception.NegocioException;
-import br.com.usuario.Usuario;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;

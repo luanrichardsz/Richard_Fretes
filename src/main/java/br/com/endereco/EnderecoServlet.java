@@ -1,11 +1,8 @@
 package br.com.endereco;
 
-import br.com.endereco.EnderecoBO;
 import br.com.cliente.ClienteDAO;
-import br.com.endereco.EnderecoDAO;
 import br.com.exception.CadastroException;
 import br.com.cliente.Cliente;
-import br.com.endereco.Endereco;
 import br.com.usuario.Usuario;
 
 import javax.servlet.ServletException;

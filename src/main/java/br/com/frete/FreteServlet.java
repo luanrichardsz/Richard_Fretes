@@ -1,15 +1,12 @@
 package br.com.frete;
 
-import br.com.frete.FreteBO;
 import br.com.cliente.ClienteDAO;
 import br.com.endereco.EnderecoDAO;
-import br.com.frete.FreteDAO;
 import br.com.motorista.MotoristaDAO;
 import br.com.veiculo.VeiculoDAO;
 import br.com.exception.FreteException;
 import br.com.cliente.Cliente;
 import br.com.endereco.Endereco;
-import br.com.frete.Frete;
 import br.com.frete.Frete.StatusFrete;
 import br.com.motorista.Motorista;
 import br.com.ocorrenciafrete.OcorrenciaFrete;

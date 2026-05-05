@@ -1,4 +1,4 @@
-package br.com.security;
+package br.com.seguranca;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;

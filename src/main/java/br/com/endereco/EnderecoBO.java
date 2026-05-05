@@ -1,8 +1,6 @@
 package br.com.endereco;
 
-import br.com.endereco.EnderecoDAO;
 import br.com.exception.CadastroException;
-import br.com.endereco.Endereco;
 import br.com.util.ValidationUtils;
 
 public class EnderecoBO {

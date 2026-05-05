@@ -1,7 +1,6 @@
 package br.com.cliente;
 
 import br.com.connection.ConnectionFactory;
-import br.com.cliente.Cliente;
 
 import java.sql.*;
 import java.util.ArrayList;

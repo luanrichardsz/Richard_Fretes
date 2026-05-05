@@ -1,7 +1,6 @@
 package br.com.frete;
 
 import br.com.connection.ConnectionFactory;
-import br.com.frete.Frete;
 import br.com.frete.Frete.StatusFrete;
 
 import java.sql.*;

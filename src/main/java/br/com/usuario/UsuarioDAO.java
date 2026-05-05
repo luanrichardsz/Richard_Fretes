@@ -2,7 +2,7 @@ package br.com.usuario;
 
 import br.com.connection.ConnectionFactory;
 import br.com.cliente.Cliente;
-import br.com.security.PasswordService;
+import br.com.seguranca.PasswordService;
 
 import java.sql.*;
 import java.util.ArrayList;

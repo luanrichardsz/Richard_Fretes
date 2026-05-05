@@ -1,8 +1,6 @@
 package br.com.motorista;
 
-import br.com.motorista.MotoristaDAO;
 import br.com.exception.CadastroException;
-import br.com.motorista.Motorista;
 import br.com.frete.FreteDAO;
 import br.com.util.ValidationUtils;
 
