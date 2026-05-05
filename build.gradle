@@ -16,6 +16,8 @@ repositories {
    maven { url "https://jaspersoft.jfrog.io/jaspersoft/third-party-ce-artifacts/" }
 }
 
+compileJava.options.encoding = 'UTF-8'
+compileJava.options.compilerArgs << '-parameters'
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }

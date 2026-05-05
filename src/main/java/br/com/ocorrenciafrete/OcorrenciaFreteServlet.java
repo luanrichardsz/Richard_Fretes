@@ -33,6 +33,8 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
 
         Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
 
@@ -64,6 +66,8 @@ public class OcorrenciaFreteServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
 
         OcorrenciaFrete ocorrencia = new OcorrenciaFrete();
 

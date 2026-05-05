@@ -8,7 +8,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Richard Fretes | Menu</title>
+    <title>Menu</title>
 
     <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
     <link rel="stylesheet" href="/RichardFretes/css/styleMenu.css" />
