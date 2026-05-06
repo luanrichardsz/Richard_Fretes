@@ -89,7 +89,7 @@
 
         <div class="form-group">
           <label>Destinatário *</label>
-          <select name="destinatarioId" required>
+          <select id="destinatarioId" name="destinatarioId" required>
             <option value="">Selecione um cliente</option>
             <c:forEach var="cliente" items="${clientes}">
               <option value="${cliente.id}" ${not empty frete.destinatarioId and frete.destinatarioId eq cliente.id ? 'selected' : ''}>
@@ -103,8 +103,8 @@
           <label>Endereço Origem *</label>
           <select id="enderecoOrigemId" name="enderecoOrigemId" required>
             <option value="">Selecione um endereço</option>
-            <c:forEach var="endereco" items="${enderecos}">
-              <option value="${endereco.id}" data-codigo-ibge="${endereco.codigoIbge}" ${not empty frete.enderecoOrigemId and frete.enderecoOrigemId eq endereco.id ? 'selected' : ''}>
+            <c:forEach var="endereco" items="${enderecosOrigem}">
+              <option value="${endereco.id}" data-cliente-id="${endereco.clienteId}" data-codigo-ibge="${endereco.codigoIbge}" data-uf="${endereco.uf}" data-municipio="${endereco.municipio}" ${not empty frete.enderecoOrigemId and frete.enderecoOrigemId eq endereco.id ? 'selected' : ''}>
                 ${endereco.logradouro}, ${endereco.numero} - ${endereco.municipio}/${endereco.uf}
               </option>
             </c:forEach>
@@ -115,8 +115,8 @@
           <label>Endereço Destino *</label>
           <select id="enderecoDestinoId" name="enderecoDestinoId" required>
             <option value="">Selecione um endereço</option>
-            <c:forEach var="endereco" items="${enderecos}">
-              <option value="${endereco.id}" data-codigo-ibge="${endereco.codigoIbge}" ${not empty frete.enderecoDestinoId and frete.enderecoDestinoId eq endereco.id ? 'selected' : ''}>
+            <c:forEach var="endereco" items="${enderecosDestino}">
+              <option value="${endereco.id}" data-cliente-id="${endereco.clienteId}" data-codigo-ibge="${endereco.codigoIbge}" data-uf="${endereco.uf}" data-municipio="${endereco.municipio}" ${not empty frete.enderecoDestinoId and frete.enderecoDestinoId eq endereco.id ? 'selected' : ''}>
                 ${endereco.logradouro}, ${endereco.numero} - ${endereco.municipio}/${endereco.uf}
               </option>
             </c:forEach>
@@ -184,12 +184,12 @@
 
         <div class="form-group">
           <label>Alíquota ICMS (%)</label>
-          <input type="number" step="0.01" min="0" id="aliquotaIcms" name="aliquotaIcms" value="${frete.aliquotaIcms}" />
+          <input type="number" step="0.01" min="0" id="aliquotaIcms" name="aliquotaIcms" value="${frete.aliquotaIcms}" readonly style="background: #f3f4f6; color: #475467; cursor: not-allowed;" />
         </div>
 
         <div class="form-group">
           <label>Valor ICMS</label>
-          <input type="number" step="0.01" min="0" id="valorIcms" name="valorIcms" value="${frete.valorIcms}" />
+          <input type="number" step="0.01" min="0" id="valorIcms" name="valorIcms" value="${frete.valorIcms}" readonly style="background: #f3f4f6; color: #475467; cursor: not-allowed;" />
         </div>
 
         <div class="form-group">
@@ -199,7 +199,7 @@
 
         <div class="form-group">
           <label>Previsão Entrega *</label>
-          <input type="date" name="previsaoEntrega" min="${hoje}" value="${frete.previsaoEntrega}" required />
+          <input type="date" id="previsaoEntrega" name="previsaoEntrega" min="${hoje}" value="${frete.previsaoEntrega}" required />
         </div>
 
         <div class="form-group">
