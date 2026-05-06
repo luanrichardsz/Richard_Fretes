@@ -8,7 +8,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Menu</title>
+    <title>Richard Fretes | Painel</title>
 
     <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
     <link rel="stylesheet" href="/RichardFretes/css/styleMenu.css" />
@@ -19,278 +19,487 @@
 
 <body>
 
-<div class="dashboard-wrapper">
+<div class="app-shell">
 
     <aside class="sidebar">
-        <div class="brand">
-            <div class="brand-mark">RF</div>
+
+        <div class="brand-area">
+            <div class="brand-symbol">
+                <img src="/RichardFretes/img/richardLogo.png" alt="Richard Fretes" class="brand-logo">
+            </div>
+
+            <div class="brand-text">
+                <strong>Richard</strong>
+                <span>Fretes</span>
+            </div>
         </div>
 
-        <nav class="side-nav">
-            <a href="#" class="active" title="Início">
-                <i class="fas fa-home"></i>
+        <nav class="sidebar-nav">
+
+            <a href="#" class="nav-item active">
+                <i class="fas fa-table-cells-large"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="fretes" class="nav-item">
+                <i class="fas fa-route"></i>
+                <span>Fretes</span>
+            </a>
+
+            <a href="motoristas" class="nav-item">
+                <i class="fas fa-id-card"></i>
+                <span>Motoristas</span>
+            </a>
+
+            <a href="veiculos" class="nav-item">
+                <i class="fas fa-truck-moving"></i>
+                <span>Veículos</span>
+            </a>
+
+            <a href="enderecos" class="nav-item">
+                <i class="fas fa-location-dot"></i>
+                <span>Endereços</span>
             </a>
 
             <c:if test="${sessionScope.usuarioAutenticado.admin}">
-                <a href="clientes" title="Clientes">
-                    <i class="fas fa-users"></i>
+                <a href="clientes" class="nav-item">
+                    <i class="fas fa-building"></i>
+                    <span>Clientes</span>
                 </a>
             </c:if>
 
-            <a href="motoristas" title="Motoristas">
-                <i class="fas fa-id-card"></i>
-            </a>
-
-            <a href="enderecos" title="Endereços">
-                <i class="fas fa-map-location-dot"></i>
-            </a>
-
-            <a href="veiculos" title="Veículos">
-                <i class="fas fa-truck"></i>
-            </a>
-
-            <a href="fretes" title="Fretes">
-                <i class="fas fa-route"></i>
-            </a>
-
-            <a href="logout" class="logout-link" title="Sair" aria-label="Sair">
-                <i class="fas fa-right-from-bracket"></i>
-            </a>
         </nav>
-    </aside>
 
-    <main class="main-content">
+        <div class="sidebar-user">
 
-        <header class="main-header">
-            <div class="welcome-text">
-                <span class="page-tag">Painel Administrativo -                     
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+
+            <div class="user-meta">
+                <span>Usuário logado</span>
+                <strong>${sessionScope.usuarioAutenticado.usuario}</strong>
+
+                <small>
                     <c:choose>
                         <c:when test="${sessionScope.usuarioAutenticado.admin}">
-                            Richard Fretes
+                            Administrador
                         </c:when>
                         <c:otherwise>
-                            ${sessionScope.usuarioAutenticado.cliente.razaoSocial}
+                            Cliente
                         </c:otherwise>
-                    </c:choose></span>
+                    </c:choose>
+                </small>
+            </div>
 
-                <h2>Olá, <span>${sessionScope.usuarioAutenticado.usuario}!</span></h2>
+            <div class="user-actions">
+                <a href="minhaConta" title="Minha Conta">
+                    <i class="fas fa-gear"></i>
+                </a>
+
+                <a href="logout" title="Sair" class="logout-action">
+                    <i class="fas fa-right-from-bracket"></i>
+                </a>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <main class="main-area">
+
+        <header class="topbar">
+
+            <div>
+                <span class="eyebrow">
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioAutenticado.admin}">
+                            Painel administrativo
+                        </c:when>
+                        <c:otherwise>
+                            Painel do cliente
+                        </c:otherwise>
+                    </c:choose>
+                </span>
+
+                <h1>Visão geral da operação</h1>
 
                 <p>
-
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioAutenticado.admin}">
+                            Controle os principais módulos da Richard Fretes em uma central objetiva.
+                        </c:when>
+                        <c:otherwise>
+                            Acompanhe os dados vinculados à sua empresa.
+                        </c:otherwise>
+                    </c:choose>
                 </p>
             </div>
 
-            <div class="header-brand">
-                <img src="/RichardFretes/img/richardFretes01-removebg-preview.ico" alt="Ícone da Richard Fretes">
-            </div>
         </header>
 
-                <section class="dashboard-summary">
-                    <div class="summary-content">
-                        <span class="summary-label">Resumo da operação</span>
+        <section class="hero-grid">
 
-                        <h1>
-                            Acompanhe os principais dados da sua empresa.
-                        </h1>
+            <div class="operation-hero">
 
-                        <p>
-                            Veja rapidamente a quantidade de fretes, motoristas e veículos vinculados à sua operação.
-                        </p>
-                    </div>
+                <div class="hero-content">
+                    <span class="section-label">Operação principal</span>
 
-                    <div class="summary-stats">
+                    <h2>Fretes no centro da gestão.</h2>
 
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-route"></i>
-                            </div>
+                    <p>
+                        Cadastre viagens, vincule remetente, destinatário, motorista, veículo e acompanhe o fluxo operacional do transporte.
+                    </p>
 
-                            <div>
-                                <strong>${empty fretes ? 0 : fn:length(fretes)}</strong>
-                                <span>Fretes cadastrados</span>
-                            </div>
-                        </div>
+                    <div class="hero-actions">
+                        <a href="fretes" class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Novo frete
+                        </a>
 
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-id-card"></i>
-                            </div>
-
-                            <div>
-                                <strong>${empty motoristas ? 0 : fn:length(motoristas)}</strong>
-                                <span>Motoristas</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <i class="fas fa-truck-moving"></i>
-                            </div>
-
-                            <div>
-                                <strong>${empty veiculos ? 0 : fn:length(veiculos)}</strong>
-                                <span>Veículos</span>
-                            </div>
-                        </div>
-
-                        <c:if test="${sessionScope.usuarioAutenticado.admin}">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="fas fa-building"></i>
-                                </div>
-
-                                <div>
-                                    <strong>${empty clientes ? 0 : fn:length(clientes)}</strong>
-                                    <span>Clientes</span>
-                                </div>
-                            </div>
-                        </c:if>
-
-                    </div>
-                </section>
-
-        <section class="modules-layout">
-
-            <div class="modules-column main-modules">
-                <div class="modules-header">
-                    <div>
-                        <span>Operação da transportadora</span>
-                        <h2>Central de trabalho</h2>
-                    </div>
-
-                    <a href="fretes" class="quick-action">
-                        <i class="fas fa-plus"></i>
-                        Novo Frete
-                    </a>
-                </div>
-
-                <div class="operation-panel">
-
-                    <a href="fretes" class="operation-item featured">
-                        <div class="item-icon">
-                            <i class="fas fa-route"></i>
-                        </div>
-
-                        <div class="item-content">
-                            <span>Principal</span>
-                            <h3>Operação de Fretes</h3>
-                            <p>Cadastre fretes, acompanhe entregas e registre ocorrências.</p>
-                        </div>
-
-                        <div class="item-action">
+                        <a href="fretes" class="btn-secondary">
+                            Ver fretes
                             <i class="fas fa-arrow-right"></i>
-                        </div>
-                    </a>
-
-                    <div class="support-grid">
-
-                        <a href="enderecos" class="operation-item compact">
-                            <div class="item-icon">
-                                <i class="fas fa-map-location-dot"></i>
-                            </div>
-
-                            <div class="item-content">
-                                <span>Origem e destino</span>
-                                <h3>Endereços</h3>
-                                <p>
-                                    ${sessionScope.usuarioAutenticado.admin ? 
-                                    'Gerencie os endereços cadastrados no sistema.' : 
-                                    'Organize os endereços da sua empresa.'}
-                                </p>
-                            </div>
-
-                            <div class="item-action">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
                         </a>
-
-                        <a href="motoristas" class="operation-item compact">
-                            <div class="item-icon">
-                                <i class="fas fa-user-tie"></i>
-                            </div>
-
-                            <div class="item-content">
-                                <span>Equipe</span>
-                                <h3>Motoristas</h3>
-                                <p>Controle dados, CNH, vínculo e status dos condutores.</p>
-                            </div>
-
-                            <div class="item-action">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
-                        </a>
-
-                        <a href="veiculos" class="operation-item compact">
-                            <div class="item-icon">
-                                <i class="fas fa-truck-moving"></i>
-                            </div>
-
-                            <div class="item-content">
-                                <span>Frota</span>
-                                <h3>Veículos</h3>
-                                <p>Cadastre placas, modelos, capacidade e status da frota.</p>
-                            </div>
-
-                            <div class="item-action">
-                                <i class="fas fa-arrow-right"></i>
-                            </div>
-                        </a>
-
                     </div>
                 </div>
+
+                <div class="hero-metric">
+                    <span>Total de fretes</span>
+                    <strong>${empty fretes ? 0 : fn:length(fretes)}</strong>
+                    <small>Registros cadastrados</small>
+                </div>
+
             </div>
 
-            <aside class="modules-column side-modules">
+            <aside class="client-panel">
 
-                <c:if test="${sessionScope.usuarioAutenticado.admin}">
-                    <div class="admin-box">
-                        <div class="admin-box-header">
-                            <div>
-                                <span>Área administrativa</span>
-                                <h2>Administração</h2>
-                            </div>
-                        </div>
+                <span class="section-label">
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioAutenticado.admin}">
+                            Visão administrativa
+                        </c:when>
+                        <c:otherwise>
+                            Dados do cliente
+                        </c:otherwise>
+                    </c:choose>
+                </span>
 
-                        <a href="clientes" class="admin-link">
-                            <div class="admin-link-icon">
+                <c:choose>
+
+                    <c:when test="${sessionScope.usuarioAutenticado.admin}">
+
+                        <div class="client-panel-header">
+                            <div class="client-panel-icon">
                                 <i class="fas fa-building"></i>
                             </div>
 
                             <div>
-                                <h3>Clientes</h3>
-                                <p>Cadastro e gestão das empresas do sistema.</p>
+                                <h3>Gestão de clientes</h3>
+                                <p>Administre empresas, usuários e operações vinculadas ao sistema.</p>
+                            </div>
+                        </div>
+
+                        <div class="client-panel-list">
+
+                            <div class="client-info-row">
+                                <small>Clientes cadastrados</small>
+                                <strong>${empty clientes ? 0 : fn:length(clientes)}</strong>
                             </div>
 
+                            <div class="client-info-row">
+                                <small>Fretes no sistema</small>
+                                <strong>${empty fretes ? 0 : fn:length(fretes)}</strong>
+                            </div>
+
+                            <div class="client-info-row">
+                                <small>Motoristas cadastrados</small>
+                                <strong>${empty motoristas ? 0 : fn:length(motoristas)}</strong>
+                            </div>
+
+                        </div>
+
+                        <a href="clientes" class="client-panel-action">
+                            Gerenciar clientes
                             <i class="fas fa-arrow-right"></i>
                         </a>
-                    </div>
-                </c:if>
 
-                <div class="account-box">
-                    <div class="account-avatar">
-                        <i class="fas fa-user"></i>
-                    </div>
+                    </c:when>
 
-                    <div class="account-info">
-                        <span>Usuário logado</span>
-                        <h3>${sessionScope.usuarioAutenticado.usuario}</h3>
-                        <p>Gerencie seus dados de acesso.</p>
-                    </div>
+                    <c:otherwise>
 
-                    <a href="minhaConta" class="account-button">
-                        Minha Conta
-                        <i class="fas fa-arrow-right"></i>
-                    </a>
-                </div>
+                        <div class="client-panel-header">
+                            <div class="client-panel-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+
+                            <div>
+                                <h3>${sessionScope.usuarioAutenticado.cliente.razaoSocial}</h3>
+                                <p>Informações principais da empresa vinculada ao seu acesso.</p>
+                            </div>
+                        </div>
+
+                        <div class="client-panel-list">
+
+                            <div class="client-info-row">
+                                <small>Documento</small>
+                                <strong>${sessionScope.usuarioAutenticado.cliente.documento}</strong>
+                            </div>
+
+                            <div class="client-info-row">
+                                <small>Inscrição Estadual</small>
+                                <strong>${sessionScope.usuarioAutenticado.cliente.inscricaoEstadual}</strong>
+                            </div>
+
+                            <div class="client-info-row">
+                                <small>E-mail</small>
+                                <strong>${sessionScope.usuarioAutenticado.cliente.email}</strong>
+                            </div>
+
+                            <div class="client-info-row">
+                                <small>Telefone</small>
+                                <strong>${sessionScope.usuarioAutenticado.cliente.telefone}</strong>
+                            </div>
+
+                        </div>
+
+                        <a href="minhaConta" class="client-panel-action">
+                            Ver minha conta
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+
+                    </c:otherwise>
+
+                </c:choose>
 
             </aside>
 
         </section>
 
+        <section class="insights-section">
+
+            <div class="section-header">
+                <div>
+                    <span class="section-label">Resumo</span>
+                    <h2>Indicadores principais</h2>
+                </div>
+
+                <div class="slide-controls">
+                    <button type="button" class="slide-btn" id="prevSlide">
+                        <i class="fas fa-arrow-left"></i>
+                    </button>
+
+                    <button type="button" class="slide-btn" id="nextSlide">
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="slides-shell">
+                <div class="slides-track" id="slidesTrack">
+
+                    <article class="insight-slide">
+                        <div class="slide-icon">
+                            <i class="fas fa-route"></i>
+                        </div>
+
+                        <div class="slide-info">
+                            <span>Fretes</span>
+                            <strong>${empty fretes ? 0 : fn:length(fretes)}</strong>
+                            <p>Total de operações cadastradas.</p>
+                        </div>
+                    </article>
+
+                    <article class="insight-slide">
+                        <div class="slide-icon">
+                            <i class="fas fa-id-card"></i>
+                        </div>
+
+                        <div class="slide-info">
+                            <span>Motoristas</span>
+                            <strong>${empty motoristas ? 0 : fn:length(motoristas)}</strong>
+                            <p>Condutores registrados na operação.</p>
+                        </div>
+                    </article>
+
+                    <article class="insight-slide">
+                        <div class="slide-icon">
+                            <i class="fas fa-truck-moving"></i>
+                        </div>
+
+                        <div class="slide-info">
+                            <span>Veículos</span>
+                            <strong>${empty veiculos ? 0 : fn:length(veiculos)}</strong>
+                            <p>Frota cadastrada no sistema.</p>
+                        </div>
+                    </article>
+
+                    <c:choose>
+                        <c:when test="${sessionScope.usuarioAutenticado.admin}">
+                            <article class="insight-slide">
+                                <div class="slide-icon">
+                                    <i class="fas fa-building"></i>
+                                </div>
+
+                                <div class="slide-info">
+                                    <span>Clientes</span>
+                                    <strong>${empty clientes ? 0 : fn:length(clientes)}</strong>
+                                    <p>Empresas cadastradas na plataforma.</p>
+                                </div>
+                            </article>
+                        </c:when>
+
+                        <c:otherwise>
+                            <article class="insight-slide client-slide">
+                                <div class="slide-icon">
+                                    <i class="fas fa-id-card"></i>
+                                </div>
+
+                                <div class="client-slide-content">
+                                    <div class="client-main">
+                                        <span>Cliente vinculado</span>
+                                        <strong>${sessionScope.usuarioAutenticado.cliente.razaoSocial}</strong>
+                                    </div>
+
+                                    <div class="client-data-grid">
+                                        <div>
+                                            <small>Documento</small>
+                                            <p>${sessionScope.usuarioAutenticado.cliente.documento}</p>
+                                        </div>
+
+                                        <div>
+                                            <small>Inscrição Estadual</small>
+                                            <p>${sessionScope.usuarioAutenticado.cliente.inscricaoEstadual}</p>
+                                        </div>
+
+                                        <div>
+                                            <small>E-mail</small>
+                                            <p>${sessionScope.usuarioAutenticado.cliente.email}</p>
+                                        </div>
+
+                                        <div>
+                                            <small>Telefone</small>
+                                            <p>${sessionScope.usuarioAutenticado.cliente.telefone}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </c:otherwise>
+                    </c:choose>
+
+                </div>
+            </div>
+
+            <div class="slide-dots" id="slideDots"></div>
+
+        </section>
+
+        <section class="modules-section">
+
+            <div class="section-header">
+                <div>
+                    <span class="section-label">Módulos</span>
+                    <h2>Central de trabalho</h2>
+                </div>
+            </div>
+
+            <div class="module-grid">
+
+                <a href="fretes" class="module-card main-module">
+                    <div class="module-icon">
+                        <i class="fas fa-route"></i>
+                    </div>
+
+                    <div>
+                        <span>Principal</span>
+                        <h3>Operação de Fretes</h3>
+                        <p>Cadastro e acompanhamento das movimentações de transporte.</p>
+                    </div>
+
+                    <i class="fas fa-arrow-right module-arrow"></i>
+                </a>
+
+                <a href="motoristas" class="module-card">
+                    <div class="module-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+
+                    <div>
+                        <span>Equipe</span>
+                        <h3>Motoristas</h3>
+                        <p>Controle de dados, CNH, vínculo e status dos condutores.</p>
+                    </div>
+
+                    <i class="fas fa-arrow-right module-arrow"></i>
+                </a>
+
+                <a href="veiculos" class="module-card">
+                    <div class="module-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+
+                    <div>
+                        <span>Frota</span>
+                        <h3>Veículos</h3>
+                        <p>Gerencie placas, modelos, capacidades e disponibilidade.</p>
+                    </div>
+
+                    <i class="fas fa-arrow-right module-arrow"></i>
+                </a>
+
+                <a href="enderecos" class="module-card">
+                    <div class="module-icon">
+                        <i class="fas fa-map-location-dot"></i>
+                    </div>
+
+                    <div>
+                        <span>Rotas</span>
+                        <h3>Endereços</h3>
+                        <p>Organize origens, destinos e locais vinculados aos clientes.</p>
+                    </div>
+
+                    <i class="fas fa-arrow-right module-arrow"></i>
+                </a>
+
+                <c:if test="${sessionScope.usuarioAutenticado.admin}">
+                    <a href="clientes" class="module-card admin-module">
+                        <div class="module-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+
+                        <div>
+                            <span>Administração</span>
+                            <h3>Clientes</h3>
+                            <p>Cadastro e gestão das empresas atendidas pelo sistema.</p>
+                        </div>
+
+                        <i class="fas fa-arrow-right module-arrow"></i>
+                    </a>
+                </c:if>
+
+                <a href="minhaConta" class="module-card account-module">
+                    <div class="module-icon">
+                        <i class="fas fa-user-gear"></i>
+                    </div>
+
+                    <div>
+                        <span>Conta</span>
+                        <h3>Minha Conta</h3>
+                        <p>Visualize e gerencie seus dados de acesso.</p>
+                    </div>
+
+                    <i class="fas fa-arrow-right module-arrow"></i>
+                </a>
+
+            </div>
+
+        </section>
+
     </main>
+
 </div>
 
-<script src="js/funcoesMenu.js"></script>
+<script src="/RichardFretes/js/funcoesMenu.js"></script>
 
 </body>
 </html>

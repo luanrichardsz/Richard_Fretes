@@ -75,7 +75,7 @@ public class UsuarioDAO extends ConnectionFactory {
     }
 
     public Usuario buscarPorEmail(String email) {
-        String sql = "SELECT u.*, c.razao_social FROM usuario u LEFT JOIN cliente c ON u.cliente_id = c.id WHERE u.email = ?";
+        String sql = "SELECT u.*, c.razao_social, c.nome_fantasia, c.documento, c.inscricao_estadual, c.email AS cliente_email, c.telefone AS cliente_telefone, c.ativo AS cliente_ativo, c.criado_em AS cliente_criado_em FROM usuario u LEFT JOIN cliente c ON u.cliente_id = c.id WHERE u.email = ?";
         Usuario usuario = null;
 
         try (Connection conn = getConnection();
@@ -238,6 +238,16 @@ public class UsuarioDAO extends ConnectionFactory {
             cliente.setId(usuario.getClienteId());
             try {
                 cliente.setRazaoSocial(rs.getString("razao_social"));
+                cliente.setNomeFantasia(rs.getString("nome_fantasia"));
+                cliente.setDocumento(rs.getString("documento"));
+                cliente.setInscricaoEstadual(rs.getString("inscricao_estadual"));
+                cliente.setEmail(rs.getString("cliente_email"));
+                cliente.setTelefone(rs.getString("cliente_telefone"));
+                Timestamp criadoEm = rs.getTimestamp("cliente_criado_em");
+                if (criadoEm != null) {
+                    cliente.setCriadoEm(criadoEm.toLocalDateTime());
+                }
+                cliente.setAtivo(rs.getBoolean("cliente_ativo"));
             } catch (SQLException ignored) {
                 // Algumas consultas nao trazem a razao social.
             }

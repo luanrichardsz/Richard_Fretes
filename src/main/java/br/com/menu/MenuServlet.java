@@ -39,6 +39,8 @@ public class MenuServlet extends HttpServlet {
             req.setAttribute("veiculos", veiculoDAO.listarTodos());
             req.setAttribute("clientes", clienteDAO.listarTodos());
         } else if (usuario.getClienteId() != null) {
+            usuario.setCliente(clienteDAO.buscarPorId(usuario.getClienteId()));
+            session.setAttribute("usuarioAutenticado", usuario);
             req.setAttribute("fretes", freteDAO.listarPorCliente(usuario.getClienteId()));
             req.setAttribute("motoristas", motoristaDAO.listarPorCliente(usuario.getClienteId()));
             req.setAttribute("veiculos", veiculoDAO.listarPorCliente(usuario.getClienteId()));

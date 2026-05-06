@@ -1,13 +1,57 @@
-    document.addEventListener("mousemove", function (event) {
-        var summary = document.querySelector(".dashboard-summary");
 
-        if (!summary) {
-            return;
+    const track = document.getElementById('slidesTrack');
+    const slides = document.querySelectorAll('.insight-slide');
+    const dotsContainer = document.getElementById('slideDots');
+    const prevButton = document.getElementById('prevSlide');
+    const nextButton = document.getElementById('nextSlide');
+
+    let currentSlide = 0;
+
+    function createDots() {
+        slides.forEach(function (_, index) {
+            const dot = document.createElement('button');
+            dot.type = 'button';
+            dot.className = index === 0 ? 'dot active' : 'dot';
+
+            dot.addEventListener('click', function () {
+                goToSlide(index);
+            });
+
+            dotsContainer.appendChild(dot);
+        });
+    }
+
+    function updateDots() {
+        const dots = document.querySelectorAll('.dot');
+
+        dots.forEach(function (dot, index) {
+            dot.classList.toggle('active', index === currentSlide);
+        });
+    }
+
+    function goToSlide(index) {
+        if (index < 0) {
+            currentSlide = slides.length - 1;
+        } else if (index >= slides.length) {
+            currentSlide = 0;
+        } else {
+            currentSlide = index;
         }
 
-        var x = (window.innerWidth / 2 - event.clientX) / 70;
-        var y = (window.innerHeight / 2 - event.clientY) / 70;
+        track.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+        updateDots();
+    }
 
-        summary.style.setProperty("--move-x", x + "px");
-        summary.style.setProperty("--move-y", y + "px");
+    prevButton.addEventListener('click', function () {
+        goToSlide(currentSlide - 1);
     });
+
+    nextButton.addEventListener('click', function () {
+        goToSlide(currentSlide + 1);
+    });
+
+    createDots();
+
+    setInterval(function () {
+        goToSlide(currentSlide + 1);
+    }, 6500);
