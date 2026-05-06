@@ -36,7 +36,9 @@
           ${frete.status}
         </span>
         <a href="fretes"><button type="button" class="btn-neutral">Voltar</button></a>
-        <a href="fretes?acao=editar&id=${frete.id}"><button type="button" class="btn-small">Editar Cadastro</button></a>
+        <c:if test="${frete.status == 'EMITIDO'}">
+          <a href="fretes?acao=editar&id=${frete.id}"><button type="button" class="btn-small">Editar Cadastro</button></a>
+        </c:if>
       </div>
     </div>
   </section>

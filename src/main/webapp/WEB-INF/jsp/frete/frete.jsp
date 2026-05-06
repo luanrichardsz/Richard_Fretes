@@ -86,7 +86,7 @@
                   <a href="fretes?acao=detalhes&id=${f.id}">
                     <button class="btn-small">Detalhes</button>
                   </a>
-                  <c:if test="${f.status != 'ENTREGUE'}">
+                  <c:if test="${f.status == 'EMITIDO'}">
                     <a href="fretes?acao=editar&id=${f.id}">
                       <button class="btn-small">Editar</button>
                     </a>
