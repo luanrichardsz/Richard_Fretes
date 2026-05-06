@@ -11,6 +11,7 @@ import br.com.veiculo.Veiculo;
 import br.com.util.ValidationUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.sql.Connection;
@@ -102,8 +103,30 @@ public class FreteBO {
     }
 
     private void validarEdicaoPermitida(Frete frete) throws FreteException {
-        if (frete.getStatus() == Frete.StatusFrete.ENTREGUE) {
-            throw new FreteException("Não é permitido editar um frete que já foi entregue.");
+        if (frete.getStatus() != Frete.StatusFrete.EMITIDO) {
+            throw new FreteException("Só é permitido editar frete com status EMITIDO.");
+        }
+    }
+
+    public void deletar(Integer freteId) throws FreteException {
+        if (freteId == null || freteId <= 0) {
+            throw new FreteException("Frete inválido.");
+        }
+
+        Frete frete = freteDAO.buscarPorId(freteId);
+        if (frete == null) {
+            throw new FreteException("Frete não encontrado.");
+        }
+
+        validarExclusaoPermitida(frete);
+
+        // A exclusão do frete não altera o status do motorista nem do veículo.
+        freteDAO.deletar(freteId);
+    }
+
+    private void validarExclusaoPermitida(Frete frete) throws FreteException {
+        if (frete.getStatus() != Frete.StatusFrete.EMITIDO) {
+            throw new FreteException("Só é permitido excluir frete com status EMITIDO.");
         }
     }
 
@@ -195,6 +218,7 @@ public class FreteBO {
         validarDecimalPositivo(frete.getDistanciaKm(), "Distância");
         validarDecimalPositivo(frete.getValorFreteBruto(), "Valor do frete bruto");
         validarDecimalNaoNegativo(frete.getValorPedagio(), "Valor do pedágio");
+        calcularValoresTributarios(frete);
         validarDecimalNaoNegativo(frete.getAliquotaIcms(), "Alíquota ICMS");
         validarDecimalNaoNegativo(frete.getValorIcms(), "Valor ICMS");
         frete.setValorTotal(calcularValorTotal(frete));
@@ -228,6 +252,11 @@ public class FreteBO {
             throw new FreteException("Endereço de destino selecionado não foi encontrado.");
         }
 
+        if (enderecoDestino.getClienteId() == null
+                || !enderecoDestino.getClienteId().equals(frete.getDestinatarioId())) {
+            throw new FreteException("O endereço de destino deve pertencer ao destinatário selecionado.");
+        }
+
         String destinoIbge = ValidationUtils.manterSomenteDigitos(enderecoDestino.getCodigoIbge());
         if (destinoIbge.length() != 7) {
             throw new FreteException("O endereço de destino não possui um código IBGE válido.");
@@ -235,6 +264,56 @@ public class FreteBO {
 
         frete.setOrigemIbge(origemIbge);
         frete.setDestinoIbge(destinoIbge);
+    }
+
+    private void calcularValoresTributarios(Frete frete) throws FreteException {
+        Endereco enderecoOrigem = enderecoDAO.buscarPorId(frete.getEnderecoOrigemId());
+        Endereco enderecoDestino = enderecoDAO.buscarPorId(frete.getEnderecoDestinoId());
+
+        if (enderecoOrigem == null || enderecoDestino == null) {
+            throw new FreteException("Não foi possível calcular o ICMS sem os endereços de origem e destino.");
+        }
+
+        BigDecimal aliquotaIcms = calcularAliquotaIcms(enderecoOrigem, enderecoDestino);
+        BigDecimal valorIcms = frete.getValorFreteBruto()
+                .multiply(aliquotaIcms)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+
+        frete.setAliquotaIcms(aliquotaIcms);
+        frete.setValorIcms(valorIcms);
+    }
+
+    private BigDecimal calcularAliquotaIcms(Endereco enderecoOrigem, Endereco enderecoDestino) {
+        String ufOrigem = normalizarTexto(enderecoOrigem.getUf());
+        String ufDestino = normalizarTexto(enderecoDestino.getUf());
+        String municipioOrigem = normalizarTexto(enderecoOrigem.getMunicipio());
+        String municipioDestino = normalizarTexto(enderecoDestino.getMunicipio());
+
+        if (ufOrigem.equals(ufDestino) && municipioOrigem.equals(municipioDestino)) {
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
+
+        if (!ufOrigem.equals(ufDestino)
+                && pertenceAoGrupo(ufOrigem, "SP", "RJ", "MG", "PR", "SC", "RS")
+                && pertenceAoGrupo(ufDestino, "AC", "AL", "AM", "AP", "BA", "CE", "DF", "ES", "GO", "MA",
+                        "MT", "MS", "PA", "PB", "PE", "PI", "RN", "RO", "RR", "SE", "TO")) {
+            return BigDecimal.valueOf(7).setScale(2, RoundingMode.HALF_UP);
+        }
+
+        return BigDecimal.valueOf(12).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private boolean pertenceAoGrupo(String uf, String... ufs) {
+        for (String item : ufs) {
+            if (item.equals(uf)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String normalizarTexto(String valor) {
+        return valor == null ? "" : valor.trim().toUpperCase();
     }
 
     private void validarMotoristaDisponivelParaFrete(
@@ -385,7 +464,8 @@ public class FreteBO {
     private BigDecimal calcularValorTotal(Frete frete) {
         return frete.getValorFreteBruto()
                 .add(frete.getValorPedagio())
-                .add(frete.getValorIcms());
+                .add(frete.getValorIcms())
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     private void validarIdPositivo(Integer valor, String campo) throws FreteException {

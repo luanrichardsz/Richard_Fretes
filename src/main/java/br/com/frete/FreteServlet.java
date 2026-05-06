@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,31 +115,31 @@ public class FreteServlet extends HttpServlet {
             frete.setNumeroFrete(req.getParameter("numeroFrete"));
             frete.setStatus(StatusFrete.EMITIDO);
         }
-        if (usuarioLogado.isAdmin()) {
-            frete.setRemetenteId(Integer.parseInt(req.getParameter("remetenteId")));
-        } else {
-            frete.setRemetenteId(usuarioLogado.getClienteId());
-        }
-        frete.setDestinatarioId(Integer.parseInt(req.getParameter("destinatarioId")));
-        frete.setEnderecoOrigemId(Integer.parseInt(req.getParameter("enderecoOrigemId")));
-        frete.setEnderecoDestinoId(Integer.parseInt(req.getParameter("enderecoDestinoId")));
-        frete.setMotoristaId(Integer.parseInt(req.getParameter("motoristaId")));
-        frete.setVeiculoId(Integer.parseInt(req.getParameter("veiculoId")));
-        frete.setChaveNfe(req.getParameter("chaveNfe"));
-        frete.setOrigemIbge(req.getParameter("origemIbge"));
-        frete.setDestinoIbge(req.getParameter("destinoIbge"));
-        frete.setNaturezaCarga(req.getParameter("naturezaCarga"));
-        frete.setPesoBruto(new BigDecimal(req.getParameter("pesoBruto")));
-        frete.setVolumes(Integer.parseInt(req.getParameter("volumes")));
-        frete.setValorFreteBruto(new BigDecimal(req.getParameter("valorFreteBruto")));
-        frete.setValorPedagio(parseBigDecimalOuZero(req.getParameter("valorPedagio")));
-        frete.setAliquotaIcms(parseBigDecimalOuZero(req.getParameter("aliquotaIcms")));
-        frete.setValorIcms(parseBigDecimalOuZero(req.getParameter("valorIcms")));
-        frete.setValorTotal(parseBigDecimalOuZero(req.getParameter("valorTotal")));
-        frete.setPrevisaoEntrega(LocalDate.parse(req.getParameter("previsaoEntrega")));
-        frete.setDistanciaKm(new BigDecimal(req.getParameter("distanciaKm")));
-
         try {
+            if (usuarioLogado.isAdmin()) {
+                frete.setRemetenteId(Integer.parseInt(req.getParameter("remetenteId")));
+            } else {
+                frete.setRemetenteId(usuarioLogado.getClienteId());
+            }
+            frete.setDestinatarioId(Integer.parseInt(req.getParameter("destinatarioId")));
+            frete.setEnderecoOrigemId(Integer.parseInt(req.getParameter("enderecoOrigemId")));
+            frete.setEnderecoDestinoId(Integer.parseInt(req.getParameter("enderecoDestinoId")));
+            frete.setMotoristaId(Integer.parseInt(req.getParameter("motoristaId")));
+            frete.setVeiculoId(Integer.parseInt(req.getParameter("veiculoId")));
+            frete.setChaveNfe(req.getParameter("chaveNfe"));
+            frete.setOrigemIbge(req.getParameter("origemIbge"));
+            frete.setDestinoIbge(req.getParameter("destinoIbge"));
+            frete.setNaturezaCarga(req.getParameter("naturezaCarga"));
+            frete.setPesoBruto(new BigDecimal(req.getParameter("pesoBruto")));
+            frete.setVolumes(Integer.parseInt(req.getParameter("volumes")));
+            frete.setValorFreteBruto(new BigDecimal(req.getParameter("valorFreteBruto")));
+            frete.setValorPedagio(parseBigDecimalOuZero(req.getParameter("valorPedagio")));
+            frete.setAliquotaIcms(parseBigDecimalOuZero(req.getParameter("aliquotaIcms")));
+            frete.setValorIcms(parseBigDecimalOuZero(req.getParameter("valorIcms")));
+            frete.setValorTotal(parseBigDecimalOuZero(req.getParameter("valorTotal")));
+            frete.setPrevisaoEntrega(parsePrevisaoEntrega(req.getParameter("previsaoEntrega")));
+            frete.setDistanciaKm(new BigDecimal(req.getParameter("distanciaKm")));
+
             if (!isEdicao) {
                 frete.setDataEmissao(LocalDateTime.now());
                 freteBO.salvar(frete);
@@ -156,11 +157,18 @@ public class FreteServlet extends HttpServlet {
             }
             req.setAttribute("erro", e.getMessage());
             carregarFormulario(req, resp, usuarioLogado, frete);
+        } catch (DateTimeParseException e) {
+            req.setAttribute("erro", "Informe uma data válida para a previsão de entrega no formato AAAA-MM-DD.");
+            carregarFormulario(req, resp, usuarioLogado, frete);
         }
     }
 
     public void delete(Integer id) {
-        freteDAO.deletar(id);
+        try {
+            freteBO.deletar(id);
+        } catch (FreteException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
     }
 
     private void processarNovo(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado)
@@ -202,9 +210,19 @@ public class FreteServlet extends HttpServlet {
     private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             Integer freteId = obterIdFrete(req);
-            freteDAO.deletar(freteId);
+            Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+            Frete frete = buscarFreteOuLancarErro(freteId);
+
+            if (!usuarioPodeAcessarFrete(usuarioLogado, frete)) {
+                resp.sendRedirect("fretes");
+                return;
+            }
+
+            freteBO.deletar(freteId);
         } catch (NumberFormatException e) {
             req.getSession().setAttribute("erro", "Id do frete inválido.");
+        } catch (FreteException e) {
+            req.getSession().setAttribute("erro", e.getMessage());
         }
         resp.sendRedirect("fretes");
     }
@@ -247,6 +265,14 @@ public class FreteServlet extends HttpServlet {
         return valor == null || valor.trim().isEmpty() ? BigDecimal.ZERO : new BigDecimal(valor);
     }
 
+    private LocalDate parsePrevisaoEntrega(String valor) {
+        if (ValidationUtils.estaVazio(valor) || !valor.trim().matches("^\\d{4}-\\d{2}-\\d{2}$")) {
+            throw new DateTimeParseException("Formato de data inválido.", valor, 0);
+        }
+
+        return LocalDate.parse(valor.trim());
+    }
+
     private void carregarFormulario(HttpServletRequest req, HttpServletResponse resp, Usuario usuarioLogado, Frete frete)
             throws ServletException, IOException {
         if (!usuarioLogado.isAdmin() && usuarioLogado.getClienteId() != null) {
@@ -262,15 +288,18 @@ public class FreteServlet extends HttpServlet {
         req.setAttribute("clientes", clienteDAO.listarTodos());
 
         if (usuarioLogado.isAdmin()) {
-            req.setAttribute("enderecos", enderecoDAO.listarTodos());
+            req.setAttribute("enderecosOrigem", enderecoDAO.listarTodos());
+            req.setAttribute("enderecosDestino", enderecoDAO.listarTodos());
             req.setAttribute("motoristas", motoristaDAO.listarTodos());
             req.setAttribute("veiculos", veiculoDAO.listarTodos());
         } else if (usuarioLogado.getClienteId() != null) {
-            req.setAttribute("enderecos", enderecoDAO.listarPorCliente(usuarioLogado.getClienteId()));
+            req.setAttribute("enderecosOrigem", enderecoDAO.listarPorCliente(usuarioLogado.getClienteId()));
+            req.setAttribute("enderecosDestino", enderecoDAO.listarTodos());
             req.setAttribute("motoristas", motoristaDAO.listarPorCliente(usuarioLogado.getClienteId()));
             req.setAttribute("veiculos", veiculoDAO.listarPorCliente(usuarioLogado.getClienteId()));
         } else {
-            req.setAttribute("enderecos", new ArrayList<Endereco>());
+            req.setAttribute("enderecosOrigem", new ArrayList<Endereco>());
+            req.setAttribute("enderecosDestino", new ArrayList<Endereco>());
             req.setAttribute("motoristas", new ArrayList<Motorista>());
             req.setAttribute("veiculos", new ArrayList<Veiculo>());
         }
