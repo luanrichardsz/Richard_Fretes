@@ -5,109 +5,242 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${not empty cliente.id ? 'Editar Cliente' : 'Novo Cliente'}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
-<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>${not empty cliente.id ? 'Editar Cliente' : 'Novo Cliente'}</title>
 
-<style>
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-.full {
-  grid-column: span 2;
-}
-</style>
+    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
+    <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
 <header class="top-header">
-    <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
+    <a href="menu" class="logo-btn" title="Voltar ao menu">
+        <i class="fas fa-home"></i>
+    </a>
 </header>
 
-<div class="container">
+<main class="container">
 
-  <section class="card">
-    <h2>${not empty cliente.id ? 'Editar Cliente' : 'Novo Cliente'}</h2>
+    <div class="page-heading">
+        <div>
+            <span>Cadastro de cliente</span>
 
-    <c:if test="${not empty erro}">
-      <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
-        ${erro}
-      </div>
-    </c:if>
+            <h1>
+                ${not empty cliente.id ? 'Editar Cliente' : 'Novo Cliente'}
+            </h1>
 
-    <form action="clientes" method="post">
-      <c:if test="${not empty cliente.id}">
-        <input type="hidden" name="id" value="${cliente.id}" />
-      </c:if>
-
-      <div class="form-grid">
-
-        <div class="form-group full">
-          <label>Razão Social *</label>
-          <input type="text" name="razaoSocial" value="${cliente.razaoSocial}" required />
+            <p>
+                Preencha os dados comerciais, fiscais e de contato da empresa que será vinculada às operações de frete.
+            </p>
         </div>
+    </div>
 
-        <div class="form-group full">
-          <label>Nome Fantasia</label>
-          <input type="text" name="nomeFantasia" value="${cliente.nomeFantasia}" />
-        </div>
+    <section class="card">
 
-        <div class="form-group">
-          <label>CNPJ *</label>
-          <input type="text" id="documento" name="documento" maxlength="18" inputmode="numeric" value="${cliente.documento}" required />
-        </div>
+        <c:if test="${not empty erro}">
+            <div class="alert alert-error">
+                <i class="fas fa-circle-exclamation"></i>
+                ${erro}
+            </div>
+        </c:if>
 
-        <div class="form-group">
-          <label>Inscrição Estadual (Sem Pontuação)</label>
-          <input type="text" name="inscricaoEstadual" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="14" inputmode="numeric" value="${cliente.inscricaoEstadual}" />
-        </div>
+        <form action="clientes" method="post">
 
-        <div class="form-group">
-          <label>Email *</label>
-          <input type="email" name="email" value="${cliente.email}" required />
-        </div>
+            <c:if test="${not empty cliente.id}">
+                <input type="hidden" name="id" value="${cliente.id}" />
+            </c:if>
 
-        <div class="form-group">
-          <label>Telefone *</label>
-          <input type="text" id="telefone" name="telefone" minlength="15" maxlength="15" inputmode="numeric" value="${cliente.telefone}" required />
-        </div>
+            <div class="form-section">
 
-        <div class="form-group full">
-          <label>Usuário Responsável *</label>
-          <select name="usuarioId" required>
-            <option value="0">Selecione um usuário</option>
-            <c:forEach var="u" items="${usuarios}">
-              <option value="${u.id}" ${not empty cliente.id and not empty u.clienteId and u.clienteId eq cliente.id ? 'selected' : ''}>
-                ${u.usuario} (${u.email})
-              </option>
-            </c:forEach>
-          </select>
-        </div>
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
 
-      </div>
+                    <div>
+                        <h3>Identificação da empresa</h3>
+                        <p>Dados principais usados para reconhecer o cliente no sistema.</p>
+                    </div>
+                </div>
 
-      <div style="margin-top:20px;">
-        <button type="submit" class="btn-primary">${not empty cliente.id ? 'Atualizar Cliente' : 'Salvar Cliente'}</button>
-        <a href="clientes" class="btn-small">Cancelar</a>
-      </div>
+                <div class="form-grid">
 
-    </form>
-  </section>
+                    <div class="form-group full">
+                        <label>Razão Social <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            name="razaoSocial"
+                            value="${cliente.razaoSocial}"
+                            placeholder="Ex: Richard Transportes LTDA"
+                            required
+                        />
+                    </div>
 
-</div>
+                    <div class="form-group full">
+                        <label>Nome Fantasia</label>
+                        <input
+                            type="text"
+                            name="nomeFantasia"
+                            value="${cliente.nomeFantasia}"
+                            placeholder="Ex: Richard Fretes"
+                        />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-section">
+
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+
+                    <div>
+                        <h3>Dados fiscais</h3>
+                        <p>Informações usadas para identificação fiscal e emissão de documentos.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>CNPJ <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="documento"
+                            name="documento"
+                            maxlength="18"
+                            inputmode="numeric"
+                            value="${cliente.documento}"
+                            placeholder="00.000.000/0000-00"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Inscrição Estadual</label>
+                        <input
+                            type="text"
+                            name="inscricaoEstadual"
+                            pattern="[0-9]*"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            maxlength="14"
+                            inputmode="numeric"
+                            value="${cliente.inscricaoEstadual}"
+                            placeholder="Somente números"
+                        />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-section">
+
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-address-book"></i>
+                    </div>
+
+                    <div>
+                        <h3>Contato</h3>
+                        <p>Dados de comunicação com o cliente responsável pela operação.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Email <span class="required">*</span></label>
+                        <input
+                            type="email"
+                            name="email"
+                            value="${cliente.email}"
+                            placeholder="empresa@email.com"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Telefone <span class="required">*</span></label>
+                        <input
+                            type="text"
+                            id="telefone"
+                            name="telefone"
+                            minlength="14"
+                            maxlength="15"
+                            inputmode="numeric"
+                            value="${cliente.telefone}"
+                            placeholder="(81) 99999-9999"
+                            required
+                        />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-section">
+
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+
+                    <div>
+                        <h3>Usuário responsável</h3>
+                        <p>Selecione o usuário que ficará vinculado a este cliente.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group full">
+                        <label>Usuário Responsável <span class="required">*</span></label>
+
+                        <select name="usuarioId" required>
+                            <option value="0">Selecione um usuário</option>
+
+                            <c:forEach var="u" items="${usuarios}">
+                                <option
+                                    value="${u.id}"
+                                    ${not empty cliente.id and not empty u.clienteId and u.clienteId eq cliente.id ? 'selected' : ''}
+                                >
+                                    ${u.usuario} (${u.email})
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a href="clientes" class="btn-small">
+                    <i class="fas fa-arrow-left"></i>
+                    Cancelar
+                </a>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    ${not empty cliente.id ? 'Atualizar Cliente' : 'Salvar Cliente'}
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
 
 <script src="/RichardFretes/js/funcoesCadastroC.js"></script>
 
