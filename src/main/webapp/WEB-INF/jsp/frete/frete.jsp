@@ -45,11 +45,19 @@
         </select>
       </div>
 
-      <a href="fretes?acao=novo">
-        <button class="btn-primary">
-          + Novo Frete
-        </button>
-      </a>
+      <div style="display: flex; gap: 10px;">
+        <a href="relatorios/fretes-abertos" target="_blank" rel="noopener noreferrer">
+          <button class="btn-primary" type="button">
+            Imprimir Relatorio
+          </button>
+        </a>
+
+        <a href="fretes?acao=novo">
+          <button class="btn-primary" type="button">
+            + Novo Frete
+          </button>
+        </a>
+      </div>
     </div>
   </section>
 

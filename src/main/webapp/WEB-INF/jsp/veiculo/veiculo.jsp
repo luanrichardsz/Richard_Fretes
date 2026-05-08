@@ -181,10 +181,11 @@
                                         <div class="entity-avatar">
                                             <i class="fas fa-truck"></i>
                                         </div>
-
+                                        <span>
+                                            Placa
                                         <div class="entity-info">
-                                            <strong class="mask-placa">${v.placa}</strong>
-
+                                                <strong class="mask-placa">${v.placa}</strong>
+                                        </span>
                                             <span>
                                                 RENAVAM
                                                 <c:choose>

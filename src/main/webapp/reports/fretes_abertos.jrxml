@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport
+    xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="fretes_abertos"
+    language="java"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="43e58d9f-b45f-4f42-96f7-d039f1b1d55d">
+
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+
+    <parameter name="CLIENTE_ID" class="java.lang.Integer"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT
+    frete."id" AS frete_id,
+    frete."numero_frete" AS frete_numero_frete,
+
+    remetente."razao_social" AS remetente_razao_social,
+    destinatario."razao_social" AS destinatario_razao_social,
+
+    motorista."nome_completo" AS motorista_nome,
+    veiculo."placa" AS veiculo_placa,
+
+    frete."natureza_carga" AS frete_natureza_carga,
+    frete."valor_total" AS frete_valor_total,
+    frete."status" AS frete_status,
+    frete."data_emissao" AS frete_data_emissao,
+    frete."previsao_entrega" AS frete_previsao_entrega
+
+FROM
+    public."frete" frete
+
+INNER JOIN public."cliente" remetente
+    ON remetente."id" = frete."remetente_id"
+
+INNER JOIN public."cliente" destinatario
+    ON destinatario."id" = frete."destinatario_id"
+
+INNER JOIN public."motorista" motorista
+    ON motorista."id" = frete."motorista_id"
+
+INNER JOIN public."veiculo" veiculo
+    ON veiculo."id" = frete."veiculo_id"
+
+WHERE
+    frete."status" NOT IN ('ENTREGUE', 'CANCELADO')
+    AND (
+        $P{CLIENTE_ID} IS NULL
+        OR frete."remetente_id" = $P{CLIENTE_ID}
+        OR frete."destinatario_id" = $P{CLIENTE_ID}
+    )
+
+ORDER BY
+    frete."data_emissao" DESC
+        ]]>
+    </queryString>
+
+    <field name="frete_id" class="java.lang.Integer"/>
+    <field name="frete_numero_frete" class="java.lang.String"/>
+    <field name="remetente_razao_social" class="java.lang.String"/>
+    <field name="destinatario_razao_social" class="java.lang.String"/>
+    <field name="motorista_nome" class="java.lang.String"/>
+    <field name="veiculo_placa" class="java.lang.String"/>
+    <field name="frete_natureza_carga" class="java.lang.String"/>
+    <field name="frete_valor_total" class="java.math.BigDecimal"/>
+    <field name="frete_status" class="java.lang.String"/>
+    <field name="frete_data_emissao" class="java.sql.Timestamp"/>
+    <field name="frete_previsao_entrega" class="java.sql.Date"/>
+
+    <variable name="total_valor_frete" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{frete_valor_total}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+
+    <title>
+    <band height="0"/>
+</title>
+
+<pageHeader>
+    <band height="70" splitType="Stretch">
+
+        <rectangle>
+            <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="20000000-0000-0000-0000-000000000001"/>
+            <graphicElement>
+                <pen lineWidth="0"/>
+            </graphicElement>
+        </rectangle>
+
+        <staticText>
+            <reportElement x="18" y="7" width="500" height="24" forecolor="#FFFFFF" uuid="20000000-0000-0000-0000-000000000002"/>
+            <textElement verticalAlignment="Middle">
+                <font size="18" isBold="true"/>
+            </textElement>
+            <text><![CDATA[Relatório de Fretes em Aberto]]></text>
+        </staticText>
+
+        <staticText>
+            <reportElement x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="20000000-0000-0000-0000-000000000003"/>
+            <textElement verticalAlignment="Middle">
+                <font size="8"/>
+            </textElement>
+            <text><![CDATA[Fretes com status diferente de ENTREGUE e CANCELADO]]></text>
+        </staticText>
+
+        <staticText>
+            <reportElement x="605" y="10" width="75" height="13" forecolor="#DDEEF6" uuid="20000000-0000-0000-0000-000000000004"/>
+            <textElement textAlignment="Right" verticalAlignment="Middle">
+                <font size="8" isBold="true"/>
+            </textElement>
+            <text><![CDATA[Gerado em:]]></text>
+        </staticText>
+
+        <textField pattern="dd/MM/yyyy HH:mm">
+            <reportElement x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="20000000-0000-0000-0000-000000000005"/>
+            <textElement verticalAlignment="Middle">
+                <font size="8"/>
+            </textElement>
+            <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+        </textField>
+
+        <line>
+            <reportElement x="0" y="58" width="802" height="1" forecolor="#0B4F71" uuid="20000000-0000-0000-0000-000000000006"/>
+        </line>
+
+    </band>
+</pageHeader>
+
+    <columnHeader>
+        <band height="26" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="24" backcolor="#E9EEF2" uuid="10000000-0000-0000-0000-000000000006"/>
+                <graphicElement>
+                    <pen lineWidth="0.3" lineColor="#B8C4CC"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="5" y="5" width="70" height="13" uuid="10000000-0000-0000-0000-000000000007"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Nº Frete]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="80" y="5" width="155" height="13" uuid="10000000-0000-0000-0000-000000000008"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Remetente]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="240" y="5" width="155" height="13" uuid="10000000-0000-0000-0000-000000000009"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Destinatário]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="400" y="5" width="105" height="13" uuid="10000000-0000-0000-0000-000000000010"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Motorista]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="510" y="5" width="55" height="13" uuid="10000000-0000-0000-0000-000000000011"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Placa]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="570" y="5" width="85" height="13" uuid="10000000-0000-0000-0000-000000000012"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="660" y="5" width="55" height="13" uuid="10000000-0000-0000-0000-000000000013"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Emissão]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="720" y="5" width="78" height="13" uuid="10000000-0000-0000-0000-000000000014"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Valor Total]]></text>
+            </staticText>
+
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="24" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="23" backcolor="#F7F9FB" uuid="10000000-0000-0000-0000-000000000015">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT}.intValue() % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="5" y="5" width="70" height="12" uuid="10000000-0000-0000-0000-000000000016"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{frete_numero_frete}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="80" y="5" width="155" height="12" uuid="10000000-0000-0000-0000-000000000017"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{remetente_razao_social} == null ? "" :
+($F{remetente_razao_social}.length() > 32 ? $F{remetente_razao_social}.substring(0, 32) + "..." : $F{remetente_razao_social})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="240" y="5" width="155" height="12" uuid="10000000-0000-0000-0000-000000000018"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{destinatario_razao_social} == null ? "" :
+($F{destinatario_razao_social}.length() > 32 ? $F{destinatario_razao_social}.substring(0, 32) + "..." : $F{destinatario_razao_social})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="400" y="5" width="105" height="12" uuid="10000000-0000-0000-0000-000000000019"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{motorista_nome} == null ? "" :
+($F{motorista_nome}.length() > 22 ? $F{motorista_nome}.substring(0, 22) + "..." : $F{motorista_nome})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="510" y="5" width="55" height="12" uuid="10000000-0000-0000-0000-000000000020"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{veiculo_placa}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement mode="Opaque" x="570" y="4" width="85" height="14" backcolor="#EEF4F8" uuid="10000000-0000-0000-0000-000000000021"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[String.valueOf($F{frete_status})]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="dd/MM/yyyy" isStretchWithOverflow="false">
+                <reportElement x="660" y="5" width="55" height="12" uuid="10000000-0000-0000-0000-000000000022"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{frete_data_emissao}]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="R$ #,##0.00" isStretchWithOverflow="false">
+                <reportElement x="720" y="5" width="78" height="12" uuid="10000000-0000-0000-0000-000000000023"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{frete_valor_total}]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="0" y="23" width="802" height="1" forecolor="#D9E0E5" uuid="10000000-0000-0000-0000-000000000024"/>
+            </line>
+
+        </band>
+    </detail>
+
+    <columnFooter>
+        <band height="32" splitType="Stretch">
+
+            <line>
+                <reportElement x="0" y="3" width="802" height="1" forecolor="#9EADB7" uuid="10000000-0000-0000-0000-000000000025"/>
+            </line>
+
+            <staticText>
+                <reportElement x="560" y="10" width="155" height="16" uuid="10000000-0000-0000-0000-000000000026"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total dos fretes em aberto:]]></text>
+            </staticText>
+
+            <textField pattern="R$ #,##0.00">
+                <reportElement x="720" y="10" width="78" height="16" uuid="10000000-0000-0000-0000-000000000027"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="9" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_valor_frete}]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </columnFooter>
+
+    <pageFooter>
+        <band height="24" splitType="Stretch">
+
+            <line>
+                <reportElement x="0" y="0" width="802" height="1" forecolor="#D9E0E5" uuid="10000000-0000-0000-0000-000000000028"/>
+            </line>
+
+            <staticText>
+                <reportElement x="0" y="6" width="200" height="12" uuid="10000000-0000-0000-0000-000000000029"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <text><![CDATA[Richard Fretes]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="650" y="6" width="100" height="12" uuid="10000000-0000-0000-0000-000000000030"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Página " + $V{PAGE_NUMBER} + " de"]]></textFieldExpression>
+            </textField>
+
+            <textField evaluationTime="Report">
+                <reportElement x="750" y="6" width="52" height="12" uuid="10000000-0000-0000-0000-000000000031"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="0"/>
+    </summary>
+
+</jasperReport>
