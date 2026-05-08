@@ -475,7 +475,449 @@ select option {
     border: 1px solid rgba(239, 68, 68, 0.28);
 }
 
-/* Responsivo */
+/* Consulta profissional */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.summary-card {
+    min-height: 110px;
+    padding: 18px;
+    border-radius: 22px;
+    background:
+        radial-gradient(circle at top right, rgba(47, 124, 255, 0.12), transparent 35%),
+        rgba(15, 23, 42, 0.78);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-dark);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.summary-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    background: var(--royal-soft);
+    border: 1px solid var(--royal-border);
+    color: var(--royal-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.summary-icon.green-icon {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.28);
+    color: #86efac;
+}
+
+.summary-icon.red-icon {
+    background: rgba(239, 68, 68, 0.12);
+    border-color: rgba(239, 68, 68, 0.28);
+    color: #fecaca;
+}
+
+.summary-card span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 6px;
+}
+
+.summary-card strong {
+    display: block;
+    color: var(--text);
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+/* Toolbar de consulta */
+
+.toolbar-card {
+    padding: 18px;
+}
+
+.filter-field {
+    position: relative;
+    min-width: 360px;
+    flex: 1;
+}
+
+.filter-field i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.filter-field input {
+    padding-left: 42px;
+}
+
+.toolbar-row .filters {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toolbar-row .filters select {
+    max-width: 220px;
+}
+
+/* Cabeçalho da tabela */
+
+.table-card {
+    overflow-x: auto;
+}
+
+.table-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.table-header h2 {
+    margin-bottom: 0;
+    font-size: 1.35rem;
+}
+
+.professional-table {
+    min-width: 920px;
+    border-spacing: 0;
+}
+
+.professional-table thead th:first-child {
+    border-top-left-radius: 16px;
+}
+
+.professional-table thead th:last-child {
+    border-top-right-radius: 16px;
+}
+
+.professional-table th {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.professional-table td {
+    vertical-align: middle;
+    padding-top: 16px;
+    padding-bottom: 16px;
+}
+
+.actions-column {
+    width: 190px;
+}
+
+/* Célula de entidade */
+
+.entity-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+}
+
+.entity-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 16px;
+    background: var(--royal-soft);
+    border: 1px solid var(--royal-border);
+    color: var(--royal-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.entity-info {
+    min-width: 0;
+}
+
+.entity-info strong {
+    display: block;
+    color: var(--text);
+    font-size: 0.92rem;
+    font-weight: 900;
+    line-height: 1.25;
+}
+
+.entity-info span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dados empilhados */
+
+.stacked-info small {
+    display: block;
+    color: var(--muted);
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 5px;
+}
+
+.stacked-info strong {
+    display: block;
+    color: var(--text-soft);
+    font-size: 0.86rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* Contato */
+
+.contact-cell {
+    display: grid;
+    gap: 7px;
+}
+
+.contact-cell div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.contact-cell i {
+    width: 15px;
+    color: var(--royal-light);
+    font-size: 0.78rem;
+}
+
+.contact-cell span {
+    max-width: 260px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Status */
+
+.status-badge {
+    gap: 6px;
+}
+
+.status-badge i {
+    font-size: 0.72rem;
+}
+
+/* Ações da tabela */
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.table-actions .btn-small {
+    min-height: 36px;
+    padding: 0 11px;
+}
+
+/* Estado vazio */
+
+.empty-state {
+    padding: 42px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empty-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 22px;
+    background: var(--royal-soft);
+    border: 1px solid var(--royal-border);
+    color: var(--royal-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.45rem;
+    margin-bottom: 16px;
+}
+
+.empty-state h3 {
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 900;
+    margin-bottom: 6px;
+}
+
+.empty-state p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.field-hint {
+    display: block;
+    min-height: 18px;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.field-hint.success {
+    color: #86efac;
+}
+
+.field-hint.error {
+    color: #fecaca;
+}
+
+.muted-line {
+    display: block;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-top: 5px;
+    white-space: nowrap;
+}
+
+.reference-preview {
+    max-width: 230px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-soft);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.reference-preview i {
+    color: var(--royal-light);
+    flex-shrink: 0;
+}
+
+.reference-preview span {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.check-card {
+    cursor: pointer;
+    min-height: 72px;
+    padding: 14px 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: var(--transition);
+}
+
+.check-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--royal-border);
+}
+
+.check-card input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    min-height: 20px;
+    accent-color: var(--royal-light);
+    flex-shrink: 0;
+}
+
+.check-card span {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.check-card strong {
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 900;
+}
+
+.check-card small {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+/* Complementos para consulta de veículos */
+
+.orange {
+    background: rgba(251, 146, 60, 0.16);
+    color: #fed7aa;
+    border: 1px solid rgba(251, 146, 60, 0.32);
+}
+
+.status-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+}
+
+.status-stack .badge {
+    width: fit-content;
+}
+/* Responsivo da consulta */
+
+@media (max-width: 900px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .page-heading .btn-primary {
+        width: 100%;
+    }
+
+    .filter-field {
+        min-width: 100%;
+    }
+
+    .toolbar-row .filters select {
+        max-width: none;
+    }
+}
 
 @media (max-width: 760px) {
     .top-header {
@@ -528,5 +970,21 @@ select option {
 
     .card.table-card {
         overflow-x: auto;
+    }
+
+        .summary-card {
+        min-height: auto;
+    }
+
+    .professional-table {
+        min-width: 860px;
+    }
+
+    .reference-preview {
+        max-width: 180px;
+    }
+
+    .status-stack {
+        min-width: 170px;
     }
 }

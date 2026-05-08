@@ -1,109 +1,360 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Veículos</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
-<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Veículos</title>
 
+    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
+    <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
 <header class="top-header">
-    <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
+    <a href="menu" class="logo-btn" title="Voltar ao menu">
+        <i class="fas fa-home"></i>
+    </a>
 </header>
 
-<div class="container">
+<main class="container">
 
-  <c:if test="${not empty erro}">
-    <section class="card">
-      <div style="padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
-        ${erro}
-      </div>
-    </section>
-  </c:if>
+    <div class="page-heading">
+        <div>
+            <span>Gestão de frota</span>
+            <h1>Veículos</h1>
+            <p>
+                Consulte, cadastre e acompanhe os veículos disponíveis para as operações de transporte.
+            </p>
+        </div>
 
-  <section class="card toolbar">
-    <div class="toolbar-row">
-      <div class="filters">
-        <input type="text" placeholder="Buscar por placa" />
-
-        <select>
-          <option>Todos os status</option>
-          <option>DISPONIVEL</option>
-          <option>EM_VIAGEM</option>
-          <option>EM_MANUTENCAO</option>
-          <option>INATIVO</option>
-        </select>
-      </div>
-
-      <a href="veiculos?acao=novo">
-        <button class="btn-primary">
-          + Novo Veículo
-        </button>
-      </a>
+        <a href="veiculos?acao=novo" class="btn-primary">
+            <i class="fas fa-plus"></i>
+            Novo Veículo
+        </a>
     </div>
-  </section>
 
-  <section class="card">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Placa</th>
-          <th>Tipo</th>
-          <th>Ano</th>
-          <th>Combustível</th>
-          <th>Capacidade (kg)</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
+    <c:if test="${not empty erro}">
+        <section class="card">
+            <div class="alert alert-error">
+                <i class="fas fa-circle-exclamation"></i>
+                ${erro}
+            </div>
+        </section>
+    </c:if>
 
-      <tbody>
-        <c:choose>
-          <c:when test="${not empty veiculos}">
-            <c:forEach items="${veiculos}" var="v">
-              <tr>
-                <td><strong>${v.placa}</strong></td>
-                <td>${v.tipo}</td>
-                <td>${v.anoModelo}</td>
-                <td>${v.combustivel}</td>
-                <td>${v.capacidadeCargaKg} kg</td>
-                <td>
-                  <span class="badge ${v.status == 'DISPONIVEL' ? 'green' : v.status == 'EM_VIAGEM' ? 'blue' : v.status == 'EM_MANUTENCAO' ? 'orange' : 'gray'}">
-                    ${v.status}
-                  </span>
-                </td>
-                <td>
-                  <a href="veiculos?acao=editar&id=${v.id}">
-                    <button class="btn-small">Editar</button>
-                  </a>
-                  <a href="veiculos?acao=deletar&id=${v.id}" onclick="return confirm('Tem certeza?')">
-                    <button class="btn-small btn-danger">Deletar</button>
-                  </a>
-                </td>
-              </tr>
-            </c:forEach>
-          </c:when>
-          <c:otherwise>
-            <tr>
-              <td colspan="7" style="text-align: center; padding: 20px;">
-                Nenhum veículo cadastrado
-              </td>
-            </tr>
-          </c:otherwise>
-        </c:choose>
-      </tbody>
-    </table>
-  </section>
+    <section class="summary-grid">
 
-</div>
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-truck-moving"></i>
+            </div>
+
+            <div>
+                <span>Total de veículos</span>
+                <strong>${empty veiculos ? 0 : veiculos.size()}</strong>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon green-icon">
+                <i class="fas fa-circle-check"></i>
+            </div>
+
+            <div>
+                <span>Disponíveis</span>
+                <strong id="totalDisponiveis">0</strong>
+            </div>
+        </div>
+
+        <div class="summary-card">
+            <div class="summary-icon red-icon">
+                <i class="fas fa-screwdriver-wrench"></i>
+            </div>
+
+            <div>
+                <span>Manutenção</span>
+                <strong id="totalManutencao">0</strong>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="card toolbar-card">
+
+        <div class="toolbar-row">
+            <div class="filters">
+
+                <div class="filter-field">
+                    <i class="fas fa-search"></i>
+                    <input
+                        type="text"
+                        id="buscaVeiculo"
+                        placeholder="Buscar por placa, tipo, combustível ou motorista"
+                    />
+                </div>
+
+                <select id="filtroStatus">
+                    <option value="">Todos os status</option>
+                    <option value="DISPONIVEL">Disponível</option>
+                    <option value="EM_VIAGEM">Em viagem</option>
+                    <option value="EM_MANUTENCAO">Em manutenção</option>
+                    <option value="INATIVO">Inativo</option>
+                </select>
+
+            </div>
+        </div>
+
+    </section>
+
+    <section class="card table-card">
+
+        <div class="table-header">
+            <div>
+                <span class="section-label">Registros</span>
+                <h2>Veículos cadastrados</h2>
+            </div>
+        </div>
+
+        <table class="data-table professional-table">
+            <thead>
+                <tr>
+                    <c:if test="${sessionScope.usuarioAutenticado.admin}">
+                        <th>Cliente</th>
+                    </c:if>
+
+                    <th>Veículo</th>
+                    <th>Características</th>
+                    <th>Capacidade</th>
+                    <th>Operação</th>
+                    <th>Status</th>
+                    <th class="actions-column">Ações</th>
+                </tr>
+            </thead>
+
+            <tbody id="veiculosTableBody">
+
+                <c:choose>
+                    <c:when test="${not empty veiculos}">
+
+                        <c:forEach items="${veiculos}" var="v">
+                            <tr
+                                class="veiculo-row"
+                                data-status="${v.status}"
+                                data-manutencao="${v.manutencaoPendente ? 'sim' : 'nao'}"
+                                data-search="${v.placa} ${v.tipo} ${v.tipoOutros} ${v.combustivel} ${v.anoModelo} ${v.status} ${v.motoristaId} ${v.clienteId}"
+                            >
+
+                                <c:if test="${sessionScope.usuarioAutenticado.admin}">
+                                    <td>
+                                        <div class="entity-cell">
+                                            <div class="entity-avatar">
+                                                <i class="fas fa-building"></i>
+                                            </div>
+
+                                            <div class="entity-info">
+                                                <strong>
+                                                    <c:choose>
+                                                        <c:when test="${not empty v.clienteId}">
+                                                            Cliente #${v.clienteId}
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            Sem cliente
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </strong>
+                                                <span>Empresa vinculada</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </c:if>
+
+                                <td>
+                                    <div class="entity-cell">
+                                        <div class="entity-avatar">
+                                            <i class="fas fa-truck"></i>
+                                        </div>
+
+                                        <div class="entity-info">
+                                            <strong class="mask-placa">${v.placa}</strong>
+
+                                            <span>
+                                                RENAVAM
+                                                <c:choose>
+                                                    <c:when test="${not empty v.renavam}">
+                                                        ${v.renavam}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        não informado
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="stacked-info">
+                                        <small>Tipo / Ano</small>
+                                        <strong>
+                                            <c:choose>
+                                                <c:when test="${not empty v.tipo}">
+                                                    ${v.tipo}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Não informado
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </strong>
+
+                                        <span class="muted-line">
+                                            ${v.anoFabricacao} / ${v.anoModelo}
+                                            <c:if test="${not empty v.combustivel}">
+                                                • ${v.combustivel}
+                                            </c:if>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="stacked-info">
+                                        <small>Carga máxima</small>
+                                        <strong>
+                                            <span class="mask-kg">${v.capacidadeCargaKg}</span> kg
+                                        </strong>
+
+                                        <span class="muted-line">
+                                            Tara:
+                                            <c:choose>
+                                                <c:when test="${not empty v.taraKg}">
+                                                    <span class="mask-kg">${v.taraKg}</span> kg
+                                                </c:when>
+                                                <c:otherwise>
+                                                    não informada
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="stacked-info">
+                                        <small>Motorista</small>
+
+                                        <strong>
+                                            <c:choose>
+                                                <c:when test="${not empty v.motoristaId}">
+                                                    Motorista #${v.motoristaId}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Sem motorista
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </strong>
+
+                                        <span class="muted-line">
+                                            Seguro:
+                                            <c:choose>
+                                                <c:when test="${not empty v.seguroValidade}">
+                                                    ${v.seguroValidade}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    não informado
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="status-stack">
+
+                                        <span class="badge status-badge ${v.status == 'DISPONIVEL' ? 'green' : v.status == 'EM_VIAGEM' ? 'blue' : v.status == 'EM_MANUTENCAO' ? 'orange' : 'gray'}">
+                                            <i class="fas ${v.status == 'DISPONIVEL' ? 'fa-circle-check' : v.status == 'EM_VIAGEM' ? 'fa-route' : v.status == 'EM_MANUTENCAO' ? 'fa-screwdriver-wrench' : 'fa-circle-minus'}"></i>
+                                            ${v.status}
+                                        </span>
+
+                                        <c:if test="${v.manutencaoPendente}">
+                                            <span class="badge red status-badge">
+                                                <i class="fas fa-triangle-exclamation"></i>
+                                                Manutenção pendente
+                                            </span>
+                                        </c:if>
+
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <div class="table-actions">
+
+                                        <a href="veiculos?acao=editar&id=${v.id}" class="btn-small" title="Editar veículo">
+                                            <i class="fas fa-pen"></i>
+                                            Editar
+                                        </a>
+
+                                        <a
+                                            href="veiculos?acao=deletar&id=${v.id}"
+                                            class="btn-small danger"
+                                            title="Excluir veículo"
+                                            onclick="return confirm('Tem certeza que deseja excluir este veículo?');"
+                                        >
+                                            <i class="fas fa-trash"></i>
+                                            Excluir
+                                        </a>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </c:forEach>
+
+                    </c:when>
+
+                    <c:otherwise>
+                        <tr>
+                            <td colspan="${sessionScope.usuarioAutenticado.admin ? 7 : 6}">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="fas fa-truck-moving"></i>
+                                    </div>
+
+                                    <h3>Nenhum veículo cadastrado</h3>
+                                    <p>Cadastre o primeiro veículo para iniciar o controle da frota.</p>
+
+                                    <a href="veiculos?acao=novo" class="btn-primary">
+                                        <i class="fas fa-plus"></i>
+                                        Novo Veículo
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    </c:otherwise>
+                </c:choose>
+
+            </tbody>
+        </table>
+
+        <div class="empty-state hidden" id="emptyFilterState">
+            <div class="empty-icon">
+                <i class="fas fa-magnifying-glass"></i>
+            </div>
+
+            <h3>Nenhum resultado para sua busca</h3>
+            <p>Tente pesquisar por outra placa, tipo, combustível, motorista ou status.</p>
+        </div>
+
+    </section>
+
+</main>
+
+<script src="/RichardFretes/js/funcoesVeiculo.js"></script>
 
 </body>
 </html>

@@ -5,196 +5,403 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>${not empty veiculo.id ? 'Editar Veículo' : 'Novo Veículo'}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-<link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
-<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>${not empty veiculo.id ? 'Editar Veículo' : 'Novo Veículo'}</title>
 
-<style>
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-}
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-.full {
-  grid-column: span 3;
-}
-.section-title {
-  grid-column: span 3;
-  font-weight: bold;
-  margin-top: 15px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-}
-</style>
+    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
+    <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
 
 <header class="top-header">
-    <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
+    <a href="menu" class="logo-btn" title="Voltar ao menu">
+        <i class="fas fa-home"></i>
+    </a>
 </header>
 
-<div class="container">
+<main class="container">
 
-  <section class="card">
-    <h2>${not empty veiculo.id ? 'Editar Veículo' : 'Novo Veículo'}</h2>
+    <div class="page-heading">
+        <div>
+            <span>Cadastro de veículo</span>
 
-    <c:if test="${not empty erro}">
-      <div style="margin-bottom: 15px; padding: 12px; border-radius: 8px; background: #fdecea; color: #b42318; border: 1px solid #f5c2c7;">
-        ${erro}
-      </div>
-    </c:if>
+            <h1>
+                ${not empty veiculo.id ? 'Editar Veículo' : 'Novo Veículo'}
+            </h1>
 
-    <form action="veiculos" method="post">
-      <c:if test="${not empty veiculo.id}">
-        <input type="hidden" name="id" value="${veiculo.id}" />
-      </c:if>
-
-      <div class="form-grid">
-
-        <div class="section-title">Identificação</div>
-
-        <div class="form-group">
-          <label>Placa *</label>
-          <input type="text" id="placa" name="placa" value="${veiculo.placa}" required maxlength="8" />
+            <p>
+                Cadastre os veículos da frota, controle documentação, capacidade de carga, motorista vinculado e situação operacional.
+            </p>
         </div>
+    </div>
 
-        <div class="form-group">
-          <label>RENAVAM *</label>
-          <input type="text" id="renavam" name="renavam" maxlength="11" inputmode="numeric" value="${veiculo.renavam}" required />
-        </div>
+    <section class="card">
 
-        <div class="form-group">
-          <label>RNTRC</label>
-          <input type="text" id="rntrc" name="rntrc" maxlength="8" inputmode="numeric" value="${veiculo.rntrc}" />
-        </div>
-
-        <c:if test="${sessionScope.usuarioAutenticado.admin}">
-          <div class="form-group">
-            <label>Empresa Selecionada *</label>
-            <select name="clienteId" required>
-              <option value="">Selecione uma empresa</option>
-              <c:forEach var="cliente" items="${clientes}">
-                <option value="${cliente.id}" ${not empty veiculo.clienteId and veiculo.clienteId eq cliente.id ? 'selected' : ''}>
-                  ${cliente.razaoSocial}
-                </option>
-              </c:forEach>
-            </select>
-          </div>
+        <c:if test="${not empty erro}">
+            <div class="alert alert-error">
+                <i class="fas fa-circle-exclamation"></i>
+                ${erro}
+            </div>
         </c:if>
 
-        <div class="section-title">Características do Veículo</div>
+        <form action="veiculos" method="post">
 
-        <div class="form-group">
-          <label>Ano Fabricação *</label>
-          <input type="number" name="anoFabricacao" maxlength="4" value="${veiculo.anoFabricacao}" required />
-        </div>
+            <c:if test="${not empty veiculo.id}">
+                <input type="hidden" name="id" value="${veiculo.id}" />
+            </c:if>
 
-        <div class="form-group">
-          <label>Ano Modelo *</label>
-          <input type="number" name="anoModelo" maxlength="4" value="${veiculo.anoModelo}" required />
-        </div>
+            <c:if test="${sessionScope.usuarioAutenticado.admin}">
+                <div class="form-section">
 
-        <div class="form-group">
-          <label>Combustível *</label>
-          <select name="combustivel" required>
-            <option value="">Selecione</option>
-            <option value="Diesel" ${veiculo.combustivel eq 'Diesel' ? 'selected' : ''}>Diesel</option>
-            <option value="Gasolina" ${veiculo.combustivel eq 'Gasolina' ? 'selected' : ''}>Gasolina</option>
-            <option value="Etanol" ${veiculo.combustivel eq 'Etanol' ? 'selected' : ''}>Etanol</option>
-            <option value="GNV" ${veiculo.combustivel eq 'GNV' ? 'selected' : ''}>GNV</option>
-          </select>
-        </div>
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
 
-        <div class="form-group">
-          <label>Tipo *</label>
-          <input type="text" name="tipo" value="${veiculo.tipo}" required />
-        </div>
+                        <div>
+                            <h3>Vínculo do veículo</h3>
+                            <p>Selecione a empresa responsável por este veículo.</p>
+                        </div>
+                    </div>
 
-        <div class="form-group">
-          <label>Tipo Outros</label>
-          <input type="text" name="tipoOutros" value="${veiculo.tipoOutros}" />
-        </div>
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label>Empresa Selecionada <span class="required">*</span></label>
 
-        <div class="form-group">
-          <label>Quantidade Eixos *</label>
-          <input type="number" name="quantidadeEixos" value="${veiculo.quantidadeEixos}" required />
-        </div>
+                            <select name="clienteId" required>
+                                <option value="">Selecione uma empresa</option>
 
-        <div class="section-title">Capacidade e Peso</div>
+                                <c:forEach var="cliente" items="${clientes}">
+                                    <option
+                                        value="${cliente.id}"
+                                        ${not empty veiculo.clienteId and veiculo.clienteId eq cliente.id ? 'selected' : ''}
+                                    >
+                                        ${cliente.razaoSocial}
+                                    </option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                    </div>
 
-        <div class="form-group">
-          <label>Tara (kg) *</label>
-          <input type="number" name="taraKg" value="${veiculo.taraKg}" required />
-        </div>
+                </div>
+            </c:if>
 
-        <div class="form-group">
-          <label>Capacidade Carga (kg) *</label>
-          <input type="number" name="capacidadeCargaKg" value="${veiculo.capacidadeCargaKg}" required />
-        </div>
+            <div class="form-section">
 
-        <div class="form-group">
-          <label>Volume (m³)</label>
-          <input type="number" name="volumeM3" value="${veiculo.volumeM3}" />
-        </div>
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
 
-        <div class="section-title">Informações Operacionais</div>
+                    <div>
+                        <h3>Identificação</h3>
+                        <p>Dados oficiais de identificação e registro do veículo.</p>
+                    </div>
+                </div>
 
-        <div class="form-group">
-          <label>Status *</label>
-          <select name="status" required>
-            <option value="">Selecione</option>
-            <c:forEach var="status" items="${statusVeiculoOptions}">
-              <option value="${status}" ${veiculo.status eq status ? 'selected' : ''}>${status}</option>
-            </c:forEach>
-          </select>
-        </div>
+                <div class="form-grid">
 
-        <div class="form-group">
-          <label>Motorista</label>
-          <select name="motoristaId">
-            <option value="">Selecione um motorista</option>
-            <c:forEach var="motorista" items="${motoristas}">
-              <option value="${motorista.id}" ${not empty veiculo.motoristaId and veiculo.motoristaId eq motorista.id ? 'selected' : ''}>
-                ${motorista.nomeCompleto}
-              </option>
-            </c:forEach>
-          </select>
-        </div>
+                    <div class="form-group">
+                        <label>Placa <span class="required">*</span></label>
 
-        <div class="form-group">
-          <label>Seguro Validade</label>
-          <input type="date" name="seguroValidade" value="${veiculo.seguroValidade}" />
-        </div>
+                        <input
+                            type="text"
+                            id="placa"
+                            name="placa"
+                            value="${veiculo.placa}"
+                            maxlength="8"
+                            placeholder="ABC1D23"
+                            required
+                        />
+                    </div>
 
-        <div class="form-group">
-          <label>
-            <input type="checkbox" name="manutencaoPendente" value="true" ${veiculo.manutencaoPendente ? 'checked' : ''} />
-            Manutenção Pendente
-          </label>
-        </div>
+                    <div class="form-group">
+                        <label>RENAVAM <span class="required">*</span></label>
 
-      </div>
+                        <input
+                            type="text"
+                            id="renavam"
+                            name="renavam"
+                            maxlength="11"
+                            inputmode="numeric"
+                            value="${veiculo.renavam}"
+                            placeholder="Somente números"
+                            required
+                        />
+                    </div>
 
-      <div style="margin-top: 20px; display: flex; gap: 10px;">
-        <button type="submit" class="btn-primary">Salvar</button>
-        <a href="veiculos"><button type="button" class="btn-secondary">Cancelar</button></a>
-      </div>
+                    <div class="form-group">
+                        <label>RNTRC</label>
 
-    </form>
+                        <input
+                            type="text"
+                            id="rntrc"
+                            name="rntrc"
+                            maxlength="8"
+                            inputmode="numeric"
+                            value="${veiculo.rntrc}"
+                            placeholder="Registro ANTT"
+                        />
+                    </div>
 
-  </section>
+                </div>
 
-</div>
+            </div>
+
+            <div class="form-section">
+
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-truck-moving"></i>
+                    </div>
+
+                    <div>
+                        <h3>Características do veículo</h3>
+                        <p>Informações estruturais usadas para classificar a frota.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Ano Fabricação <span class="required">*</span></label>
+
+                        <input
+                            type="number"
+                            name="anoFabricacao"
+                            min="1950"
+                            max="2100"
+                            value="${veiculo.anoFabricacao}"
+                            placeholder="Ex: 2020"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ano Modelo <span class="required">*</span></label>
+
+                        <input
+                            type="number"
+                            name="anoModelo"
+                            min="1950"
+                            max="2100"
+                            value="${veiculo.anoModelo}"
+                            placeholder="Ex: 2021"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Combustível <span class="required">*</span></label>
+
+                        <select name="combustivel" required>
+                            <option value="">Selecione</option>
+                            <option value="Diesel" ${veiculo.combustivel eq 'Diesel' ? 'selected' : ''}>Diesel</option>
+                            <option value="Gasolina" ${veiculo.combustivel eq 'Gasolina' ? 'selected' : ''}>Gasolina</option>
+                            <option value="Etanol" ${veiculo.combustivel eq 'Etanol' ? 'selected' : ''}>Etanol</option>
+                            <option value="GNV" ${veiculo.combustivel eq 'GNV' ? 'selected' : ''}>GNV</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo <span class="required">*</span></label>
+
+                        <input
+                            type="text"
+                            name="tipo"
+                            value="${veiculo.tipo}"
+                            placeholder="Ex: Caminhão, Carreta, Van..."
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tipo Outros</label>
+
+                        <input
+                            type="text"
+                            name="tipoOutros"
+                            value="${veiculo.tipoOutros}"
+                            placeholder="Detalhe o tipo, se necessário"
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Quantidade de Eixos <span class="required">*</span></label>
+
+                        <input
+                            type="number"
+                            name="quantidadeEixos"
+                            min="1"
+                            value="${veiculo.quantidadeEixos}"
+                            placeholder="Ex: 2"
+                            required
+                        />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-section">
+
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-weight-hanging"></i>
+                    </div>
+
+                    <div>
+                        <h3>Capacidade e peso</h3>
+                        <p>Dados usados para cálculo de carga, operação e compatibilidade com fretes.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Tara (kg) <span class="required">*</span></label>
+
+                        <input
+                            type="number"
+                            name="taraKg"
+                            min="0"
+                            step="1"
+                            value="${veiculo.taraKg}"
+                            placeholder="Peso do veículo vazio"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Capacidade de Carga (kg) <span class="required">*</span></label>
+
+                        <input
+                            type="number"
+                            name="capacidadeCargaKg"
+                            min="0"
+                            step="1"
+                            value="${veiculo.capacidadeCargaKg}"
+                            placeholder="Carga máxima permitida"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Volume (m³)</label>
+
+                        <input
+                            type="number"
+                            name="volumeM3"
+                            min="0"
+                            step="0.01"
+                            value="${veiculo.volumeM3}"
+                            placeholder="Ex: 45.50"
+                        />
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-section">
+
+                <div class="form-section-header">
+                    <div class="form-section-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+
+                    <div>
+                        <h3>Informações operacionais</h3>
+                        <p>Controle de disponibilidade, seguro, motorista e pendências do veículo.</p>
+                    </div>
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Status <span class="required">*</span></label>
+
+                        <select name="status" required>
+                            <option value="">Selecione</option>
+
+                            <c:forEach var="status" items="${statusVeiculoOptions}">
+                                <option value="${status}" ${veiculo.status eq status ? 'selected' : ''}>
+                                    ${status}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Motorista</label>
+
+                        <select name="motoristaId">
+                            <option value="">Selecione um motorista</option>
+
+                            <c:forEach var="motorista" items="${motoristas}">
+                                <option
+                                    value="${motorista.id}"
+                                    ${not empty veiculo.motoristaId and veiculo.motoristaId eq motorista.id ? 'selected' : ''}
+                                >
+                                    ${motorista.nomeCompleto}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Seguro Validade</label>
+
+                        <input
+                            type="date"
+                            name="seguroValidade"
+                            value="${veiculo.seguroValidade}"
+                        />
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="check-card">
+                            <input
+                                type="checkbox"
+                                name="manutencaoPendente"
+                                value="true"
+                                ${veiculo.manutencaoPendente ? 'checked' : ''}
+                            />
+
+                            <span>
+                                <strong>Manutenção pendente</strong>
+                                <small>Marque esta opção caso o veículo não esteja liberado para operação.</small>
+                            </span>
+                        </label>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <a href="veiculos" class="btn-small">
+                    <i class="fas fa-arrow-left"></i>
+                    Cancelar
+                </a>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i>
+                    ${not empty veiculo.id ? 'Atualizar Veículo' : 'Salvar Veículo'}
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</main>
 
 <script src="/RichardFretes/js/funcoesCadastroV.js"></script>
 
