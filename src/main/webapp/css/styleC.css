@@ -899,6 +899,69 @@ select option {
 .status-stack .badge {
     width: fit-content;
 }
+
+.veiculo-page .container {
+    max-width: 1320px;
+}
+
+.veiculo-page .table-card {
+    overflow-x: hidden;
+}
+
+.veiculo-page .professional-table {
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+}
+
+.veiculo-page .professional-table th,
+.veiculo-page .professional-table td {
+    overflow-wrap: anywhere;
+}
+
+.veiculo-page .vehicle-main-cell .entity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.veiculo-page .vehicle-main-cell .entity-label {
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.veiculo-page .vehicle-main-cell .entity-info span,
+.veiculo-page .stacked-info strong,
+.veiculo-page .muted-line,
+.veiculo-page .status-badge {
+    white-space: normal;
+}
+
+.veiculo-page .status-column {
+    width: 13%;
+}
+
+.veiculo-page .actions-column {
+    width: 10%;
+}
+
+.veiculo-page .status-stack,
+.veiculo-page .table-actions {
+    width: 100%;
+}
+
+.veiculo-page .table-actions {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.veiculo-page .table-actions .btn-small {
+    width: 100%;
+}
+
 /* Responsivo da consulta */
 
 @media (max-width: 900px) {
@@ -916,6 +979,24 @@ select option {
 
     .toolbar-row .filters select {
         max-width: none;
+    }
+
+    .veiculo-page .table-card {
+        overflow-x: auto;
+    }
+
+    .veiculo-page .professional-table {
+        min-width: 900px;
+        table-layout: auto;
+    }
+
+    .veiculo-page .table-actions {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .veiculo-page .table-actions .btn-small {
+        width: auto;
     }
 }
 

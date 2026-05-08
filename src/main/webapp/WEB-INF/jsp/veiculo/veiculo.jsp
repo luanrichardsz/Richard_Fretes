@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
-<body>
+<body class="veiculo-page">
 
 <header class="top-header">
     <a href="menu" class="logo-btn" title="Voltar" onclick="if (window.history.length > 1) { window.history.back(); return false; }">
@@ -127,6 +127,30 @@
         </div>
 
         <table class="data-table professional-table">
+            <c:choose>
+                <c:when test="${sessionScope.usuarioAutenticado.admin}">
+                    <colgroup>
+                        <col style="width: 18%;">
+                        <col style="width: 18%;">
+                        <col style="width: 15%;">
+                        <col style="width: 11%;">
+                        <col style="width: 15%;">
+                        <col style="width: 13%;">
+                        <col style="width: 10%;">
+                    </colgroup>
+                </c:when>
+                <c:otherwise>
+                    <colgroup>
+                        <col style="width: 24%;">
+                        <col style="width: 18%;">
+                        <col style="width: 14%;">
+                        <col style="width: 18%;">
+                        <col style="width: 14%;">
+                        <col style="width: 12%;">
+                    </colgroup>
+                </c:otherwise>
+            </c:choose>
+
             <thead>
                 <tr>
                     <c:if test="${sessionScope.usuarioAutenticado.admin}">
@@ -137,7 +161,7 @@
                     <th>Características</th>
                     <th>Capacidade</th>
                     <th>Operação</th>
-                    <th>Status</th>
+                    <th class="status-column">Status</th>
                     <th class="actions-column">Ações</th>
                 </tr>
             </thead>
@@ -179,16 +203,14 @@
                                     </td>
                                 </c:if>
 
-                                <td>
+                                <td class="vehicle-main-cell">
                                     <div class="entity-cell">
                                         <div class="entity-avatar">
                                             <i class="fas fa-truck"></i>
                                         </div>
-                                        <span>
-                                            Placa
                                         <div class="entity-info">
-                                                <strong class="mask-placa">${v.placa}</strong>
-                                        </span>
+                                            <span class="entity-label">Placa</span>
+                                            <strong class="mask-placa">${v.placa}</strong>
                                             <span>
                                                 RENAVAM
                                                 <c:choose>
@@ -277,7 +299,7 @@
                                     </div>
                                 </td>
 
-                                <td>
+                                <td class="status-column">
                                     <div class="status-stack">
 
                                         <span class="badge status-badge ${v.status == 'DISPONIVEL' ? 'green' : v.status == 'EM_VIAGEM' ? 'blue' : v.status == 'EM_MANUTENCAO' ? 'orange' : 'gray'}">
@@ -295,7 +317,7 @@
                                     </div>
                                 </td>
 
-                                <td>
+                                <td class="actions-column">
                                     <div class="table-actions">
 
                                         <a href="veiculos?acao=editar&id=${v.id}" class="btn-small" title="Editar veículo">

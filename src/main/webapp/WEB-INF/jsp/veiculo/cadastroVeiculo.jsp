@@ -302,9 +302,9 @@
                             type="number"
                             name="volumeM3"
                             min="0"
-                            step="0.01"
+                            step="1"
                             value="${veiculo.volumeM3}"
-                            placeholder="Ex: 45.50"
+                            placeholder="Ex: 45"
                         />
                     </div>
 
