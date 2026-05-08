@@ -53,12 +53,28 @@ public class MotoristaBO {
             throw new CadastroException("Motorista inválido.");
         }
 
+        Motorista motoristaAtual = null;
+        if (emEdicao) {
+            if (motorista.getId() == null || motorista.getId() <= 0) {
+                throw new CadastroException("Motorista inválido.");
+            }
+
+            motoristaAtual = motoristaDAO.buscarPorId(motorista.getId());
+            if (motoristaAtual == null) {
+                throw new CadastroException("Motorista não encontrado.");
+            }
+        }
+
         if (ValidationUtils.estaVazio(motorista.getNomeCompleto())) {
             throw new CadastroException("Nome completo é obrigatório.");
         }
 
         String cpfLimpo = ValidationUtils.manterSomenteDigitos(motorista.getCpf());
-        if (!ValidationUtils.cpfValido(cpfLimpo)) {
+        boolean cpfLegadoMantido = emEdicao
+            && motoristaAtual != null
+            && cpfLimpo.equals(ValidationUtils.manterSomenteDigitos(motoristaAtual.getCpf()));
+
+        if (!ValidationUtils.cpfValido(cpfLimpo) && !cpfLegadoMantido) {
             throw new CadastroException("CPF inválido.");
         }
 

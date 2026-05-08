@@ -49,6 +49,18 @@ public class ClienteBO {
             throw new CadastroException("Cliente inválido.");
         }
 
+        Cliente clienteAtual = null;
+        if (emEdicao) {
+            if (cliente.getId() == null || cliente.getId() <= 0) {
+                throw new CadastroException("Cliente inválido.");
+            }
+
+            clienteAtual = clienteDAO.buscarPorId(cliente.getId());
+            if (clienteAtual == null) {
+                throw new CadastroException("Cliente não encontrado.");
+            }
+        }
+
         if (ValidationUtils.estaVazio(cliente.getRazaoSocial())) {
             throw new CadastroException("Razão social é obrigatória.");
         }
@@ -58,7 +70,11 @@ public class ClienteBO {
         }
 
         String documentoLimpo = ValidationUtils.manterSomenteDigitos(cliente.getDocumento());
-        if (!ValidationUtils.cnpjValido(documentoLimpo)) {
+        boolean documentoLegadoMantido = emEdicao
+            && clienteAtual != null
+            && documentoLimpo.equals(ValidationUtils.manterSomenteDigitos(clienteAtual.getDocumento()));
+
+        if (!ValidationUtils.cnpjValido(documentoLimpo) && !documentoLegadoMantido) {
             throw new CadastroException("CNPJ inválido.");
         }
 
