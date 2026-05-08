@@ -56,26 +56,26 @@ public class ClienteServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
-        if (isEdicao) {
-            cliente.setId(obterIdCliente(req));
-        }
-
-        cliente.setRazaoSocial(req.getParameter("razaoSocial"));
-        cliente.setNomeFantasia(req.getParameter("nomeFantasia"));
-        cliente.setDocumento(req.getParameter("documento"));
-        cliente.setInscricaoEstadual(req.getParameter("inscricaoEstadual"));
-        cliente.setEmail(req.getParameter("email"));
-        cliente.setTelefone(req.getParameter("telefone"));
-        cliente.setAtivo(true);
-
-        String usuarioIdParam = req.getParameter("usuarioId");
-        Integer usuarioId = null;
-        
-        if (usuarioIdParam != null && !usuarioIdParam.isEmpty() && !usuarioIdParam.equals("0")) {
-            usuarioId = Integer.parseInt(usuarioIdParam);
-        }
-
         try {
+            if (isEdicao) {
+                cliente.setId(obterIdCliente(req));
+            }
+
+            cliente.setRazaoSocial(req.getParameter("razaoSocial"));
+            cliente.setNomeFantasia(req.getParameter("nomeFantasia"));
+            cliente.setDocumento(req.getParameter("documento"));
+            cliente.setInscricaoEstadual(req.getParameter("inscricaoEstadual"));
+            cliente.setEmail(req.getParameter("email"));
+            cliente.setTelefone(req.getParameter("telefone"));
+            cliente.setAtivo(true);
+
+            String usuarioIdParam = req.getParameter("usuarioId");
+            Integer usuarioId = null;
+
+            if (usuarioIdParam != null && !usuarioIdParam.isEmpty() && !usuarioIdParam.equals("0")) {
+                usuarioId = Integer.parseInt(usuarioIdParam);
+            }
+
             if (isEdicao) {
                 Cliente clienteAntigo = clienteDAO.buscarPorId(cliente.getId());
                 if (clienteAntigo != null) {
@@ -105,6 +105,9 @@ public class ClienteServlet extends HttpServlet {
             resp.sendRedirect("clientes");
         } catch (CadastroException e) {
             req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, cliente, isEdicao);
+        } catch (RuntimeException e) {
+            req.setAttribute("erro", "Revise os dados do cliente e tente novamente.");
             carregarFormulario(req, resp, cliente, isEdicao);
         }
     }

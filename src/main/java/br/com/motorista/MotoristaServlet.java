@@ -72,42 +72,42 @@ public class MotoristaServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
-        if (isEdicao) {
-            motorista.setId(obterIdMotorista(req));
-        }
-
-        motorista.setNomeCompleto(req.getParameter("nomeCompleto"));
-        motorista.setRg(req.getParameter("rg"));
-        motorista.setCpf(req.getParameter("cpf"));
-        motorista.setDataNascimento(LocalDate.parse(req.getParameter("dataNascimento")));
-        motorista.setTelefone(req.getParameter("telefone"));
-        motorista.setNomeEmergencia(req.getParameter("nomeEmergencia"));
-        motorista.setTelefoneEmergencia(req.getParameter("telefoneEmergencia"));
-        motorista.setParentescoEmergencia(req.getParameter("parentescoEmergencia"));
-        motorista.setNumeroCnh(req.getParameter("numeroCnh"));
-        motorista.setCategoriaCnh(CategoriaCnh.valueOf(req.getParameter("categoriaCnh")));
-        motorista.setValidadeCnh(LocalDate.parse(req.getParameter("validadeCnh")));
-
-        String validadeToxParam = req.getParameter("validadeToxicologico");
-        if (validadeToxParam != null && !validadeToxParam.isEmpty()) {
-            motorista.setValidadeToxicologico(LocalDate.parse(validadeToxParam));
-        }
-
-        motorista.setTipoVinculo(TipoVinculo.valueOf(req.getParameter("tipoVinculo")));
-        motorista.setChavePix(req.getParameter("chavePix"));
-        motorista.setTipoPix(TipoPix.valueOf(req.getParameter("tipoPix")));
-        motorista.setStatus(StatusMotorista.valueOf(req.getParameter("status")));
-
-        if (usuarioLogado.isAdmin()) {
-            String cliIdParam = req.getParameter("clienteId");
-            if (cliIdParam != null && !cliIdParam.isEmpty()) {
-                motorista.setClienteId(Integer.parseInt(cliIdParam));
-            }
-        } else {
-            motorista.setClienteId(usuarioLogado.getClienteId());
-        }
-
         try {
+            if (isEdicao) {
+                motorista.setId(obterIdMotorista(req));
+            }
+
+            motorista.setNomeCompleto(req.getParameter("nomeCompleto"));
+            motorista.setRg(req.getParameter("rg"));
+            motorista.setCpf(req.getParameter("cpf"));
+            motorista.setDataNascimento(LocalDate.parse(req.getParameter("dataNascimento")));
+            motorista.setTelefone(req.getParameter("telefone"));
+            motorista.setNomeEmergencia(req.getParameter("nomeEmergencia"));
+            motorista.setTelefoneEmergencia(req.getParameter("telefoneEmergencia"));
+            motorista.setParentescoEmergencia(req.getParameter("parentescoEmergencia"));
+            motorista.setNumeroCnh(req.getParameter("numeroCnh"));
+            motorista.setCategoriaCnh(CategoriaCnh.valueOf(req.getParameter("categoriaCnh")));
+            motorista.setValidadeCnh(LocalDate.parse(req.getParameter("validadeCnh")));
+
+            String validadeToxParam = req.getParameter("validadeToxicologico");
+            if (validadeToxParam != null && !validadeToxParam.isEmpty()) {
+                motorista.setValidadeToxicologico(LocalDate.parse(validadeToxParam));
+            }
+
+            motorista.setTipoVinculo(TipoVinculo.valueOf(req.getParameter("tipoVinculo")));
+            motorista.setChavePix(req.getParameter("chavePix"));
+            motorista.setTipoPix(TipoPix.valueOf(req.getParameter("tipoPix")));
+            motorista.setStatus(StatusMotorista.valueOf(req.getParameter("status")));
+
+            if (usuarioLogado.isAdmin()) {
+                String cliIdParam = req.getParameter("clienteId");
+                if (cliIdParam != null && !cliIdParam.isEmpty()) {
+                    motorista.setClienteId(Integer.parseInt(cliIdParam));
+                }
+            } else {
+                motorista.setClienteId(usuarioLogado.getClienteId());
+            }
+
             if (!isEdicao) {
                 motorista.setAdicionadoEm(LocalDateTime.now());
                 motoristaBO.salvar(motorista);
@@ -118,6 +118,9 @@ public class MotoristaServlet extends HttpServlet {
             resp.sendRedirect("motoristas");
         } catch (CadastroException e) {
             req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, motorista);
+        } catch (RuntimeException e) {
+            req.setAttribute("erro", "Revise os dados do motorista. Verifique datas, seleções e campos numéricos.");
             carregarFormulario(req, resp, usuarioLogado, motorista);
         }
     }

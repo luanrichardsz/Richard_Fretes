@@ -69,34 +69,33 @@ public class EnderecoServlet extends HttpServlet {
 
         Endereco endereco = new Endereco();
 
-        // Verificar se é uma atualização (edição) ou novo endereço
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
-        if (isEdicao) {
-            endereco.setId(obterIdEndereco(req));
-        }
-
-        if (usuarioLogado.isAdmin()) {
-            String clienteIdParam = req.getParameter("clienteId");
-            if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
-                endereco.setClienteId(Integer.parseInt(clienteIdParam));
-            }
-        } else {
-            endereco.setClienteId(usuarioLogado.getClienteId());
-        }
-
-        endereco.setCep(req.getParameter("cep"));
-        endereco.setLogradouro(req.getParameter("logradouro"));
-        endereco.setNumero(req.getParameter("numero"));
-        endereco.setComplemento(req.getParameter("complemento"));
-        endereco.setBairro(req.getParameter("bairro"));
-        endereco.setMunicipio(req.getParameter("municipio"));
-        endereco.setCodigoIbge(req.getParameter("codigoIbge"));
-        endereco.setUf(req.getParameter("uf"));
-        endereco.setPontoReferencia(req.getParameter("pontoReferencia"));
-
         try {
+            if (isEdicao) {
+                endereco.setId(obterIdEndereco(req));
+            }
+
+            if (usuarioLogado.isAdmin()) {
+                String clienteIdParam = req.getParameter("clienteId");
+                if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
+                    endereco.setClienteId(Integer.parseInt(clienteIdParam));
+                }
+            } else {
+                endereco.setClienteId(usuarioLogado.getClienteId());
+            }
+
+            endereco.setCep(req.getParameter("cep"));
+            endereco.setLogradouro(req.getParameter("logradouro"));
+            endereco.setNumero(req.getParameter("numero"));
+            endereco.setComplemento(req.getParameter("complemento"));
+            endereco.setBairro(req.getParameter("bairro"));
+            endereco.setMunicipio(req.getParameter("municipio"));
+            endereco.setCodigoIbge(req.getParameter("codigoIbge"));
+            endereco.setUf(req.getParameter("uf"));
+            endereco.setPontoReferencia(req.getParameter("pontoReferencia"));
+
             if (!isEdicao) {
                 enderecoBO.salvar(endereco);
             } else {
@@ -106,6 +105,9 @@ public class EnderecoServlet extends HttpServlet {
             resp.sendRedirect("enderecos");
         } catch (CadastroException e) {
             req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, endereco);
+        } catch (RuntimeException e) {
+            req.setAttribute("erro", "Revise os dados do endereço e tente novamente.");
             carregarFormulario(req, resp, usuarioLogado, endereco);
         }
     }

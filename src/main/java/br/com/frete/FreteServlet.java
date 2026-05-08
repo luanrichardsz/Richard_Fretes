@@ -101,21 +101,22 @@ public class FreteServlet extends HttpServlet {
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
-        if (isEdicao) {
-            frete.setId(Integer.parseInt(idParam.trim()));
-        }
-
-        if (isEdicao) {
-            Frete freteExistente = freteDAO.buscarPorId(frete.getId());
-            if (freteExistente != null) {
-                frete.setNumeroFrete(freteExistente.getNumeroFrete());
-                frete.setStatus(freteExistente.getStatus());
-            }
-        } else {
-            frete.setNumeroFrete(req.getParameter("numeroFrete"));
-            frete.setStatus(StatusFrete.EMITIDO);
-        }
         try {
+            if (isEdicao) {
+                frete.setId(Integer.parseInt(idParam.trim()));
+            }
+
+            if (isEdicao) {
+                Frete freteExistente = freteDAO.buscarPorId(frete.getId());
+                if (freteExistente != null) {
+                    frete.setNumeroFrete(freteExistente.getNumeroFrete());
+                    frete.setStatus(freteExistente.getStatus());
+                }
+            } else {
+                frete.setNumeroFrete(req.getParameter("numeroFrete"));
+                frete.setStatus(StatusFrete.EMITIDO);
+            }
+
             if (usuarioLogado.isAdmin()) {
                 frete.setRemetenteId(Integer.parseInt(req.getParameter("remetenteId")));
             } else {
@@ -159,6 +160,9 @@ public class FreteServlet extends HttpServlet {
             carregarFormulario(req, resp, usuarioLogado, frete);
         } catch (DateTimeParseException e) {
             req.setAttribute("erro", "Informe uma data válida para a previsão de entrega no formato AAAA-MM-DD.");
+            carregarFormulario(req, resp, usuarioLogado, frete);
+        } catch (RuntimeException e) {
+            req.setAttribute("erro", "Revise os dados do frete. Verifique clientes, endereços, valores e previsão de entrega.");
             carregarFormulario(req, resp, usuarioLogado, frete);
         }
     }

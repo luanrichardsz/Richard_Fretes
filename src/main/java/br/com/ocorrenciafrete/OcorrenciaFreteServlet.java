@@ -68,35 +68,34 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
         OcorrenciaFrete ocorrencia = new OcorrenciaFrete();
 
-        // Verificar se é uma atualização (edição) ou nova ocorrência
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
-        if (isEdicao) {
-            ocorrencia.setId(Integer.parseInt(idParam.trim()));
-        }
-
-        ocorrencia.setFreteId(Integer.parseInt(req.getParameter("freteId")));
-        ocorrencia.setTipo(TipoOcorrencia.valueOf(req.getParameter("tipo")));
-        ocorrencia.setMunicipio(req.getParameter("municipio"));
-        ocorrencia.setUf(req.getParameter("uf"));
-        
-        String latParam = req.getParameter("latitude");
-        if (latParam != null && !latParam.isEmpty()) {
-            ocorrencia.setLatitude(new BigDecimal(latParam));
-        }
-        
-        String longParam = req.getParameter("longitude");
-        if (longParam != null && !longParam.isEmpty()) {
-            ocorrencia.setLongitude(new BigDecimal(longParam));
-        }
-        
-        ocorrencia.setDescricao(req.getParameter("descricao"));
-        ocorrencia.setRecebedorNome(req.getParameter("recebedorNome"));
-        ocorrencia.setRecebedorDocumento(req.getParameter("recebedorDocumento"));
-        ocorrencia.setFotoEvidenciaUrl(req.getParameter("fotoEvidenciaUrl"));
-
         try {
+            if (isEdicao) {
+                ocorrencia.setId(Integer.parseInt(idParam.trim()));
+            }
+
+            ocorrencia.setFreteId(Integer.parseInt(req.getParameter("freteId")));
+            ocorrencia.setTipo(TipoOcorrencia.valueOf(req.getParameter("tipo")));
+            ocorrencia.setMunicipio(req.getParameter("municipio"));
+            ocorrencia.setUf(req.getParameter("uf"));
+
+            String latParam = req.getParameter("latitude");
+            if (latParam != null && !latParam.isEmpty()) {
+                ocorrencia.setLatitude(new BigDecimal(latParam));
+            }
+
+            String longParam = req.getParameter("longitude");
+            if (longParam != null && !longParam.isEmpty()) {
+                ocorrencia.setLongitude(new BigDecimal(longParam));
+            }
+
+            ocorrencia.setDescricao(req.getParameter("descricao"));
+            ocorrencia.setRecebedorNome(req.getParameter("recebedorNome"));
+            ocorrencia.setRecebedorDocumento(req.getParameter("recebedorDocumento"));
+            ocorrencia.setFotoEvidenciaUrl(req.getParameter("fotoEvidenciaUrl"));
+
             if (!isEdicao) {
                 ocorrencia.setDataHora(LocalDateTime.now());
                 ocorrenciaBO.salvar(ocorrencia);
@@ -113,6 +112,12 @@ public class OcorrenciaFreteServlet extends HttpServlet {
             resp.sendRedirect("ocorrencias");
         } catch (FreteException e) {
             req.setAttribute("erro", e.getMessage());
+            req.setAttribute("ocorrencia", ocorrencia);
+            carregarFormulario(req, null, ocorrencia);
+            req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
+            req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
+        } catch (RuntimeException e) {
+            req.setAttribute("erro", "Revise os dados da ocorrência e tente novamente.");
             req.setAttribute("ocorrencia", ocorrencia);
             carregarFormulario(req, null, ocorrencia);
             req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());

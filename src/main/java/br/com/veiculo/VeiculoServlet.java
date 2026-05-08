@@ -73,57 +73,58 @@ public class VeiculoServlet extends HttpServlet {
 
         Veiculo veiculo = new Veiculo();
 
-        // Verificar se é uma atualização (edição) ou novo veículo
         String idParam = req.getParameter("id");
         boolean isEdicao = idParam != null && !idParam.trim().isEmpty() && !"null".equalsIgnoreCase(idParam.trim());
 
-        if (isEdicao) {
-            veiculo.setId(Integer.parseInt(idParam.trim()));
-        }
-
-        veiculo.setPlaca(req.getParameter("placa"));
-        veiculo.setRenavam(req.getParameter("renavam"));
-        veiculo.setRntrc(req.getParameter("rntrc"));
-        veiculo.setAnoFabricacao(Integer.parseInt(req.getParameter("anoFabricacao")));
-        veiculo.setAnoModelo(Integer.parseInt(req.getParameter("anoModelo")));
-        veiculo.setTipo(req.getParameter("tipo"));
-        veiculo.setTipoOutros(req.getParameter("tipoOutros"));
-        veiculo.setQuantidadeEixos(Integer.parseInt(req.getParameter("quantidadeEixos")));
-        veiculo.setCombustivel(req.getParameter("combustivel"));
-        veiculo.setTaraKg(Integer.parseInt(req.getParameter("taraKg")));
-        veiculo.setCapacidadeCargaKg(Integer.parseInt(req.getParameter("capacidadeCargaKg")));
-        String volumeM3Param = req.getParameter("volumeM3");
-        if (volumeM3Param != null && !volumeM3Param.isEmpty()) {
-            veiculo.setVolumeM3(Integer.parseInt(volumeM3Param));
-        } else {
-            veiculo.setVolumeM3(0);
-        }
-        veiculo.setStatus(StatusVeiculo.valueOf(req.getParameter("status")));
-        
-        String motoristaParam = req.getParameter("motoristaId");
-        if (motoristaParam != null && !motoristaParam.isEmpty()) {
-            veiculo.setMotoristaId(Integer.parseInt(motoristaParam));
-        }
-        
-        veiculo.setManutencaoPendente(
-            Boolean.parseBoolean(req.getParameter("manutencaoPendente"))
-        );
-        
-        String seguroParam = req.getParameter("seguroValidade");
-        if (seguroParam != null && !seguroParam.isEmpty()) {
-            veiculo.setSeguroValidade(LocalDate.parse(seguroParam));
-        }
-
-        if (usuarioLogado.isAdmin()) {
-            String clienteIdParam = req.getParameter("clienteId");
-            if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
-                veiculo.setClienteId(Integer.parseInt(clienteIdParam));
-            }
-        } else {
-            veiculo.setClienteId(usuarioLogado.getClienteId());
-        }
-
         try {
+            if (isEdicao) {
+                veiculo.setId(Integer.parseInt(idParam.trim()));
+            }
+
+            veiculo.setPlaca(req.getParameter("placa"));
+            veiculo.setRenavam(req.getParameter("renavam"));
+            veiculo.setRntrc(req.getParameter("rntrc"));
+            veiculo.setAnoFabricacao(Integer.parseInt(req.getParameter("anoFabricacao")));
+            veiculo.setAnoModelo(Integer.parseInt(req.getParameter("anoModelo")));
+            veiculo.setTipo(req.getParameter("tipo"));
+            veiculo.setTipoOutros(req.getParameter("tipoOutros"));
+            veiculo.setQuantidadeEixos(Integer.parseInt(req.getParameter("quantidadeEixos")));
+            veiculo.setCombustivel(req.getParameter("combustivel"));
+            veiculo.setTaraKg(Integer.parseInt(req.getParameter("taraKg")));
+            veiculo.setCapacidadeCargaKg(Integer.parseInt(req.getParameter("capacidadeCargaKg")));
+
+            String volumeM3Param = req.getParameter("volumeM3");
+            if (volumeM3Param != null && !volumeM3Param.isEmpty()) {
+                veiculo.setVolumeM3(Integer.parseInt(volumeM3Param));
+            } else {
+                veiculo.setVolumeM3(0);
+            }
+
+            veiculo.setStatus(StatusVeiculo.valueOf(req.getParameter("status")));
+
+            String motoristaParam = req.getParameter("motoristaId");
+            if (motoristaParam != null && !motoristaParam.isEmpty()) {
+                veiculo.setMotoristaId(Integer.parseInt(motoristaParam));
+            }
+
+            veiculo.setManutencaoPendente(
+                Boolean.parseBoolean(req.getParameter("manutencaoPendente"))
+            );
+
+            String seguroParam = req.getParameter("seguroValidade");
+            if (seguroParam != null && !seguroParam.isEmpty()) {
+                veiculo.setSeguroValidade(LocalDate.parse(seguroParam));
+            }
+
+            if (usuarioLogado.isAdmin()) {
+                String clienteIdParam = req.getParameter("clienteId");
+                if (clienteIdParam != null && !clienteIdParam.isEmpty()) {
+                    veiculo.setClienteId(Integer.parseInt(clienteIdParam));
+                }
+            } else {
+                veiculo.setClienteId(usuarioLogado.getClienteId());
+            }
+
             if (!isEdicao) {
                 veiculo.setAdicionadoEm(LocalDateTime.now());
                 veiculoBO.salvar(veiculo);
@@ -134,6 +135,9 @@ public class VeiculoServlet extends HttpServlet {
             resp.sendRedirect("veiculos");
         } catch (CadastroException e) {
             req.setAttribute("erro", e.getMessage());
+            carregarFormulario(req, resp, usuarioLogado, veiculo);
+        } catch (RuntimeException e) {
+            req.setAttribute("erro", "Revise os dados do veículo. O volume deve ser inteiro e os demais campos precisam estar válidos.");
             carregarFormulario(req, resp, usuarioLogado, veiculo);
         }
     }
