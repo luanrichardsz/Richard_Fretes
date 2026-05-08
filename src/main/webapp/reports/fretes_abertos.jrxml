@@ -89,57 +89,57 @@ ORDER BY
     </background>
 
     <title>
-    <band height="0"/>
-</title>
+        <band height="0"/>
+    </title>
 
-<pageHeader>
-    <band height="70" splitType="Stretch">
+    <pageHeader>
+        <band height="70" splitType="Stretch">
 
-        <rectangle>
-            <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="20000000-0000-0000-0000-000000000001"/>
-            <graphicElement>
-                <pen lineWidth="0"/>
-            </graphicElement>
-        </rectangle>
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="30000000-0000-0000-0000-000000000001"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
 
-        <staticText>
-            <reportElement x="18" y="7" width="500" height="24" forecolor="#FFFFFF" uuid="20000000-0000-0000-0000-000000000002"/>
-            <textElement verticalAlignment="Middle">
-                <font size="18" isBold="true"/>
-            </textElement>
-            <text><![CDATA[Relatório de Fretes em Aberto]]></text>
-        </staticText>
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="8" width="500" height="24" forecolor="#FFFFFF" uuid="30000000-0000-0000-0000-000000000002"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[RELAT�RIO DE FRETES EM ABERTO]]></text>
+            </staticText>
 
-        <staticText>
-            <reportElement x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="20000000-0000-0000-0000-000000000003"/>
-            <textElement verticalAlignment="Middle">
-                <font size="8"/>
-            </textElement>
-            <text><![CDATA[Fretes com status diferente de ENTREGUE e CANCELADO]]></text>
-        </staticText>
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="30000000-0000-0000-0000-000000000003"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Fretes com status diferente de ENTREGUE e CANCELADO]]></text>
+            </staticText>
 
-        <staticText>
-            <reportElement x="605" y="10" width="75" height="13" forecolor="#DDEEF6" uuid="20000000-0000-0000-0000-000000000004"/>
-            <textElement textAlignment="Right" verticalAlignment="Middle">
-                <font size="8" isBold="true"/>
-            </textElement>
-            <text><![CDATA[Gerado em:]]></text>
-        </staticText>
+            <staticText>
+                <reportElement mode="Transparent" x="605" y="10" width="75" height="13" forecolor="#DDEEF6" uuid="30000000-0000-0000-0000-000000000004"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Gerado em:]]></text>
+            </staticText>
 
-        <textField pattern="dd/MM/yyyy HH:mm">
-            <reportElement x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="20000000-0000-0000-0000-000000000005"/>
-            <textElement verticalAlignment="Middle">
-                <font size="8"/>
-            </textElement>
-            <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
-        </textField>
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement mode="Transparent" x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="30000000-0000-0000-0000-000000000005"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
 
-        <line>
-            <reportElement x="0" y="58" width="802" height="1" forecolor="#0B4F71" uuid="20000000-0000-0000-0000-000000000006"/>
-        </line>
+            <line>
+                <reportElement x="0" y="58" width="802" height="1" forecolor="#0B4F71" uuid="30000000-0000-0000-0000-000000000006"/>
+            </line>
 
-    </band>
-</pageHeader>
+        </band>
+    </pageHeader>
 
     <columnHeader>
         <band height="26" splitType="Stretch">

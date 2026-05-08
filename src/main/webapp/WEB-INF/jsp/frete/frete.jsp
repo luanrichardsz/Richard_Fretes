@@ -46,7 +46,7 @@
       </div>
 
       <div style="display: flex; gap: 10px;">
-        <a href="relatorios/fretes-abertos" target="_blank" rel="noopener noreferrer">
+        <a href="relatorios/fretes-abertos" rel="noopener noreferrer">
           <button class="btn-primary" type="button">
             Imprimir Relatorio
           </button>
