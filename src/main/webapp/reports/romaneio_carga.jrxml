@@ -1,0 +1,530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport
+    xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="romaneio_carga"
+    language="java"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="b7c4d42e-1111-4444-9999-000000000001">
+
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+
+    <parameter name="CLIENTE_ID" class="java.lang.Integer"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT
+    frete."id" AS frete_id,
+    frete."numero_frete" AS numero_frete,
+
+    motorista."id" AS motorista_id,
+    motorista."nome_completo" AS motorista_nome,
+    motorista."cpf" AS motorista_cpf,
+    motorista."telefone" AS motorista_telefone,
+
+    veiculo."id" AS veiculo_id,
+    veiculo."placa" AS veiculo_placa,
+
+    remetente."id" AS remetente_id,
+    remetente."razao_social" AS remetente_razao_social,
+    remetente."documento" AS remetente_documento,
+
+    destinatario."id" AS destinatario_id,
+    destinatario."razao_social" AS destinatario_razao_social,
+    destinatario."documento" AS destinatario_documento,
+
+    destino."id" AS destino_id,
+    destino."logradouro" AS destino_logradouro,
+    destino."numero" AS destino_numero,
+    destino."bairro" AS destino_bairro,
+    destino."municipio" AS destino_cidade,
+    destino."uf" AS destino_uf,
+    destino."cep" AS destino_cep,
+
+    (
+        COALESCE(destino."logradouro", '') ||
+        CASE
+            WHEN destino."numero" IS NOT NULL AND destino."numero" <> ''
+            THEN ', ' || destino."numero"
+            ELSE ''
+        END ||
+        CASE
+            WHEN destino."bairro" IS NOT NULL AND destino."bairro" <> ''
+            THEN ' - ' || destino."bairro"
+            ELSE ''
+        END ||
+        CASE
+            WHEN destino."municipio" IS NOT NULL AND destino."municipio" <> ''
+            THEN ' - ' || destino."municipio"
+            ELSE ''
+        END ||
+        CASE
+            WHEN destino."uf" IS NOT NULL AND destino."uf" <> ''
+            THEN '/' || destino."uf"
+            ELSE ''
+        END
+    ) AS destino_completo,
+
+    frete."chave_nfe" AS chave_nfe,
+    frete."natureza_carga" AS natureza_carga,
+    frete."peso_bruto" AS peso_bruto,
+    frete."volumes" AS volumes,
+    frete."distancia_km" AS distancia_km,
+    frete."valor_total" AS valor_total,
+    frete."status" AS status,
+    frete."data_emissao" AS data_emissao,
+    frete."data_saida" AS data_saida,
+    frete."previsao_entrega" AS previsao_entrega
+
+FROM
+    public."frete" frete
+
+INNER JOIN public."motorista" motorista
+    ON motorista."id" = frete."motorista_id"
+
+INNER JOIN public."veiculo" veiculo
+    ON veiculo."id" = frete."veiculo_id"
+
+INNER JOIN public."cliente" remetente
+    ON remetente."id" = frete."remetente_id"
+
+INNER JOIN public."cliente" destinatario
+    ON destinatario."id" = frete."destinatario_id"
+
+INNER JOIN public."endereco" destino
+    ON destino."id" = frete."endereco_destino_id"
+
+WHERE
+    frete."status" NOT IN ('ENTREGUE', 'CANCELADO')
+    AND (
+        $P{CLIENTE_ID} IS NULL
+        OR frete."remetente_id" = $P{CLIENTE_ID}
+        OR frete."destinatario_id" = $P{CLIENTE_ID}
+    )
+
+ORDER BY
+    motorista."nome_completo",
+    frete."data_saida",
+    destino."municipio",
+    destinatario."razao_social",
+    frete."numero_frete"
+        ]]>
+    </queryString>
+
+    <field name="frete_id" class="java.lang.Integer"/>
+    <field name="numero_frete" class="java.lang.String"/>
+
+    <field name="motorista_id" class="java.lang.Integer"/>
+    <field name="motorista_nome" class="java.lang.String"/>
+    <field name="motorista_cpf" class="java.lang.String"/>
+    <field name="motorista_telefone" class="java.lang.String"/>
+
+    <field name="veiculo_id" class="java.lang.Integer"/>
+    <field name="veiculo_placa" class="java.lang.String"/>
+
+    <field name="remetente_id" class="java.lang.Integer"/>
+    <field name="remetente_razao_social" class="java.lang.String"/>
+    <field name="remetente_documento" class="java.lang.String"/>
+
+    <field name="destinatario_id" class="java.lang.Integer"/>
+    <field name="destinatario_razao_social" class="java.lang.String"/>
+    <field name="destinatario_documento" class="java.lang.String"/>
+
+    <field name="destino_id" class="java.lang.Integer"/>
+    <field name="destino_logradouro" class="java.lang.String"/>
+    <field name="destino_numero" class="java.lang.String"/>
+    <field name="destino_bairro" class="java.lang.String"/>
+    <field name="destino_cidade" class="java.lang.String"/>
+    <field name="destino_uf" class="java.lang.String"/>
+    <field name="destino_cep" class="java.lang.String"/>
+    <field name="destino_completo" class="java.lang.String"/>
+
+    <field name="chave_nfe" class="java.lang.String"/>
+    <field name="natureza_carga" class="java.lang.String"/>
+    <field name="peso_bruto" class="java.math.BigDecimal"/>
+    <field name="volumes" class="java.lang.Integer"/>
+    <field name="distancia_km" class="java.math.BigDecimal"/>
+    <field name="valor_total" class="java.math.BigDecimal"/>
+    <field name="status" class="java.lang.String"/>
+    <field name="data_emissao" class="java.sql.Timestamp"/>
+    <field name="data_saida" class="java.sql.Timestamp"/>
+    <field name="previsao_entrega" class="java.sql.Date"/>
+
+    <variable name="total_peso" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{peso_bruto}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
+    <variable name="total_volumes" class="java.lang.Integer" calculation="Sum">
+        <variableExpression><![CDATA[$F{volumes}]]></variableExpression>
+        <initialValueExpression><![CDATA[0]]></initialValueExpression>
+    </variable>
+
+    <variable name="total_fretes" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{frete_id}]]></variableExpression>
+    </variable>
+
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+
+    <title>
+        <band height="0"/>
+    </title>
+
+    <pageHeader>
+        <band height="70" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="10000000-0000-0000-0000-000000000001"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="8" width="500" height="24" forecolor="#FFFFFF" uuid="10000000-0000-0000-0000-000000000002"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[ROMANEIO DE CARGA]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="10000000-0000-0000-0000-000000000003"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Lista de fretes abertos com dados do motorista, remetente, destinatario e destino]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="605" y="10" width="75" height="13" forecolor="#DDEEF6" uuid="10000000-0000-0000-0000-000000000004"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Gerado em:]]></text>
+            </staticText>
+
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement mode="Transparent" x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="10000000-0000-0000-0000-000000000005"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="0" y="58" width="802" height="1" forecolor="#0B4F71" uuid="10000000-0000-0000-0000-000000000006"/>
+            </line>
+
+        </band>
+    </pageHeader>
+
+    <columnHeader>
+        <band height="25" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="23" backcolor="#E9EEF2" uuid="20000000-0000-0000-0000-000000000001"/>
+                <graphicElement>
+                    <pen lineWidth="0.3" lineColor="#B8C4CC"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="5" y="5" width="65" height="12" uuid="20000000-0000-0000-0000-000000000002"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[No. Frete]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="75" y="5" width="105" height="12" uuid="20000000-0000-0000-0000-000000000003"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Motorista]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="185" y="5" width="55" height="12" uuid="20000000-0000-0000-0000-000000000004"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Placa]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="245" y="5" width="115" height="12" uuid="20000000-0000-0000-0000-000000000005"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Remetente]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="365" y="5" width="115" height="12" uuid="20000000-0000-0000-0000-000000000006"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Destinatario]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="485" y="5" width="150" height="12" uuid="20000000-0000-0000-0000-000000000007"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Destino]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="640" y="5" width="55" height="12" uuid="20000000-0000-0000-0000-000000000008"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Peso]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="700" y="5" width="40" height="12" uuid="20000000-0000-0000-0000-000000000009"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Vol.]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="745" y="5" width="52" height="12" uuid="20000000-0000-0000-0000-000000000010"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status]]></text>
+            </staticText>
+
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="25" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="24" backcolor="#F7F9FB" uuid="30000000-0000-0000-0000-000000000001">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT}.intValue() % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="5" y="5" width="65" height="12" uuid="30000000-0000-0000-0000-000000000002"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{numero_frete}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="75" y="5" width="105" height="12" uuid="30000000-0000-0000-0000-000000000003"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{motorista_nome} == null ? "" :
+($F{motorista_nome}.length() > 20 ? $F{motorista_nome}.substring(0, 20) + "..." : $F{motorista_nome})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="185" y="5" width="55" height="12" uuid="30000000-0000-0000-0000-000000000004"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{veiculo_placa}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="245" y="5" width="115" height="12" uuid="30000000-0000-0000-0000-000000000005"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{remetente_razao_social} == null ? "" :
+($F{remetente_razao_social}.length() > 22 ? $F{remetente_razao_social}.substring(0, 22) + "..." : $F{remetente_razao_social})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="365" y="5" width="115" height="12" uuid="30000000-0000-0000-0000-000000000006"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{destinatario_razao_social} == null ? "" :
+($F{destinatario_razao_social}.length() > 22 ? $F{destinatario_razao_social}.substring(0, 22) + "..." : $F{destinatario_razao_social})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="485" y="5" width="150" height="12" uuid="30000000-0000-0000-0000-000000000007"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{destino_completo} == null ? "" :
+($F{destino_completo}.length() > 30 ? $F{destino_completo}.substring(0, 30) + "..." : $F{destino_completo})
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="#,##0.000" isStretchWithOverflow="false">
+                <reportElement x="640" y="5" width="55" height="12" uuid="30000000-0000-0000-0000-000000000008"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{peso_bruto}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="700" y="5" width="40" height="12" uuid="30000000-0000-0000-0000-000000000009"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{volumes}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="false">
+                <reportElement x="745" y="5" width="52" height="12" uuid="30000000-0000-0000-0000-000000000010"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="6" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{status} == null ? "" : $F{status}]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="0" y="24" width="802" height="1" forecolor="#D9E0E5" uuid="30000000-0000-0000-0000-000000000011"/>
+            </line>
+
+        </band>
+    </detail>
+
+    <columnFooter>
+        <band height="42" splitType="Stretch">
+
+            <line>
+                <reportElement x="0" y="4" width="802" height="1" forecolor="#9EADB7" uuid="40000000-0000-0000-0000-000000000001"/>
+            </line>
+
+            <staticText>
+                <reportElement x="440" y="14" width="95" height="14" uuid="40000000-0000-0000-0000-000000000002"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total de fretes:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="540" y="14" width="45" height="14" uuid="40000000-0000-0000-0000-000000000003"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_fretes}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="600" y="14" width="65" height="14" uuid="40000000-0000-0000-0000-000000000004"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Peso total:]]></text>
+            </staticText>
+
+            <textField pattern="#,##0.000">
+                <reportElement x="670" y="14" width="70" height="14" uuid="40000000-0000-0000-0000-000000000005"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_peso}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="745" y="14" width="30" height="14" uuid="40000000-0000-0000-0000-000000000006"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Vol:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="775" y="14" width="25" height="14" uuid="40000000-0000-0000-0000-000000000007"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_volumes}]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </columnFooter>
+
+    <pageFooter>
+        <band height="50" splitType="Stretch">
+
+            <line>
+                <reportElement x="0" y="0" width="802" height="1" forecolor="#D9E0E5" uuid="50000000-0000-0000-0000-000000000001"/>
+            </line>
+
+            <staticText>
+                <reportElement x="0" y="8" width="110" height="12" uuid="50000000-0000-0000-0000-000000000002"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <text><![CDATA[Richard Fretes]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="0" y="28" width="100" height="12" uuid="50000000-0000-0000-0000-000000000003"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Assinatura:]]></text>
+            </staticText>
+
+            <line>
+                <reportElement x="70" y="38" width="250" height="1" forecolor="#000000" uuid="50000000-0000-0000-0000-000000000004"/>
+            </line>
+
+            <textField>
+                <reportElement x="650" y="8" width="100" height="12" uuid="50000000-0000-0000-0000-000000000005"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Pagina " + $V{PAGE_NUMBER} + " de"]]></textFieldExpression>
+            </textField>
+
+            <textField evaluationTime="Report">
+                <reportElement x="750" y="8" width="52" height="12" uuid="50000000-0000-0000-0000-000000000006"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </pageFooter>
+
+    <summary>
+        <band height="0"/>
+    </summary>
+
+</jasperReport>

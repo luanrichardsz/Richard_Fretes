@@ -48,7 +48,13 @@
       <div style="display: flex; gap: 10px;">
         <a href="relatorios/fretes-abertos" rel="noopener noreferrer">
           <button class="btn-primary" type="button">
-            Imprimir Relatorio
+            Relatório Fretes
+          </button>
+        </a>
+
+        <a href="relatorios/romaneio-carga" rel="noopener noreferrer">
+          <button class="btn-primary" type="button">
+            Romaneio de Carga
           </button>
         </a>
 

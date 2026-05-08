@@ -107,7 +107,7 @@ ORDER BY
                 <textElement verticalAlignment="Middle">
                     <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
                 </textElement>
-                <text><![CDATA[RELAT�RIO DE FRETES EM ABERTO]]></text>
+                <text><![CDATA[RELATÓRIO DE FRETES EM ABERTO]]></text>
             </staticText>
 
             <staticText>
