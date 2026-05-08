@@ -33,6 +33,7 @@
 <body>
 
 <header class="top-header">
+    <a href="menu" class="logo-btn" title="Voltar" onclick="if (window.history.length > 1) { window.history.back(); return false; }"><i class="fas fa-arrow-left"></i></a>
     <a href="menu" class="logo-btn" title="Home"><i class="fas fa-home"></i></a>
 </header>
 
