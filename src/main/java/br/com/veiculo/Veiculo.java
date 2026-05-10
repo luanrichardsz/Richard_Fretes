@@ -1,6 +1,7 @@
 package br.com.veiculo;
 
 import br.com.cliente.Cliente;
+import br.com.motorista.Motorista;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -34,6 +35,7 @@ public class Veiculo {
     private LocalDate seguroValidade;
     private Integer clienteId;
     private Cliente cliente;
+    private Motorista motorista;
 
     public Veiculo() {
         this.status = StatusVeiculo.DISPONIVEL;
@@ -204,5 +206,11 @@ public class Veiculo {
         this.cliente = cliente;
     }
 
-    
+    public Motorista getMotorista() {
+        return motorista;
+    }
+
+    public void setMotorista(Motorista motorista) {
+        this.motorista = motorista;
+    }
 }

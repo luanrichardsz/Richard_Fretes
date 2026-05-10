@@ -176,7 +176,7 @@
                                 class="veiculo-row"
                                 data-status="${v.status}"
                                 data-manutencao="${v.manutencaoPendente ? 'sim' : 'nao'}"
-                                data-search="${v.placa} ${v.tipo} ${v.tipoOutros} ${v.combustivel} ${v.anoModelo} ${v.status} ${v.motoristaId} ${v.clienteId}"
+                                data-search="${v.placa} ${v.tipo} ${v.tipoOutros} ${v.combustivel} ${v.anoModelo} ${v.status} ${v.motorista.nomeCompleto} ${v.cliente.razaoSocial}"
                             >
 
                                 <c:if test="${sessionScope.usuarioAutenticado.admin}">
@@ -189,8 +189,8 @@
                                             <div class="entity-info">
                                                 <strong>
                                                     <c:choose>
-                                                        <c:when test="${not empty v.clienteId}">
-                                                            Cliente #${v.clienteId}
+                                                        <c:when test="${not empty v.cliente.razaoSocial}">
+                                                            ${v.cliente.razaoSocial}
                                                         </c:when>
                                                         <c:otherwise>
                                                             Sem cliente
@@ -276,8 +276,8 @@
 
                                         <strong>
                                             <c:choose>
-                                                <c:when test="${not empty v.motoristaId}">
-                                                    Motorista #${v.motoristaId}
+                                                <c:when test="${not empty v.motorista.nomeCompleto}">
+                                                    ${v.motorista.nomeCompleto}
                                                 </c:when>
                                                 <c:otherwise>
                                                     Sem motorista

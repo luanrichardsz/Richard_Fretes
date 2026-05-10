@@ -1,6 +1,8 @@
 package br.com.veiculo;
 
+import br.com.cliente.Cliente;
 import br.com.connection.ConnectionFactory;
+import br.com.motorista.Motorista;
 import br.com.veiculo.Veiculo.StatusVeiculo;
 
 import java.sql.*;
@@ -8,6 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VeiculoDAO extends ConnectionFactory {
+
+    private static final String SQL_BASE_LISTAGEM =
+            "SELECT v.*, " +
+            "c.id AS cliente_rel_id, c.razao_social AS cliente_razao_social, " +
+            "m.id AS motorista_rel_id, m.nome_completo AS motorista_nome_completo " +
+            "FROM veiculo v " +
+            "LEFT JOIN cliente c ON c.id = v.cliente_id " +
+            "LEFT JOIN motorista m ON m.id = v.motorista_id ";
 
     public void salvar(Veiculo veiculo) {
         String sql = "INSERT INTO veiculo (placa, renavam, rntrc, ano_fabricacao, ano_modelo, tipo, tipo_outros, quantidade_eixos, combustivel, tara_kg, capacidade_carga_kg, volume_m3, status, adicionado_em, motorista_id, manutencao_pendente, seguro_validade, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?::status_veiculo_enum, ?, ?, ?, ?, ?)";
@@ -88,7 +98,7 @@ public class VeiculoDAO extends ConnectionFactory {
     }
 
     public Veiculo buscarPorId(Integer id) {
-        String sql = "SELECT * FROM veiculo WHERE id = ?";
+        String sql = SQL_BASE_LISTAGEM + "WHERE v.id = ?";
         Veiculo veiculo = null;
 
         try (Connection conn = getConnection();
@@ -110,7 +120,7 @@ public class VeiculoDAO extends ConnectionFactory {
 
     public List<Veiculo> listarTodos() {
         List<Veiculo> veiculos = new ArrayList<>();
-        String sql = "SELECT * FROM veiculo";
+        String sql = SQL_BASE_LISTAGEM;
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -128,7 +138,7 @@ public class VeiculoDAO extends ConnectionFactory {
 
     public List<Veiculo> listarPorStatus(StatusVeiculo status) {
         List<Veiculo> veiculos = new ArrayList<>();
-        String sql = "SELECT * FROM veiculo WHERE status = ?";
+        String sql = SQL_BASE_LISTAGEM + "WHERE v.status = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -148,7 +158,7 @@ public class VeiculoDAO extends ConnectionFactory {
     }
 
     public Veiculo buscarPorPlaca(String placa) {
-        String sql = "SELECT * FROM veiculo WHERE placa = ?";
+        String sql = SQL_BASE_LISTAGEM + "WHERE v.placa = ?";
         Veiculo veiculo = null;
 
         try (Connection conn = getConnection();
@@ -246,12 +256,27 @@ public class VeiculoDAO extends ConnectionFactory {
         veiculo.setManutencaoPendente(rs.getBoolean("manutencao_pendente"));
         veiculo.setSeguroValidade(rs.getDate("seguro_validade") != null ? rs.getDate("seguro_validade").toLocalDate() : null);
         veiculo.setClienteId(rs.getObject("cliente_id") != null ? rs.getInt("cliente_id") : null);
+
+        if (rs.getObject("cliente_rel_id") != null) {
+            Cliente cliente = new Cliente();
+            cliente.setId(rs.getInt("cliente_rel_id"));
+            cliente.setRazaoSocial(rs.getString("cliente_razao_social"));
+            veiculo.setCliente(cliente);
+        }
+
+        if (rs.getObject("motorista_rel_id") != null) {
+            Motorista motorista = new Motorista();
+            motorista.setId(rs.getInt("motorista_rel_id"));
+            motorista.setNomeCompleto(rs.getString("motorista_nome_completo"));
+            veiculo.setMotorista(motorista);
+        }
+
         return veiculo;
     }
 
     public List<Veiculo> listarPorCliente(Integer clienteId) {
         List<Veiculo> veiculos = new ArrayList<>();
-        String sql = "SELECT * FROM veiculo WHERE cliente_id = ?";
+        String sql = SQL_BASE_LISTAGEM + "WHERE v.cliente_id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
