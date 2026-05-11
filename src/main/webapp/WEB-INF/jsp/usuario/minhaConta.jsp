@@ -29,7 +29,7 @@
         <nav class="sidebar-nav">
             <a href="${pageContext.request.contextPath}/menu" class="nav-item" title="Home">
                 <i class="fas fa-table-cells-large"></i>
-                <span>Dashboard</span>
+                <span>Menu</span>
             </a>
             <c:if test="${sessionScope.usuarioAutenticado.admin}">
                 <a href="${pageContext.request.contextPath}/clientes" class="nav-item" title="Clientes">

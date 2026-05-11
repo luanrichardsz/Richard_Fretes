@@ -39,7 +39,7 @@
 
     <section class="card">
 
-        <form method="get" action="${pageContext.request.contextPath}/relatorios/fretes-abertos" target="_blank">
+        <form method="get" action="${pageContext.request.contextPath}/relatorios/fretes-abertos">
             <input type="hidden" name="gerar" value="true">
 
             <div class="form-section">

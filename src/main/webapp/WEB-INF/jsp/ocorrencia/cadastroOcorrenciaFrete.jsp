@@ -370,7 +370,7 @@
 
         <div class="form-group">
           <label>Recebedor Nome ${isComprovanteEntrega ? '*' : ''}</label>
-          <input type="text" id="recebedorNome" name="recebedorNome" value="${ocorrencia.recebedorNome}" minlength="3" maxlength="120" ${isComprovanteEntrega ? 'required' : ''} />
+          <input type="text" id="recebedorNome" name="recebedorNome" value="${ocorrencia.recebedorNome}" minlength="3" maxlength="120" pattern="^[^0-9]*$" title="Informe o nome do recebedor sem números." ${isComprovanteEntrega ? 'required' : ''} />
         </div>
 
         <div class="form-group">
