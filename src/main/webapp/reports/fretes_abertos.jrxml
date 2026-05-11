@@ -219,10 +219,10 @@ ORDER BY
     </columnHeader>
 
     <detail>
-        <band height="24" splitType="Stretch">
+        <band height="36" splitType="Stretch">
 
             <rectangle>
-                <reportElement mode="Opaque" x="0" y="0" width="802" height="23" backcolor="#F7F9FB" uuid="10000000-0000-0000-0000-000000000015">
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="35" backcolor="#F7F9FB" uuid="10000000-0000-0000-0000-000000000015">
                     <printWhenExpression><![CDATA[$V{REPORT_COUNT}.intValue() % 2 == 0]]></printWhenExpression>
                 </reportElement>
                 <graphicElement>
@@ -238,36 +238,33 @@ ORDER BY
                 <textFieldExpression><![CDATA[$F{frete_numero_frete}]]></textFieldExpression>
             </textField>
 
-            <textField isStretchWithOverflow="false">
-                <reportElement x="80" y="5" width="155" height="12" uuid="10000000-0000-0000-0000-000000000017"/>
-                <textElement verticalAlignment="Middle">
+            <textField isStretchWithOverflow="true">
+                <reportElement x="80" y="5" width="155" height="24" uuid="10000000-0000-0000-0000-000000000017"/>
+                <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
                 <textFieldExpression><![CDATA[
-$F{remetente_razao_social} == null ? "" :
-($F{remetente_razao_social}.length() > 32 ? $F{remetente_razao_social}.substring(0, 32) + "..." : $F{remetente_razao_social})
+$F{remetente_razao_social} == null ? "" : $F{remetente_razao_social}
                 ]]></textFieldExpression>
             </textField>
 
-            <textField isStretchWithOverflow="false">
-                <reportElement x="240" y="5" width="155" height="12" uuid="10000000-0000-0000-0000-000000000018"/>
-                <textElement verticalAlignment="Middle">
+            <textField isStretchWithOverflow="true">
+                <reportElement x="240" y="5" width="155" height="24" uuid="10000000-0000-0000-0000-000000000018"/>
+                <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
                 <textFieldExpression><![CDATA[
-$F{destinatario_razao_social} == null ? "" :
-($F{destinatario_razao_social}.length() > 32 ? $F{destinatario_razao_social}.substring(0, 32) + "..." : $F{destinatario_razao_social})
+$F{destinatario_razao_social} == null ? "" : $F{destinatario_razao_social}
                 ]]></textFieldExpression>
             </textField>
 
-            <textField isStretchWithOverflow="false">
-                <reportElement x="400" y="5" width="105" height="12" uuid="10000000-0000-0000-0000-000000000019"/>
-                <textElement verticalAlignment="Middle">
+            <textField isStretchWithOverflow="true">
+                <reportElement x="400" y="5" width="105" height="24" uuid="10000000-0000-0000-0000-000000000019"/>
+                <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
                 <textFieldExpression><![CDATA[
-$F{motorista_nome} == null ? "" :
-($F{motorista_nome}.length() > 22 ? $F{motorista_nome}.substring(0, 22) + "..." : $F{motorista_nome})
+$F{motorista_nome} == null ? "" : $F{motorista_nome}
                 ]]></textFieldExpression>
             </textField>
 
@@ -304,7 +301,7 @@ $F{motorista_nome} == null ? "" :
             </textField>
 
             <line>
-                <reportElement x="0" y="23" width="802" height="1" forecolor="#D9E0E5" uuid="10000000-0000-0000-0000-000000000024"/>
+                <reportElement x="0" y="35" width="802" height="1" forecolor="#D9E0E5" uuid="10000000-0000-0000-0000-000000000024"/>
             </line>
 
         </band>
