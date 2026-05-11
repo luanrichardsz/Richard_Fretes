@@ -69,20 +69,19 @@ public class FreteBO {
         validarFrete(frete, true, freteAtual);
         validarTransicaoStatus(freteAtual.getStatus(), frete.getStatus());
         aplicarDatasDeStatus(frete, freteAtual);
+        persistirAtualizacao(freteAtual, frete);
+    }
 
-        Connection conn = null;
-        try {
-            conn = abrirConexao();
-            conn.setAutoCommit(false);
-            freteDAO.atualizar(conn, frete);
-            sincronizarStatusVeiculo(conn, freteAtual, frete);
-            conn.commit();
-        } catch (SQLException e) {
-            rollbackSilencioso(conn);
-            throw new FreteException("Erro ao atualizar o frete.", e);
-        } finally {
-            fecharSilencioso(conn);
+    public void atualizarStatusOperacional(Frete frete) throws FreteException {
+        Frete freteAtual = freteDAO.buscarPorId(frete.getId());
+        if (freteAtual == null) {
+            throw new FreteException("Frete não encontrado.");
         }
+
+        preservarDadosDoFrete(frete, freteAtual);
+        validarTransicaoStatus(freteAtual.getStatus(), frete.getStatus());
+        aplicarDatasDeStatus(frete, freteAtual);
+        persistirAtualizacao(freteAtual, frete);
     }
 
     public String gerarProximoNumeroFrete() {
@@ -105,6 +104,36 @@ public class FreteBO {
     private void validarEdicaoPermitida(Frete frete) throws FreteException {
         if (frete.getStatus() != Frete.StatusFrete.EMITIDO) {
             throw new FreteException("Só é permitido editar frete com status EMITIDO.");
+        }
+    }
+
+    private void preservarDadosDoFrete(Frete destino, Frete origem) {
+        destino.setNumeroFrete(origem.getNumeroFrete());
+        destino.setRemetenteId(origem.getRemetenteId());
+        destino.setDestinatarioId(origem.getDestinatarioId());
+        destino.setEnderecoOrigemId(origem.getEnderecoOrigemId());
+        destino.setEnderecoDestinoId(origem.getEnderecoDestinoId());
+        destino.setMotoristaId(origem.getMotoristaId());
+        destino.setVeiculoId(origem.getVeiculoId());
+        destino.setChaveNfe(origem.getChaveNfe());
+        destino.setOrigemIbge(origem.getOrigemIbge());
+        destino.setDestinoIbge(origem.getDestinoIbge());
+        destino.setNaturezaCarga(origem.getNaturezaCarga());
+        destino.setPesoBruto(origem.getPesoBruto());
+        destino.setVolumes(origem.getVolumes());
+        destino.setValorFreteBruto(origem.getValorFreteBruto());
+        destino.setValorPedagio(origem.getValorPedagio());
+        destino.setAliquotaIcms(origem.getAliquotaIcms());
+        destino.setValorIcms(origem.getValorIcms());
+        destino.setValorTotal(origem.getValorTotal());
+        destino.setDataEmissao(origem.getDataEmissao());
+        destino.setPrevisaoEntrega(origem.getPrevisaoEntrega());
+        destino.setDataSaida(origem.getDataSaida());
+        destino.setDataEntrega(origem.getDataEntrega());
+        destino.setDistanciaKm(origem.getDistanciaKm());
+
+        if (ValidationUtils.estaVazio(destino.getMotivoFalha())) {
+            destino.setMotivoFalha(origem.getMotivoFalha());
         }
     }
 
@@ -426,6 +455,22 @@ public class FreteBO {
                 && (freteAtualizado.getStatus() == Frete.StatusFrete.ENTREGUE
                 || freteAtualizado.getStatus() == Frete.StatusFrete.NAO_ENTREGUE)) {
             veiculoDAO.atualizarStatus(conn, freteAtualizado.getVeiculoId(), Veiculo.StatusVeiculo.DISPONIVEL);
+        }
+    }
+
+    private void persistirAtualizacao(Frete freteAtual, Frete freteAtualizado) throws FreteException {
+        Connection conn = null;
+        try {
+            conn = abrirConexao();
+            conn.setAutoCommit(false);
+            freteDAO.atualizar(conn, freteAtualizado);
+            sincronizarStatusVeiculo(conn, freteAtual, freteAtualizado);
+            conn.commit();
+        } catch (SQLException e) {
+            rollbackSilencioso(conn);
+            throw new FreteException("Erro ao atualizar o frete.", e);
+        } finally {
+            fecharSilencioso(conn);
         }
     }
 

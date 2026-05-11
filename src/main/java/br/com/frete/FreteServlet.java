@@ -26,7 +26,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/fretes")
 public class FreteServlet extends HttpServlet {
@@ -323,6 +325,25 @@ public class FreteServlet extends HttpServlet {
         }
 
         req.setAttribute("fretes", fretes);
+        req.setAttribute("clientesPorId", montarMapaClientes());
+    }
+
+    private Map<Integer, String> montarMapaClientes() {
+        Map<Integer, String> clientesPorId = new HashMap<>();
+
+        for (Cliente cliente : clienteDAO.listarTodos()) {
+            if (cliente == null || cliente.getId() == null) {
+                continue;
+            }
+
+            String nomeExibicao = !ValidationUtils.estaVazio(cliente.getNomeFantasia())
+                    ? cliente.getNomeFantasia()
+                    : cliente.getRazaoSocial();
+
+            clientesPorId.put(cliente.getId(), nomeExibicao);
+        }
+
+        return clientesPorId;
     }
 
     private void carregarDetalhesFrete(HttpServletRequest req, HttpServletResponse resp, Frete frete)
@@ -389,7 +410,7 @@ public class FreteServlet extends HttpServlet {
         Frete freteAtualizado = copiarFrete(freteAtual);
         freteAtualizado.setStatus(novoStatus);
         freteAtualizado.setMotivoFalha(motivoFalha);
-        freteBO.atualizar(freteAtualizado);
+        freteBO.atualizarStatusOperacional(freteAtualizado);
     }
 
     private Frete copiarFrete(Frete origem) {
