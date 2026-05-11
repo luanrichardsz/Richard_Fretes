@@ -8,6 +8,7 @@
     pageWidth="842"
     pageHeight="595"
     orientation="Landscape"
+    whenNoDataType="NoDataSection"
     columnWidth="802"
     leftMargin="20"
     rightMargin="20"
@@ -174,6 +175,11 @@ ORDER BY
         <variableExpression><![CDATA[$F{frete_id}]]></variableExpression>
     </variable>
 
+    <variable name="total_valor" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{valor_total}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
     <background>
         <band splitType="Stretch"/>
     </background>
@@ -242,7 +248,7 @@ ORDER BY
             </rectangle>
 
             <staticText>
-                <reportElement x="5" y="5" width="65" height="12" uuid="20000000-0000-0000-0000-000000000002"/>
+                <reportElement x="5" y="5" width="60" height="12" uuid="20000000-0000-0000-0000-000000000002"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -250,7 +256,7 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="75" y="5" width="105" height="12" uuid="20000000-0000-0000-0000-000000000003"/>
+                <reportElement x="70" y="5" width="100" height="12" uuid="20000000-0000-0000-0000-000000000003"/>
                 <textElement verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -258,7 +264,7 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="185" y="5" width="55" height="12" uuid="20000000-0000-0000-0000-000000000004"/>
+                <reportElement x="175" y="5" width="50" height="12" uuid="20000000-0000-0000-0000-000000000004"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -266,7 +272,7 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="245" y="5" width="115" height="12" uuid="20000000-0000-0000-0000-000000000005"/>
+                <reportElement x="230" y="5" width="105" height="12" uuid="20000000-0000-0000-0000-000000000005"/>
                 <textElement verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -274,7 +280,7 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="365" y="5" width="115" height="12" uuid="20000000-0000-0000-0000-000000000006"/>
+                <reportElement x="340" y="5" width="105" height="12" uuid="20000000-0000-0000-0000-000000000006"/>
                 <textElement verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -282,7 +288,7 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="485" y="5" width="150" height="12" uuid="20000000-0000-0000-0000-000000000007"/>
+                <reportElement x="450" y="5" width="120" height="12" uuid="20000000-0000-0000-0000-000000000007"/>
                 <textElement verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -290,7 +296,15 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="640" y="5" width="55" height="12" uuid="20000000-0000-0000-0000-000000000008"/>
+                <reportElement x="575" y="5" width="70" height="12" uuid="20000000-0000-0000-0000-000000000008"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Valor]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="650" y="5" width="50" height="12" uuid="20000000-0000-0000-0000-000000000018"/>
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -298,7 +312,7 @@ ORDER BY
             </staticText>
 
             <staticText>
-                <reportElement x="700" y="5" width="40" height="12" uuid="20000000-0000-0000-0000-000000000009"/>
+                <reportElement x="705" y="5" width="35" height="12" uuid="20000000-0000-0000-0000-000000000009"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="7" isBold="true"/>
                 </textElement>
@@ -329,7 +343,7 @@ ORDER BY
             </rectangle>
 
             <textField isStretchWithOverflow="false">
-                <reportElement x="5" y="5" width="65" height="12" uuid="30000000-0000-0000-0000-000000000002"/>
+                <reportElement x="5" y="5" width="60" height="12" uuid="30000000-0000-0000-0000-000000000002"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="7"/>
                 </textElement>
@@ -337,7 +351,7 @@ ORDER BY
             </textField>
 
             <textField isStretchWithOverflow="true">
-                <reportElement x="75" y="5" width="105" height="24" uuid="30000000-0000-0000-0000-000000000003"/>
+                <reportElement x="70" y="5" width="100" height="24" uuid="30000000-0000-0000-0000-000000000003"/>
                 <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
@@ -347,7 +361,7 @@ $F{motorista_nome} == null ? "" : $F{motorista_nome}
             </textField>
 
             <textField isStretchWithOverflow="false">
-                <reportElement x="185" y="5" width="55" height="12" uuid="30000000-0000-0000-0000-000000000004"/>
+                <reportElement x="175" y="5" width="50" height="12" uuid="30000000-0000-0000-0000-000000000004"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="7"/>
                 </textElement>
@@ -355,7 +369,7 @@ $F{motorista_nome} == null ? "" : $F{motorista_nome}
             </textField>
 
             <textField isStretchWithOverflow="true">
-                <reportElement x="245" y="5" width="115" height="24" uuid="30000000-0000-0000-0000-000000000005"/>
+                <reportElement x="230" y="5" width="105" height="24" uuid="30000000-0000-0000-0000-000000000005"/>
                 <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
@@ -365,7 +379,7 @@ $F{remetente_razao_social} == null ? "" : $F{remetente_razao_social}
             </textField>
 
             <textField isStretchWithOverflow="true">
-                <reportElement x="365" y="5" width="115" height="24" uuid="30000000-0000-0000-0000-000000000006"/>
+                <reportElement x="340" y="5" width="105" height="24" uuid="30000000-0000-0000-0000-000000000006"/>
                 <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
@@ -375,7 +389,7 @@ $F{destinatario_razao_social} == null ? "" : $F{destinatario_razao_social}
             </textField>
 
             <textField isStretchWithOverflow="true">
-                <reportElement x="485" y="5" width="150" height="24" uuid="30000000-0000-0000-0000-000000000007"/>
+                <reportElement x="450" y="5" width="120" height="24" uuid="30000000-0000-0000-0000-000000000007"/>
                 <textElement verticalAlignment="Top">
                     <font size="7"/>
                 </textElement>
@@ -384,8 +398,16 @@ $F{destino_completo} == null ? "" : $F{destino_completo}
                 ]]></textFieldExpression>
             </textField>
 
+            <textField pattern="R$ #,##0.00" isStretchWithOverflow="false">
+                <reportElement x="575" y="5" width="70" height="12" uuid="30000000-0000-0000-0000-000000000012"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{valor_total}]]></textFieldExpression>
+            </textField>
+
             <textField pattern="#,##0.000" isStretchWithOverflow="false">
-                <reportElement x="640" y="5" width="55" height="12" uuid="30000000-0000-0000-0000-000000000008"/>
+                <reportElement x="650" y="5" width="50" height="12" uuid="30000000-0000-0000-0000-000000000008"/>
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font size="7"/>
                 </textElement>
@@ -393,7 +415,7 @@ $F{destino_completo} == null ? "" : $F{destino_completo}
             </textField>
 
             <textField isStretchWithOverflow="false">
-                <reportElement x="700" y="5" width="40" height="12" uuid="30000000-0000-0000-0000-000000000009"/>
+                <reportElement x="705" y="5" width="35" height="12" uuid="30000000-0000-0000-0000-000000000009"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="7"/>
                 </textElement>
@@ -423,7 +445,7 @@ $F{destino_completo} == null ? "" : $F{destino_completo}
             </line>
 
             <staticText>
-                <reportElement x="440" y="14" width="95" height="14" uuid="40000000-0000-0000-0000-000000000002"/>
+                <reportElement x="250" y="14" width="95" height="14" uuid="40000000-0000-0000-0000-000000000002"/>
                 <textElement textAlignment="Right" verticalAlignment="Middle">
                     <font size="8" isBold="true"/>
                 </textElement>
@@ -431,11 +453,27 @@ $F{destino_completo} == null ? "" : $F{destino_completo}
             </staticText>
 
             <textField>
-                <reportElement x="540" y="14" width="45" height="14" uuid="40000000-0000-0000-0000-000000000003"/>
+                <reportElement x="350" y="14" width="45" height="14" uuid="40000000-0000-0000-0000-000000000003"/>
                 <textElement textAlignment="Center" verticalAlignment="Middle">
                     <font size="8" isBold="true"/>
                 </textElement>
                 <textFieldExpression><![CDATA[$V{total_fretes}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="410" y="14" width="70" height="14" uuid="40000000-0000-0000-0000-000000000004"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Valor total:]]></text>
+            </staticText>
+
+            <textField pattern="R$ #,##0.00">
+                <reportElement x="485" y="14" width="95" height="14" uuid="40000000-0000-0000-0000-000000000008"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_valor}]]></textFieldExpression>
             </textField>
 
             <staticText>
@@ -522,5 +560,65 @@ $F{destino_completo} == null ? "" : $F{destino_completo}
     <summary>
         <band height="0"/>
     </summary>
+
+    <noData>
+        <band height="180" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="10000000-0000-0000-0000-000000000011"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="8" width="500" height="24" forecolor="#FFFFFF" uuid="10000000-0000-0000-0000-000000000012"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[ROMANEIO DE CARGA]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="10000000-0000-0000-0000-000000000013"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Lista de fretes abertos com dados do motorista, remetente, destinatario e destino]]></text>
+            </staticText>
+
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement mode="Transparent" x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="10000000-0000-0000-0000-000000000014"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="171" y="78" width="460" height="72" backcolor="#F7F9FB" uuid="10000000-0000-0000-0000-000000000015"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#B8C4CC"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="210" y="95" width="380" height="20" uuid="10000000-0000-0000-0000-000000000016"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="13" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Nenhum romaneio disponivel]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="195" y="118" width="410" height="18" forecolor="#67717A" uuid="10000000-0000-0000-0000-000000000017"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Revise os filtros selecionados e tente novamente.]]></text>
+            </staticText>
+
+        </band>
+    </noData>
 
 </jasperReport>

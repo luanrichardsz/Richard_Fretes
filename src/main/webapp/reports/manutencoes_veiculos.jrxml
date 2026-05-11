@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport
+    xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="manutencoes_veiculos"
+    language="java"
+    pageWidth="842"
+    pageHeight="595"
+    orientation="Landscape"
+    whenNoDataType="NoDataSection"
+    columnWidth="802"
+    leftMargin="20"
+    rightMargin="20"
+    topMargin="20"
+    bottomMargin="20"
+    uuid="d11c6b11-4f37-4d76-88c8-aec53d900001">
+
+    <property name="ireport.zoom" value="1.0"/>
+    <property name="ireport.x" value="0"/>
+    <property name="ireport.y" value="0"/>
+
+    <parameter name="CLIENTE_ID" class="java.lang.Integer"/>
+    <parameter name="STATUS_MANUTENCAO" class="java.lang.String"/>
+
+    <queryString language="SQL">
+        <![CDATA[
+SELECT
+    mv.id AS manutencao_id,
+    c.razao_social AS cliente_razao_social,
+    v.placa AS veiculo_placa,
+    v.tipo AS veiculo_tipo,
+    CAST(v.status AS VARCHAR) AS veiculo_status,
+    CAST(mv.tipo AS VARCHAR) AS manutencao_tipo,
+    CAST(mv.status AS VARCHAR) AS manutencao_status,
+    mv.descricao AS manutencao_descricao,
+    mv.data_prevista AS manutencao_data_prevista,
+    mv.data_realizacao AS manutencao_data_realizacao,
+    mv.custo AS manutencao_custo,
+    mv.fornecedor_oficina AS manutencao_fornecedor,
+    mv.observacao AS manutencao_observacao,
+    mv.adicionado_em AS manutencao_adicionado_em
+FROM
+    public.manutencao_veiculo mv
+INNER JOIN public.veiculo v
+    ON v.id = mv.veiculo_id
+LEFT JOIN public.cliente c
+    ON c.id = v.cliente_id
+WHERE
+    ($P{CLIENTE_ID} IS NULL OR v.cliente_id = $P{CLIENTE_ID})
+    AND ($P{STATUS_MANUTENCAO} IS NULL OR CAST(mv.status AS VARCHAR) = $P{STATUS_MANUTENCAO})
+ORDER BY
+    c.razao_social,
+    v.placa,
+    mv.data_prevista DESC,
+    mv.adicionado_em DESC
+        ]]>
+    </queryString>
+
+    <field name="manutencao_id" class="java.lang.Integer"/>
+    <field name="cliente_razao_social" class="java.lang.String"/>
+    <field name="veiculo_placa" class="java.lang.String"/>
+    <field name="veiculo_tipo" class="java.lang.String"/>
+    <field name="veiculo_status" class="java.lang.String"/>
+    <field name="manutencao_tipo" class="java.lang.String"/>
+    <field name="manutencao_status" class="java.lang.String"/>
+    <field name="manutencao_descricao" class="java.lang.String"/>
+    <field name="manutencao_data_prevista" class="java.sql.Date"/>
+    <field name="manutencao_data_realizacao" class="java.sql.Date"/>
+    <field name="manutencao_custo" class="java.math.BigDecimal"/>
+    <field name="manutencao_fornecedor" class="java.lang.String"/>
+    <field name="manutencao_observacao" class="java.lang.String"/>
+    <field name="manutencao_adicionado_em" class="java.sql.Timestamp"/>
+
+    <variable name="total_registros" class="java.lang.Integer" calculation="Count">
+        <variableExpression><![CDATA[$F{manutencao_id}]]></variableExpression>
+    </variable>
+
+    <variable name="total_custo" class="java.math.BigDecimal" calculation="Sum">
+        <variableExpression><![CDATA[$F{manutencao_custo}]]></variableExpression>
+        <initialValueExpression><![CDATA[java.math.BigDecimal.ZERO]]></initialValueExpression>
+    </variable>
+
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+
+    <title>
+        <band height="0"/>
+    </title>
+
+    <pageHeader>
+        <band height="70" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="d11c6b11-4f37-4d76-88c8-aec53d900002"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="8" width="500" height="24" forecolor="#FFFFFF" uuid="d11c6b11-4f37-4d76-88c8-aec53d900003"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[RELATORIO DE MANUTENCOES DE VEICULOS]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="32" width="460" height="14" forecolor="#DDEEF6" uuid="d11c6b11-4f37-4d76-88c8-aec53d900004"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Relatorio geral das manutencoes com todos os status e acompanhamento da situacao operacional do veiculo]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="605" y="10" width="75" height="13" forecolor="#DDEEF6" uuid="d11c6b11-4f37-4d76-88c8-aec53d900005"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Gerado em:]]></text>
+            </staticText>
+
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement mode="Transparent" x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="d11c6b11-4f37-4d76-88c8-aec53d900006"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+
+            <line>
+                <reportElement x="0" y="58" width="802" height="1" forecolor="#0B4F71" uuid="d11c6b11-4f37-4d76-88c8-aec53d900007"/>
+            </line>
+
+        </band>
+    </pageHeader>
+
+    <columnHeader>
+        <band height="25" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="23" backcolor="#E9EEF2" uuid="d11c6b11-4f37-4d76-88c8-aec53d900008"/>
+                <graphicElement>
+                    <pen lineWidth="0.3" lineColor="#B8C4CC"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="5" y="5" width="130" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900009"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Cliente]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="140" y="5" width="58" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900010"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Placa]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="203" y="5" width="80" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900011"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Tipo veiculo]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="288" y="5" width="60" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900012"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Tipo manut.]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="353" y="5" width="72" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900013"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status manut.]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="430" y="5" width="72" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900014"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status veiculo]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="507" y="5" width="145" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900015"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Descricao]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="657" y="5" width="45" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900016"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Prevista]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="707" y="5" width="45" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900017"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Realizada]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="757" y="5" width="40" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900018"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Custo]]></text>
+            </staticText>
+
+        </band>
+    </columnHeader>
+
+    <detail>
+        <band height="36" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="35" backcolor="#F7F9FB" uuid="d11c6b11-4f37-4d76-88c8-aec53d900019">
+                    <printWhenExpression><![CDATA[$V{REPORT_COUNT}.intValue() % 2 == 0]]></printWhenExpression>
+                </reportElement>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="5" y="5" width="130" height="24" uuid="d11c6b11-4f37-4d76-88c8-aec53d900020"/>
+                <textElement verticalAlignment="Top">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{cliente_razao_social} == null ? "Sem cliente" : $F{cliente_razao_social}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="140" y="5" width="58" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900021"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{veiculo_placa}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="203" y="5" width="80" height="24" uuid="d11c6b11-4f37-4d76-88c8-aec53d900022"/>
+                <textElement verticalAlignment="Top">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{veiculo_tipo} == null ? "" : $F{veiculo_tipo}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="288" y="5" width="60" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900023"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{manutencao_tipo}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="353" y="5" width="72" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900024"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{manutencao_status}]]></textFieldExpression>
+            </textField>
+
+            <textField>
+                <reportElement x="430" y="5" width="72" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900025"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{veiculo_status}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="507" y="5" width="145" height="24" uuid="d11c6b11-4f37-4d76-88c8-aec53d900026"/>
+                <textElement verticalAlignment="Top">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+$F{manutencao_descricao} == null ? "" : $F{manutencao_descricao}
+                ]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="dd/MM/yyyy">
+                <reportElement x="657" y="5" width="45" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900027"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{manutencao_data_prevista}]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+                <reportElement x="707" y="5" width="45" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900028"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{manutencao_data_realizacao}]]></textFieldExpression>
+            </textField>
+
+            <textField pattern="#,##0.00">
+                <reportElement x="757" y="5" width="40" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900029"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="7"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$F{manutencao_custo}]]></textFieldExpression>
+            </textField>
+
+            <textField isStretchWithOverflow="true">
+                <reportElement x="507" y="19" width="290" height="12" forecolor="#67717A" uuid="d11c6b11-4f37-4d76-88c8-aec53d900030"/>
+                <textElement verticalAlignment="Top">
+                    <font size="6"/>
+                </textElement>
+                <textFieldExpression><![CDATA[
+($F{manutencao_fornecedor} == null ? "" : $F{manutencao_fornecedor}) +
+($F{manutencao_observacao} == null || $F{manutencao_observacao}.trim().isEmpty() ? "" : " | " + $F{manutencao_observacao})
+                ]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </detail>
+
+    <summary>
+        <band height="32" splitType="Stretch">
+
+            <line>
+                <reportElement x="0" y="4" width="802" height="1" forecolor="#B8C4CC" uuid="d11c6b11-4f37-4d76-88c8-aec53d900031"/>
+            </line>
+
+            <staticText>
+                <reportElement x="5" y="12" width="80" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900032"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Total registros:]]></text>
+            </staticText>
+
+            <textField>
+                <reportElement x="88" y="12" width="45" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900033"/>
+                <textElement verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_registros}]]></textFieldExpression>
+            </textField>
+
+            <staticText>
+                <reportElement x="640" y="12" width="82" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900034"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Custo total:]]></text>
+            </staticText>
+
+            <textField pattern="#,##0.00">
+                <reportElement x="727" y="12" width="70" height="12" uuid="d11c6b11-4f37-4d76-88c8-aec53d900035"/>
+                <textElement textAlignment="Right" verticalAlignment="Middle">
+                    <font size="8"/>
+                </textElement>
+                <textFieldExpression><![CDATA[$V{total_custo}]]></textFieldExpression>
+            </textField>
+
+        </band>
+    </summary>
+
+    <noData>
+        <band height="180" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="d11c6b11-4f37-4d76-88c8-aec53d900036"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="8" width="500" height="24" forecolor="#FFFFFF" uuid="d11c6b11-4f37-4d76-88c8-aec53d900037"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[RELATORIO DE MANUTENCOES DE VEICULOS]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="d11c6b11-4f37-4d76-88c8-aec53d900038"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Consulta de manutencoes por cliente e status]]></text>
+            </staticText>
+
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement mode="Transparent" x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="d11c6b11-4f37-4d76-88c8-aec53d900039"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="171" y="78" width="460" height="72" backcolor="#F7F9FB" uuid="d11c6b11-4f37-4d76-88c8-aec53d900040"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#B8C4CC"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="210" y="95" width="380" height="20" uuid="d11c6b11-4f37-4d76-88c8-aec53d900041"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="13" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Nenhuma manutencao encontrada]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="195" y="118" width="410" height="18" forecolor="#67717A" uuid="d11c6b11-4f37-4d76-88c8-aec53d900042"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Revise os filtros selecionados para cliente e status e tente novamente.]]></text>
+            </staticText>
+
+        </band>
+    </noData>
+
+</jasperReport>

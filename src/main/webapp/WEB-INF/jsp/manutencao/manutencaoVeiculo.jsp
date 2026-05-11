@@ -130,6 +130,33 @@
         </div>
     </section>
 
+    <section class="card toolbar-card">
+        <div class="toolbar-row">
+            <div class="filters">
+                <div>
+                    <span class="section-label">Relatorios</span>
+                    <h2>Exportar manutencoes em PDF</h2>
+                    <p>Gere o relatorio dos veiculos em manutencao com todos os status ou filtre a situacao desejada.</p>
+                </div>
+            </div>
+
+            <div class="toolbar-actions report-actions">
+                <a href="relatorios/manutencoes-veiculos" target="_blank" class="report-link" title="Abrir filtro do relatorio de manutencoes de veiculos">
+                    <div class="report-link-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+
+                    <div class="report-link-content">
+                        <strong>Relatorio de manutencoes</strong>
+                        <small>Abrir filtro e gerar PDF</small>
+                    </div>
+
+                    <i class="fas fa-arrow-up-right-from-square report-link-arrow"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
     <section class="card table-card">
         <div class="table-header">
             <div>

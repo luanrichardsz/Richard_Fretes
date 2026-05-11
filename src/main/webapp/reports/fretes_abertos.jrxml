@@ -8,6 +8,7 @@
     pageWidth="842"
     pageHeight="595"
     orientation="Landscape"
+    whenNoDataType="NoDataSection"
     columnWidth="802"
     leftMargin="20"
     rightMargin="20"
@@ -370,5 +371,65 @@ $F{motorista_nome} == null ? "" : $F{motorista_nome}
     <summary>
         <band height="0"/>
     </summary>
+
+    <noData>
+        <band height="180" splitType="Stretch">
+
+            <rectangle>
+                <reportElement mode="Opaque" x="0" y="0" width="802" height="52" backcolor="#0B4F71" uuid="30000000-0000-0000-0000-000000000007"/>
+                <graphicElement>
+                    <pen lineWidth="0"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="8" width="500" height="24" forecolor="#FFFFFF" uuid="30000000-0000-0000-0000-000000000008"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="16" isBold="true" pdfFontName="Helvetica-Bold" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[RELATÓRIO DE FRETES EM ABERTO]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement mode="Transparent" x="18" y="32" width="430" height="14" forecolor="#DDEEF6" uuid="30000000-0000-0000-0000-000000000009"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <text><![CDATA[Fretes com status diferente de ENTREGUE e CANCELADO]]></text>
+            </staticText>
+
+            <textField pattern="dd/MM/yyyy HH:mm">
+                <reportElement mode="Transparent" x="685" y="10" width="100" height="13" forecolor="#FFFFFF" uuid="30000000-0000-0000-0000-000000000010"/>
+                <textElement verticalAlignment="Middle">
+                    <font fontName="SansSerif" size="8" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+                </textElement>
+                <textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+            </textField>
+
+            <rectangle>
+                <reportElement mode="Opaque" x="171" y="78" width="460" height="72" backcolor="#F7F9FB" uuid="30000000-0000-0000-0000-000000000011"/>
+                <graphicElement>
+                    <pen lineWidth="0.5" lineColor="#B8C4CC"/>
+                </graphicElement>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="210" y="95" width="380" height="20" uuid="30000000-0000-0000-0000-000000000012"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="13" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Nenhum frete em aberto encontrado]]></text>
+            </staticText>
+
+            <staticText>
+                <reportElement x="195" y="118" width="410" height="18" forecolor="#67717A" uuid="30000000-0000-0000-0000-000000000013"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="9"/>
+                </textElement>
+                <text><![CDATA[Revise os filtros selecionados e tente novamente.]]></text>
+            </staticText>
+
+        </band>
+    </noData>
 
 </jasperReport>
