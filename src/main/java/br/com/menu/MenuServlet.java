@@ -4,6 +4,7 @@ import br.com.cliente.ClienteDAO;
 import br.com.frete.FreteDAO;
 import br.com.motorista.MotoristaDAO;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 import br.com.veiculo.VeiculoDAO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,7 +28,7 @@ public class MenuServlet extends HttpServlet {
         resp.setContentType("text/html;charset=UTF-8");
 
         HttpSession session = req.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
+        Usuario usuario = UsuarioSessionUtils.obterUsuarioLogado(req);
         if (usuario == null) {
             resp.sendRedirect("login");
             return;

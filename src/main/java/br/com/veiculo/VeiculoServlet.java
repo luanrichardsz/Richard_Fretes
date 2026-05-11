@@ -10,6 +10,7 @@ import br.com.cliente.Cliente;
 import br.com.motorista.Motorista;
 import br.com.veiculo.Veiculo.StatusVeiculo;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -37,7 +38,7 @@ public class VeiculoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
@@ -70,7 +71,7 @@ public class VeiculoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
         
         if(usuarioLogado == null) {
             resp.sendRedirect("login");

@@ -3,6 +3,7 @@ package br.com.relatorio;
 import br.com.cliente.ClienteDAO;
 import br.com.connection.ConnectionFactory;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +50,7 @@ public class RelatorioRomaneioCargaServlet extends HttpServlet {
             return;
         }
 
-        Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(request);
         if (usuarioLogado == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

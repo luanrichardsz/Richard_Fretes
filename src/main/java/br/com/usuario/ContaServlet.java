@@ -22,7 +22,7 @@ public class ContaServlet extends HttpServlet {
         resp.setContentType("text/html;charset=UTF-8");
 
         HttpSession session = req.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
+        Usuario usuario = UsuarioSessionUtils.obterUsuarioLogado(req);
         if (usuario == null) {
             resp.sendRedirect("login");
             return;
@@ -36,7 +36,7 @@ public class ContaServlet extends HttpServlet {
         resp.setContentType("text/html;charset=UTF-8");
 
         HttpSession session = req.getSession();
-        Usuario usuario = (Usuario) session.getAttribute("usuarioAutenticado");
+        Usuario usuario = UsuarioSessionUtils.obterUsuarioLogado(req);
         
         if (usuario == null) {
             resp.sendRedirect("login");

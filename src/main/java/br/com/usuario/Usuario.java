@@ -46,7 +46,11 @@ public class Usuario {
         this.isAdmin = isAdmin;
     }
     public Integer getClienteId() {
-        return clienteId;
+        if (clienteId != null) {
+            return clienteId;
+        }
+
+        return cliente != null ? cliente.getId() : null;
     }
     public void setClienteId(Integer clienteId) {
         this.clienteId = clienteId;
@@ -62,5 +66,9 @@ public class Usuario {
     }
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+
+        if (this.clienteId == null && cliente != null) {
+            this.clienteId = cliente.getId();
+        }
     }
 }

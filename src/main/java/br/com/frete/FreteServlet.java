@@ -12,6 +12,7 @@ import br.com.motorista.Motorista;
 import br.com.ocorrenciafrete.OcorrenciaFrete;
 import br.com.ocorrenciafrete.OcorrenciaFreteDAO;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 import br.com.veiculo.Veiculo;
 import br.com.util.ValidationUtils;
 
@@ -46,7 +47,7 @@ public class FreteServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
@@ -84,7 +85,7 @@ public class FreteServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
@@ -216,7 +217,7 @@ public class FreteServlet extends HttpServlet {
     private void processarExclusao(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             Integer freteId = obterIdFrete(req);
-            Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+            Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
             Frete frete = buscarFreteOuLancarErro(freteId);
 
             if (!usuarioPodeAcessarFrete(usuarioLogado, frete)) {

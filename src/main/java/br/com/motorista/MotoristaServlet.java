@@ -4,6 +4,7 @@ import br.com.cliente.ClienteDAO;
 import br.com.exception.CadastroException;
 import br.com.motorista.Motorista.*;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 import br.com.cliente.Cliente;
 
 import javax.servlet.ServletException;
@@ -28,7 +29,7 @@ public class MotoristaServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
@@ -61,7 +62,7 @@ public class MotoristaServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");

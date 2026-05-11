@@ -4,6 +4,7 @@ import br.com.cliente.ClienteDAO;
 import br.com.exception.CadastroException;
 import br.com.cliente.Cliente;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,7 +28,7 @@ public class EnderecoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
@@ -60,7 +61,7 @@ public class EnderecoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
         
         if(usuarioLogado == null) {
             resp.sendRedirect("login");

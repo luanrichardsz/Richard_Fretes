@@ -4,6 +4,7 @@ import br.com.exception.CadastroException;
 import br.com.manutencao.ManutencaoVeiculo.StatusManutencao;
 import br.com.manutencao.ManutencaoVeiculo.TipoManutencao;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 import br.com.util.ValidationUtils;
 import br.com.veiculo.Veiculo;
 import br.com.veiculo.VeiculoDAO;
@@ -33,7 +34,7 @@ public class ManutencaoVeiculoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
@@ -64,7 +65,7 @@ public class ManutencaoVeiculoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;

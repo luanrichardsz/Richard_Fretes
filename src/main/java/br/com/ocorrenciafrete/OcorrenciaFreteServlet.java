@@ -7,6 +7,7 @@ import br.com.frete.Frete;
 import br.com.frete.FreteDAO;
 import br.com.ocorrenciafrete.OcorrenciaFrete.TipoOcorrencia;
 import br.com.usuario.Usuario;
+import br.com.usuario.UsuarioSessionUtils;
 import br.com.util.ValidationUtils;
 
 import javax.servlet.ServletException;
@@ -46,7 +47,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
 
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
@@ -79,7 +80,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
-        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        Usuario usuarioLogado = UsuarioSessionUtils.obterUsuarioLogado(req);
         if (usuarioLogado == null) {
             resp.sendRedirect("login");
             return;
