@@ -111,6 +111,11 @@ public class OcorrenciaFreteBO {
             throw new FreteException("UF inválida.");
         }
 
+        if (!ValidationUtils.estaVazio(ocorrencia.getRecebedorNome())
+                && ocorrencia.getRecebedorNome().matches(".*\\d.*")) {
+            throw new FreteException("Nome do recebedor inválido. Não informe números nesse campo.");
+        }
+
         if (!ValidationUtils.estaVazio(ocorrencia.getRecebedorDocumento())) {
             String documento = ValidationUtils.manterSomenteDigitos(ocorrencia.getRecebedorDocumento());
             if (!(documento.length() == 11 || documento.length() == 14)) {

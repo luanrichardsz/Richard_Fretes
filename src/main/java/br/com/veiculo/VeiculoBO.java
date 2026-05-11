@@ -141,6 +141,19 @@ public class VeiculoBO {
             throw new CadastroException("Cliente responsável pelo veículo é obrigatório.");
         }
 
+        if (veiculo.getSeguroValidade() != null) {
+            int anoSeguro = veiculo.getSeguroValidade().getYear();
+            int anoLimite = LocalDate.now().getYear() + 20;
+
+            if (anoSeguro < 2000 || anoSeguro > anoLimite) {
+                throw new CadastroException("Validade do seguro inválida.");
+            }
+
+            if (veiculo.getSeguroValidade().isBefore(LocalDate.now())) {
+                throw new CadastroException("Validade do seguro não pode estar vencida.");
+            }
+        }
+
         ResumoManutencaoVeiculo resumo = emEdicao && veiculo.getId() != null
                 ? manutencaoDAO.resumirPorVeiculo(veiculo.getId())
                 : new ResumoManutencaoVeiculo(false, false, false, false, null, null, null, null);
