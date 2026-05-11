@@ -240,14 +240,19 @@ filtrarEnderecosDestinoPorDestinatario();
 validarPrevisaoEntrega();
 atualizarValoresFrete();
 
-document.querySelector("form").addEventListener("submit", function () {
-  if (!validarPrevisaoEntrega()) {
-    document.getElementById("previsaoEntrega").reportValidity();
-    return;
-  }
+var formularioFrete = document.querySelector("form");
 
-  atualizarValoresFrete();
-  limparDigitosFrete("chaveNfe", 44);
-  limparDigitosFrete("origemIbge", 7);
-  limparDigitosFrete("destinoIbge", 7);
-});
+if (formularioFrete) {
+  formularioFrete.addEventListener("submit", function (event) {
+    if (!validarPrevisaoEntrega()) {
+      event.preventDefault();
+      document.getElementById("previsaoEntrega").reportValidity();
+      return;
+    }
+
+    atualizarValoresFrete();
+    limparDigitosFrete("chaveNfe", 44);
+    limparDigitosFrete("origemIbge", 7);
+    limparDigitosFrete("destinoIbge", 7);
+  });
+}

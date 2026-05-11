@@ -70,6 +70,7 @@ function limparCampoNumerico(id, limite) {
 function configurarChavePix() {
   var tipoPix = document.getElementById("tipoPix");
   var chavePix = document.getElementById("chavePix");
+  var tipoAtual;
 
   if (!tipoPix || !chavePix) {
     return;
@@ -114,7 +115,17 @@ function configurarChavePix() {
     }
   });
 
-  tipoPix.addEventListener("change", aplicar);
+  tipoAtual = tipoPix.value;
+
+  tipoPix.addEventListener("change", function () {
+    if (tipoPix.value !== tipoAtual) {
+      chavePix.value = "";
+      tipoAtual = tipoPix.value;
+    }
+
+    aplicar();
+  });
+
   aplicar();
 }
 
