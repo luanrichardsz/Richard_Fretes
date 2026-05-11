@@ -1081,6 +1081,10 @@ textarea:disabled:focus {
     width: 13%;
 }
 
+.veiculo-page td.status-column {
+    text-align: center;
+}
+
 .veiculo-page .actions-column {
     width: 12%;
 }
@@ -1095,6 +1099,10 @@ textarea:disabled:focus {
 .veiculo-page .status-stack,
 .veiculo-page .table-actions {
     width: 100%;
+}
+
+.veiculo-page .status-stack {
+    align-items: center;
 }
 
 .veiculo-page .table-actions {
