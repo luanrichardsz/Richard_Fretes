@@ -2,6 +2,8 @@ package br.com.veiculo;
 
 import br.com.exception.CadastroException;
 import br.com.frete.FreteDAO;
+import br.com.manutencao.ManutencaoVeiculoDAO;
+import br.com.manutencao.ResumoManutencaoVeiculo;
 import br.com.util.ValidationUtils;
 
 import java.time.LocalDate;
@@ -10,18 +12,20 @@ public class VeiculoBO {
 
     private final VeiculoDAO veiculoDAO;
     private final FreteDAO freteDAO;
+    private final ManutencaoVeiculoDAO manutencaoDAO;
 
     public VeiculoBO() {
-        this(new VeiculoDAO(), new FreteDAO());
+        this(new VeiculoDAO(), new FreteDAO(), new ManutencaoVeiculoDAO());
     }
 
     public VeiculoBO(VeiculoDAO veiculoDAO) {
-        this(veiculoDAO, new FreteDAO());
+        this(veiculoDAO, new FreteDAO(), new ManutencaoVeiculoDAO());
     }
 
-    public VeiculoBO(VeiculoDAO veiculoDAO, FreteDAO freteDAO) {
+    public VeiculoBO(VeiculoDAO veiculoDAO, FreteDAO freteDAO, ManutencaoVeiculoDAO manutencaoDAO) {
         this.veiculoDAO = veiculoDAO;
         this.freteDAO = freteDAO;
+        this.manutencaoDAO = manutencaoDAO;
     }
 
     public void salvar(Veiculo veiculo) throws CadastroException {
@@ -137,6 +141,18 @@ public class VeiculoBO {
             throw new CadastroException("Cliente responsável pelo veículo é obrigatório.");
         }
 
+        ResumoManutencaoVeiculo resumo = emEdicao && veiculo.getId() != null
+                ? manutencaoDAO.resumirPorVeiculo(veiculo.getId())
+                : new ResumoManutencaoVeiculo(false, false, false, false, null, null, null, null);
+
+        if (resumo.isManutencaoEmAndamento() && veiculo.getStatus() != Veiculo.StatusVeiculo.EM_MANUTENCAO) {
+            throw new CadastroException("Enquanto existir manutenção em andamento, o veículo deve permanecer com status Em manutenção.");
+        }
+
+        if (veiculo.getStatus() == Veiculo.StatusVeiculo.EM_MANUTENCAO && !resumo.isManutencaoEmAndamento()) {
+            throw new CadastroException("O status Em manutenção só pode ser usado quando existir manutenção em andamento para o veículo.");
+        }
+
         if (emEdicao
                 && veiculo.getStatus() == Veiculo.StatusVeiculo.DISPONIVEL
                 && freteDAO.existeFreteEmTransitoParaVeiculo(veiculo.getId(), null)) {
@@ -148,6 +164,7 @@ public class VeiculoBO {
         veiculo.setPlaca(placa);
         veiculo.setRenavam(renavam);
         veiculo.setTipo(veiculo.getTipo().trim());
+        veiculo.setManutencaoPendente(resumo.isManutencaoPendente());
 
         if (veiculo.getTipoOutros() != null) {
             veiculo.setTipoOutros(veiculo.getTipoOutros().trim());

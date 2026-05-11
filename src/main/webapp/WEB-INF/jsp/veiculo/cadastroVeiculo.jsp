@@ -15,6 +15,58 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        .maintenance-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+        .maintenance-summary-card {
+            min-width: 0;
+            padding: 18px;
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at top right, rgba(47, 124, 255, 0.08), transparent 36%),
+                rgba(255, 255, 255, 0.035);
+            border: 1px solid var(--border);
+        }
+        .maintenance-summary-card.full {
+            grid-column: 1 / -1;
+        }
+        .maintenance-summary-card small {
+            display: block;
+            color: var(--muted);
+            font-size: 0.7rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .maintenance-summary-card strong {
+            display: block;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 900;
+            line-height: 1.35;
+        }
+        .maintenance-summary-card span {
+            display: block;
+            color: var(--text-soft);
+            font-size: 0.82rem;
+            font-weight: 700;
+            line-height: 1.55;
+            margin-top: 8px;
+        }
+        @media (max-width: 768px) {
+            .maintenance-summary-grid {
+                grid-template-columns: 1fr;
+            }
+            .maintenance-summary-card.full {
+                grid-column: auto;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -375,11 +427,12 @@
                                 name="manutencaoPendente"
                                 value="true"
                                 ${veiculo.manutencaoPendente ? 'checked' : ''}
+                                disabled
                             />
 
                             <span>
                                 <strong>Manutenção pendente</strong>
-                                <small>Marque esta opção caso o veículo não esteja liberado para operação.</small>
+                                <small>Esse indicador agora é controlado automaticamente pelo histórico de manutenções do veículo.</small>
                             </span>
                         </label>
                     </div>
@@ -387,6 +440,71 @@
                 </div>
 
             </div>
+
+            <c:if test="${not empty veiculo.id}">
+                <div class="form-section">
+
+                    <div class="form-section-header">
+                        <div class="form-section-icon">
+                            <i class="fas fa-screwdriver-wrench"></i>
+                        </div>
+
+                        <div>
+                            <h3>Controle de manutenção</h3>
+                            <p>Agenda, histórico recente e atalhos para manter o veículo pronto para operação.</p>
+                        </div>
+                    </div>
+
+                    <div class="maintenance-summary-grid">
+                        <div class="maintenance-summary-card">
+                            <small>Próxima manutenção</small>
+                            <strong>${not empty resumoManutencao and not empty resumoManutencao.proximaDataPrevista ? resumoManutencao.proximaDataPrevista : 'Sem agenda aberta'}</strong>
+                            <span>${not empty resumoManutencao and not empty resumoManutencao.proximaDescricao ? resumoManutencao.proximaDescricao : 'Nenhuma manutenção agendada para este veículo.'}</span>
+                        </div>
+
+                        <div class="maintenance-summary-card">
+                            <small>Última concluída</small>
+                            <strong>${not empty resumoManutencao and not empty resumoManutencao.ultimaDataRealizacao ? resumoManutencao.ultimaDataRealizacao : 'Sem histórico'}</strong>
+                            <span>${not empty resumoManutencao and not empty resumoManutencao.ultimaDescricao ? resumoManutencao.ultimaDescricao : 'Ainda não existe manutenção concluída registrada.'}</span>
+                        </div>
+
+                        <div class="maintenance-summary-card full">
+                            <small>Situação atual</small>
+                            <strong>
+                                <c:choose>
+                                    <c:when test="${not empty resumoManutencao and resumoManutencao.manutencaoEmAndamento}">
+                                        Manutenção em andamento
+                                    </c:when>
+                                    <c:when test="${not empty resumoManutencao and resumoManutencao.manutencaoVencida}">
+                                        Manutenção vencida
+                                    </c:when>
+                                    <c:when test="${not empty resumoManutencao and resumoManutencao.manutencaoProxima}">
+                                        Manutenção próxima
+                                    </c:when>
+                                    <c:when test="${not empty resumoManutencao and resumoManutencao.manutencaoPendente}">
+                                        Manutenção pendente
+                                    </c:when>
+                                    <c:otherwise>
+                                        Veículo sem pendência de manutenção
+                                    </c:otherwise>
+                                </c:choose>
+                            </strong>
+                            <span>O status operacional do veículo é sincronizado com as manutenções registradas.</span>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="manutencoes?veiculoId=${veiculo.id}" class="btn-small">
+                            <i class="fas fa-list"></i>
+                            Ver histórico completo
+                        </a>
+                        <a href="manutencoes?acao=novo&veiculoId=${veiculo.id}" class="btn-secondary">
+                            <i class="fas fa-plus"></i>
+                            Nova manutenção
+                        </a>
+                    </div>
+                </div>
+            </c:if>
 
             <div class="form-actions">
                 <a href="veiculos" class="btn-small">

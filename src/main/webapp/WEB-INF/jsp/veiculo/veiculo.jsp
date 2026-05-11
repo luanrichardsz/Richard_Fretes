@@ -172,6 +172,7 @@
                     <c:when test="${not empty veiculos}">
 
                         <c:forEach items="${veiculos}" var="v">
+                            <c:set var="resumoManutencao" value="${resumosManutencaoPorVeiculo[v.id]}" />
                             <tr
                                 class="veiculo-row"
                                 data-status="${v.status}"
@@ -314,11 +315,30 @@
                                             </span>
                                         </c:if>
 
+                                        <c:if test="${not empty resumoManutencao and resumoManutencao.manutencaoVencida}">
+                                            <span class="badge red status-badge">
+                                                <i class="fas fa-triangle-exclamation"></i>
+                                                Vencida
+                                            </span>
+                                        </c:if>
+
+                                        <c:if test="${not empty resumoManutencao and not resumoManutencao.manutencaoVencida and resumoManutencao.manutencaoProxima}">
+                                            <span class="badge orange status-badge">
+                                                <i class="fas fa-calendar-days"></i>
+                                                Próxima
+                                            </span>
+                                        </c:if>
+
                                     </div>
                                 </td>
 
                                 <td class="actions-column">
                                     <div class="table-actions">
+
+                                        <a href="manutencoes?veiculoId=${v.id}" class="btn-small maintenance-action-btn" title="Abrir manutenção do veículo">
+                                            <i class="fas fa-screwdriver-wrench"></i>
+                                            Manutenção
+                                        </a>
 
                                         <a href="veiculos?acao=editar&id=${v.id}" class="btn-small" title="Editar veículo">
                                             <i class="fas fa-pen"></i>

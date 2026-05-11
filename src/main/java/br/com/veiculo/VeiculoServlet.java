@@ -1,6 +1,9 @@
 package br.com.veiculo;
 
 import br.com.cliente.ClienteDAO;
+import br.com.manutencao.ManutencaoVeiculo;
+import br.com.manutencao.ManutencaoVeiculoDAO;
+import br.com.manutencao.ResumoManutencaoVeiculo;
 import br.com.motorista.MotoristaDAO;
 import br.com.exception.CadastroException;
 import br.com.cliente.Cliente;
@@ -17,7 +20,9 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/veiculos")
 public class VeiculoServlet extends HttpServlet {
@@ -25,6 +30,7 @@ public class VeiculoServlet extends HttpServlet {
     private VeiculoDAO veiculoDAO = new VeiculoDAO();
     private VeiculoBO veiculoBO = new VeiculoBO(veiculoDAO);
     private MotoristaDAO motoristaDAO = new MotoristaDAO();
+    private ManutencaoVeiculoDAO manutencaoDAO = new ManutencaoVeiculoDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -226,6 +232,11 @@ public class VeiculoServlet extends HttpServlet {
             req.setAttribute("motoristas", motoristas);
         }
 
+        if (veiculo != null && veiculo.getId() != null) {
+            req.setAttribute("resumoManutencao", manutencaoDAO.resumirPorVeiculo(veiculo.getId()));
+            req.setAttribute("manutencoesVeiculo", manutencaoDAO.listarPorVeiculo(veiculo.getId()));
+        }
+
         req.getRequestDispatcher("/WEB-INF/jsp/veiculo/cadastroVeiculo.jsp").forward(req, resp);
     }
 
@@ -241,5 +252,18 @@ public class VeiculoServlet extends HttpServlet {
         }
 
         req.setAttribute("veiculos", veiculos);
+        req.setAttribute("resumosManutencaoPorVeiculo", montarResumosManutencao(veiculos));
+    }
+
+    private Map<Integer, ResumoManutencaoVeiculo> montarResumosManutencao(List<Veiculo> veiculos) {
+        Map<Integer, ResumoManutencaoVeiculo> resumos = new HashMap<>();
+
+        for (Veiculo veiculo : veiculos) {
+            if (veiculo.getId() != null) {
+                resumos.put(veiculo.getId(), manutencaoDAO.resumirPorVeiculo(veiculo.getId()));
+            }
+        }
+
+        return resumos;
     }
 }

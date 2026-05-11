@@ -56,6 +56,11 @@
                 <span>Veículos</span>
             </a>
 
+            <a href="manutencoes" class="nav-item">
+                <i class="fas fa-screwdriver-wrench"></i>
+                <span>Manutenções</span>
+            </a>
+
             <a href="enderecos" class="nav-item">
                 <i class="fas fa-location-dot"></i>
                 <span>Endereços</span>
@@ -442,6 +447,20 @@
                         <span>Frota</span>
                         <h3>Veículos</h3>
                         <p>Gerencie placas, modelos, capacidades e disponibilidade.</p>
+                    </div>
+
+                    <i class="fas fa-arrow-right module-arrow"></i>
+                </a>
+
+                <a href="manutencoes" class="module-card">
+                    <div class="module-icon">
+                        <i class="fas fa-screwdriver-wrench"></i>
+                    </div>
+
+                    <div>
+                        <span>Oficina</span>
+                        <h3>Manutenções</h3>
+                        <p>Agende preventivas, acompanhe corretivas e sinalize veículos indisponíveis.</p>
                     </div>
 
                     <i class="fas fa-arrow-right module-arrow"></i>

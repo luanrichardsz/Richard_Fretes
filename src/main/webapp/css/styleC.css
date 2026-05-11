@@ -1082,7 +1082,14 @@ textarea:disabled:focus {
 }
 
 .veiculo-page .actions-column {
-    width: 10%;
+    width: 12%;
+}
+
+.veiculo-page td.actions-column {
+    vertical-align: top;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
 }
 
 .veiculo-page .status-stack,
@@ -1092,11 +1099,17 @@ textarea:disabled:focus {
 
 .veiculo-page .table-actions {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+    gap: 10px;
 }
 
 .veiculo-page .table-actions .btn-small {
-    width: 100%;
+    width: min(100%, 132px);
+    white-space: nowrap;
+}
+
+.veiculo-page .table-actions .maintenance-action-btn {
+    min-width: 132px;
 }
 
 .frete-page .container {
@@ -1184,10 +1197,15 @@ textarea:disabled:focus {
     .veiculo-page .table-actions {
         flex-direction: row;
         align-items: center;
+        justify-content: center;
     }
 
     .veiculo-page .table-actions .btn-small {
         width: auto;
+    }
+
+    .veiculo-page .table-actions .maintenance-action-btn {
+        min-width: 0;
     }
 
     .frete-page .table-actions {
