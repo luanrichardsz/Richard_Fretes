@@ -264,6 +264,31 @@
   line-height: 1.55;
 }
 
+.occurrence-evidence {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.occurrence-evidence-link {
+  color: var(--royal-light);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.occurrence-evidence-link:hover {
+  text-decoration: underline;
+}
+
+.occurrence-evidence-image {
+  width: min(320px, 100%);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.14);
+}
+
 .timeline-step.active {
   border-color: var(--royal-border);
   background:

@@ -379,6 +379,23 @@
                     </form>
                 </div>
 
+                <div class="action-card">
+                    <div class="action-card-top">
+                        <div class="action-card-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <span class="badge gray">Histórico</span>
+                    </div>
+
+                    <h3>Registrar ocorrência</h3>
+                    <p>Use para saída do pátio ou qualquer observação operacional. Só a ocorrência de entrega realizada encerra o frete.</p>
+
+                    <a href="ocorrencias?acao=novo&freteId=${frete.id}&retornoFreteId=${frete.id}" class="btn-small">
+                        <i class="fas fa-plus"></i>
+                        Nova Ocorrência
+                    </a>
+                </div>
+
                 <div class="action-card danger-card">
                     <div class="action-card-top">
                         <div class="action-card-icon danger-icon">
@@ -432,7 +449,7 @@
                     </div>
 
                     <h3>Registrar ocorrência</h3>
-                    <p>Lance um evento operacional intermediário para manter o histórico atualizado.</p>
+                    <p>Lance um evento operacional intermediário. Essas ocorrências mantêm o frete em andamento e não encerram a entrega.</p>
 
                     <a href="ocorrencias?acao=novo&freteId=${frete.id}&retornoFreteId=${frete.id}" class="btn-small">
                         <i class="fas fa-plus"></i>
@@ -451,7 +468,7 @@
                     </div>
 
                     <h3>Registrar entrega realizada</h3>
-                    <p>Abra o cadastro da ocorrência final de entrega com dados do recebedor e documento.</p>
+                    <p>Abra o comprovante digital com recebedor, foto, horário e localização automática da entrega.</p>
 
                     <a href="ocorrencias?acao=novo&freteId=${frete.id}&tipo=ENTREGA_REALIZADA&retornoFreteId=${frete.id}" class="btn-primary">
                         <i class="fas fa-box-open"></i>
@@ -468,7 +485,7 @@
                     </div>
 
                     <h3>Cadastrar ocorrência</h3>
-                    <p>Use para avaria, extravio, tentativa de entrega ou atualizações da viagem.</p>
+                    <p>Use para avaria, extravio, tentativa de entrega ou atualizações da viagem. Só a entrega realizada fecha o frete.</p>
 
                     <a href="ocorrencias?acao=novo&freteId=${frete.id}&retornoFreteId=${frete.id}" class="btn-small">
                         <i class="fas fa-plus"></i>
@@ -554,6 +571,38 @@
                                         - ${ocorrencia.recebedorDocumento}
                                     </c:if>
                                 </p>
+                            </c:if>
+
+                            <c:if test="${not empty ocorrencia.latitude && not empty ocorrencia.longitude}">
+                                <p class="muted occurrence-meta">
+                                    Localização: ${ocorrencia.latitude}, ${ocorrencia.longitude}
+                                    <a
+                                        href="https://www.google.com/maps?q=${ocorrencia.latitude},${ocorrencia.longitude}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="occurrence-evidence-link"
+                                    >
+                                        Abrir no mapa
+                                    </a>
+                                </p>
+                            </c:if>
+
+                            <c:if test="${not empty ocorrencia.fotoEvidenciaUrl}">
+                                <div class="occurrence-evidence">
+                                    <a
+                                        href="${ocorrencia.fotoEvidenciaUrl}"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="occurrence-evidence-link"
+                                    >
+                                        Abrir evidência
+                                    </a>
+                                    <img
+                                        src="${ocorrencia.fotoEvidenciaUrl}"
+                                        alt="Foto de evidência da ocorrência ${ocorrencia.tipo}"
+                                        class="occurrence-evidence-image"
+                                    />
+                                </div>
                             </c:if>
                         </div>
                     </c:forEach>

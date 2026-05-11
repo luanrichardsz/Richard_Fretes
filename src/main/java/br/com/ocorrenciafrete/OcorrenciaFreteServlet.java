@@ -10,17 +10,30 @@ import br.com.usuario.Usuario;
 import br.com.util.ValidationUtils;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.Part;
 import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @WebServlet("/ocorrencias")
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,
+    maxFileSize = 5 * 1024 * 1024,
+    maxRequestSize = 6 * 1024 * 1024
+)
 public class OcorrenciaFreteServlet extends HttpServlet {
 
     private OcorrenciaFreteDAO ocorrenciaDAO = new OcorrenciaFreteDAO();
@@ -66,6 +79,12 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("text/html;charset=UTF-8");
 
+        Usuario usuarioLogado = (Usuario) req.getSession().getAttribute("usuarioAutenticado");
+        if (usuarioLogado == null) {
+            resp.sendRedirect("login");
+            return;
+        }
+
         OcorrenciaFrete ocorrencia = new OcorrenciaFrete();
 
         String idParam = req.getParameter("id");
@@ -94,7 +113,7 @@ public class OcorrenciaFreteServlet extends HttpServlet {
             ocorrencia.setDescricao(req.getParameter("descricao"));
             ocorrencia.setRecebedorNome(req.getParameter("recebedorNome"));
             ocorrencia.setRecebedorDocumento(req.getParameter("recebedorDocumento"));
-            ocorrencia.setFotoEvidenciaUrl(req.getParameter("fotoEvidenciaUrl"));
+            ocorrencia.setFotoEvidenciaUrl(processarFotoEvidencia(req));
 
             if (!isEdicao) {
                 ocorrencia.setDataHora(LocalDateTime.now());
@@ -113,13 +132,13 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         } catch (FreteException e) {
             req.setAttribute("erro", e.getMessage());
             req.setAttribute("ocorrencia", ocorrencia);
-            carregarFormulario(req, null, ocorrencia);
+            carregarFormulario(req, usuarioLogado, ocorrencia);
             req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
             req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
         } catch (RuntimeException e) {
             req.setAttribute("erro", "Revise os dados da ocorrência e tente novamente.");
             req.setAttribute("ocorrencia", ocorrencia);
-            carregarFormulario(req, null, ocorrencia);
+            carregarFormulario(req, usuarioLogado, ocorrencia);
             req.setAttribute("tipoOcorrenciaOptions", TipoOcorrencia.values());
             req.getRequestDispatcher("/WEB-INF/jsp/ocorrencia/cadastroOcorrenciaFrete.jsp").forward(req, resp);
         }
@@ -207,6 +226,10 @@ public class OcorrenciaFreteServlet extends HttpServlet {
 
     private void carregarFormulario(HttpServletRequest req, Usuario usuarioLogado, OcorrenciaFrete ocorrencia) {
         req.setAttribute("ocorrencia", ocorrencia);
+        req.setAttribute(
+                "modoComprovanteEntrega",
+                ocorrencia != null && ocorrencia.getTipo() == TipoOcorrencia.ENTREGA_REALIZADA
+        );
 
         String retornoFreteId = req.getParameter("retornoFreteId");
         if (!ValidationUtils.estaVazio(retornoFreteId)) {
@@ -244,5 +267,63 @@ public class OcorrenciaFreteServlet extends HttpServlet {
         }
 
         return ocorrencia;
+    }
+
+    private String processarFotoEvidencia(HttpServletRequest req) throws IOException, ServletException, FreteException {
+        String fotoAtual = req.getParameter("fotoEvidenciaUrlAtual");
+        Part fotoPart = req.getPart("fotoEvidenciaArquivo");
+
+        if (fotoPart == null || fotoPart.getSize() <= 0) {
+            return fotoAtual;
+        }
+
+        String contentType = fotoPart.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("image/")) {
+            throw new FreteException("Envie uma imagem válida para a evidência da entrega.");
+        }
+
+        String extensao = resolverExtensaoImagem(fotoPart);
+        String nomeArquivo = "comprovante-" + UUID.randomUUID() + extensao;
+        String caminhoUploads = getServletContext().getRealPath("/uploads/comprovantes");
+
+        if (ValidationUtils.estaVazio(caminhoUploads)) {
+            throw new FreteException("Não foi possível preparar a pasta de comprovantes no servidor.");
+        }
+
+        Path diretorioUploads = Paths.get(caminhoUploads);
+        Files.createDirectories(diretorioUploads);
+
+        Path destinoArquivo = diretorioUploads.resolve(nomeArquivo);
+        try (InputStream inputStream = fotoPart.getInputStream()) {
+            Files.copy(inputStream, destinoArquivo, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        return req.getContextPath() + "/uploads/comprovantes/" + nomeArquivo;
+    }
+
+    private String resolverExtensaoImagem(Part fotoPart) {
+        String submittedFileName = fotoPart.getSubmittedFileName();
+        if (submittedFileName != null) {
+            int ultimoPonto = submittedFileName.lastIndexOf('.');
+            if (ultimoPonto >= 0 && ultimoPonto < submittedFileName.length() - 1) {
+                String extensao = submittedFileName.substring(ultimoPonto).toLowerCase();
+                if (extensao.matches("\\.(jpg|jpeg|png|gif|webp)$")) {
+                    return extensao;
+                }
+            }
+        }
+
+        String contentType = fotoPart.getContentType();
+        if ("image/png".equalsIgnoreCase(contentType)) {
+            return ".png";
+        }
+        if ("image/gif".equalsIgnoreCase(contentType)) {
+            return ".gif";
+        }
+        if ("image/webp".equalsIgnoreCase(contentType)) {
+            return ".webp";
+        }
+
+        return ".jpg";
     }
 }

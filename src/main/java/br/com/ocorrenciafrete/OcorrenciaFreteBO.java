@@ -10,6 +10,7 @@ import br.com.util.ValidationUtils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class OcorrenciaFreteBO {
@@ -40,7 +41,7 @@ public class OcorrenciaFreteBO {
             conn = abrirConexao();
             conn.setAutoCommit(false);
             ocorrenciaDAO.salvar(conn, ocorrencia);
-            atualizarFreteEntregaSeNecessario(conn, frete, ocorrencia);
+            sincronizarFreteComOcorrencia(conn, frete, ocorrencia);
             conn.commit();
         } catch (SQLException e) {
             rollbackSilencioso(conn);
@@ -58,7 +59,7 @@ public class OcorrenciaFreteBO {
             conn = abrirConexao();
             conn.setAutoCommit(false);
             ocorrenciaDAO.atualizar(conn, ocorrencia);
-            atualizarFreteEntregaSeNecessario(conn, frete, ocorrencia);
+            sincronizarFreteComOcorrencia(conn, frete, ocorrencia);
             conn.commit();
         } catch (SQLException e) {
             rollbackSilencioso(conn);
@@ -90,9 +91,10 @@ public class OcorrenciaFreteBO {
             throw new FreteException("Frete não encontrado para a ocorrência.");
         }
 
-        if (frete.getStatus() == Frete.StatusFrete.ENTREGUE
+        if (ocorrencia.getId() == null
+                && (frete.getStatus() == Frete.StatusFrete.ENTREGUE
                 || frete.getStatus() == Frete.StatusFrete.NAO_ENTREGUE
-                || frete.getStatus() == Frete.StatusFrete.CANCELADO) {
+                || frete.getStatus() == Frete.StatusFrete.CANCELADO)) {
             throw new FreteException("Não é permitido registrar ocorrência para frete ENTREGUE, NÃO ENTREGUE ou CANCELADO.");
         }
 
@@ -117,13 +119,19 @@ public class OcorrenciaFreteBO {
             ocorrencia.setRecebedorDocumento(documento);
         }
 
+        validarCoordenadas(ocorrencia);
+
         if (ocorrencia.getTipo() == OcorrenciaFrete.TipoOcorrencia.ENTREGA_REALIZADA) {
-            if (frete.getStatus() != Frete.StatusFrete.EM_TRANSITO) {
-                throw new FreteException("Só é permitido registrar Entrega Realizada para frete em trânsito.");
+            if (frete.getStatus() == Frete.StatusFrete.NAO_ENTREGUE
+                    || frete.getStatus() == Frete.StatusFrete.CANCELADO) {
+                throw new FreteException("Não é permitido finalizar entrega para frete NÃO ENTREGUE ou CANCELADO.");
             }
             if (ValidationUtils.estaVazio(ocorrencia.getRecebedorNome())
                     || ValidationUtils.estaVazio(ocorrencia.getRecebedorDocumento())) {
                 throw new FreteException("Entrega Realizada exige nome e documento do recebedor.");
+            }
+            if (ValidationUtils.estaVazio(ocorrencia.getFotoEvidenciaUrl())) {
+                throw new FreteException("Entrega Realizada exige uma foto de evidência.");
             }
         }
 
@@ -145,18 +153,94 @@ public class OcorrenciaFreteBO {
         return frete;
     }
 
-    private void atualizarFreteEntregaSeNecessario(Connection conn, Frete frete, OcorrenciaFrete ocorrencia)
-            throws SQLException {
-        if (ocorrencia.getTipo() != OcorrenciaFrete.TipoOcorrencia.ENTREGA_REALIZADA) {
+    private void validarCoordenadas(OcorrenciaFrete ocorrencia) throws FreteException {
+        BigDecimal latitude = ocorrencia.getLatitude();
+        BigDecimal longitude = ocorrencia.getLongitude();
+
+        if ((latitude == null) != (longitude == null)) {
+            throw new FreteException("Informe latitude e longitude juntas.");
+        }
+
+        if (latitude == null) {
             return;
         }
 
-        frete.setStatus(Frete.StatusFrete.ENTREGUE);
-        if (frete.getDataEntrega() == null) {
-            frete.setDataEntrega(ocorrencia.getDataHora());
+        if (latitude.compareTo(BigDecimal.valueOf(-90)) < 0
+                || latitude.compareTo(BigDecimal.valueOf(90)) > 0) {
+            throw new FreteException("Latitude inválida.");
         }
+
+        if (longitude.compareTo(BigDecimal.valueOf(-180)) < 0
+                || longitude.compareTo(BigDecimal.valueOf(180)) > 0) {
+            throw new FreteException("Longitude inválida.");
+        }
+    }
+
+    private void sincronizarFreteComOcorrencia(Connection conn, Frete frete, OcorrenciaFrete ocorrencia)
+            throws SQLException {
+        if (frete.getStatus() == Frete.StatusFrete.NAO_ENTREGUE
+                || frete.getStatus() == Frete.StatusFrete.CANCELADO) {
+            return;
+        }
+
+        if (ocorrencia.getTipo() == OcorrenciaFrete.TipoOcorrencia.ENTREGA_REALIZADA) {
+            marcarFreteComoEntregue(conn, frete, ocorrencia);
+            return;
+        }
+
+        atualizarFreteEmAndamentoSeNecessario(conn, frete, ocorrencia);
+    }
+
+    private void marcarFreteComoEntregue(Connection conn, Frete frete, OcorrenciaFrete ocorrencia) throws SQLException {
+        if (frete.getDataSaida() == null) {
+            frete.setDataSaida(ocorrencia.getDataHora());
+        }
+
+        frete.setStatus(Frete.StatusFrete.ENTREGUE);
+        frete.setDataEntrega(ocorrencia.getDataHora());
         freteDAO.atualizar(conn, frete);
         veiculoDAO.atualizarStatus(conn, frete.getVeiculoId(), Veiculo.StatusVeiculo.DISPONIVEL);
+    }
+
+    private void atualizarFreteEmAndamentoSeNecessario(Connection conn, Frete frete, OcorrenciaFrete ocorrencia)
+            throws SQLException {
+        Frete.StatusFrete statusOriginal = frete.getStatus();
+        Frete.StatusFrete proximoStatus = resolverStatusOperacional(frete, ocorrencia);
+
+        if (proximoStatus == statusOriginal) {
+            return;
+        }
+
+        if (frete.getDataSaida() == null
+                && (proximoStatus == Frete.StatusFrete.SAIDA_CONFIRMADA
+                || proximoStatus == Frete.StatusFrete.EM_TRANSITO)) {
+            frete.setDataSaida(ocorrencia.getDataHora());
+        }
+
+        frete.setStatus(proximoStatus);
+        freteDAO.atualizar(conn, frete);
+
+        if (proximoStatus == Frete.StatusFrete.SAIDA_CONFIRMADA
+                || proximoStatus == Frete.StatusFrete.EM_TRANSITO) {
+            veiculoDAO.atualizarStatus(conn, frete.getVeiculoId(), Veiculo.StatusVeiculo.EM_VIAGEM);
+        }
+    }
+
+    private Frete.StatusFrete resolverStatusOperacional(Frete frete, OcorrenciaFrete ocorrencia) {
+        if (ocorrencia.getTipo() == OcorrenciaFrete.TipoOcorrencia.SAIDA_DO_PATIO) {
+            if (frete.getStatus() == Frete.StatusFrete.EMITIDO) {
+                return Frete.StatusFrete.SAIDA_CONFIRMADA;
+            }
+
+            return frete.getStatus();
+        }
+
+        if (frete.getStatus() == Frete.StatusFrete.EMITIDO
+                || frete.getStatus() == Frete.StatusFrete.SAIDA_CONFIRMADA) {
+            return Frete.StatusFrete.EM_TRANSITO;
+        }
+
+        return frete.getStatus();
     }
 
     private Connection abrirConexao() throws SQLException {
