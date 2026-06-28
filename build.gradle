@@ -34,6 +34,6 @@ dependencies {
 // Configuração do servidor
 gretty {
    servletContainer = 'tomcat9' // Força o uso do Tomcat 9
-   contextPath = '/RichardFretes' // Como vai ficar a URL no navegador
+   contextPath = '/RichardFretes/login' // Como vai ficar a URL no navegador
    fastReload = true
 }
