@@ -10,8 +10,8 @@
 
     <title>Richard Fretes</title>
 
-    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
-    <link rel="stylesheet" href="/RichardFretes/css/styleMenu.css" />
+    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/img/richardFretes01-removebg-preview.ico"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styleMenu.css" />
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -25,7 +25,7 @@
 
         <div class="brand-area">
             <div class="brand-symbol">
-                <img src="/RichardFretes/img/richardLogo.png" alt="Richard Fretes" class="brand-logo">
+                <img src="${pageContext.request.contextPath}/img/richardLogo.png" alt="Richard Fretes" class="brand-logo">
             </div>
 
             <div class="brand-text">
@@ -518,7 +518,7 @@
 
 </div>
 
-<script src="/RichardFretes/js/funcoesMenu.js"></script>
+<script src="${pageContext.request.contextPath}/js/funcoesMenu.js"></script>
 
 </body>
 </html>

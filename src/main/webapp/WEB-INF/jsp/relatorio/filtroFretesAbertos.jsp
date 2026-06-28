@@ -9,8 +9,8 @@
 
     <title>Relatório de Fretes em Aberto</title>
 
-    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
-    <link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/img/richardFretes01-removebg-preview.ico"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/styleC.css" />
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

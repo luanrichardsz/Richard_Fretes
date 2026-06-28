@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Ocorrências</title>
 
-<link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
-<link rel="stylesheet" href="/RichardFretes/css/styleC.css" />
+<link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/img/richardFretes01-removebg-preview.ico"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/styleC.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
@@ -217,7 +217,7 @@
 
 </main>
 
-<script src="/RichardFretes/js/funcoesDetalheFrete.js"></script>
+<script src="${pageContext.request.contextPath}/js/funcoesDetalheFrete.js"></script>
 
 </body>
 </html>

@@ -9,7 +9,7 @@
 
     <title>Acesso ao Sistema</title>
 
-    <link rel="icon" type="image/x-icon" href="/RichardFretes/img/richardFretes01-removebg-preview.ico"/>
+    <link rel="icon" type="image/x-icon" href="${pageContext.request.contextPath}/img/richardFretes01-removebg-preview.ico"/>
     <link rel="stylesheet" href="css/styleLogin.css" />
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -199,7 +199,7 @@
     </main>
 </div>
 
-<script src="/RichardFretes/js/funcoesLogin.js"></script>
+<script src="${pageContext.request.contextPath}/js/funcoesLogin.js"></script>
 
 </body>
 </html>
